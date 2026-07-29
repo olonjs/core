@@ -512,10 +512,10 @@ cat << 'END_OF_FILE_CONTENT' > "package.json"
     "dist:dna": "npm run dist"
   },
   "dependencies": {
-    "@olonjs/core": "^1.1.30",
-    "@olonjs/next": "^0.0.10",
-    "@olonjs/react": "^0.1.13",
-    "@olonjs/studio": "^0.1.13",
+    "@olonjs/core": "^1.1.31",
+    "@olonjs/next": "^0.0.11",
+    "@olonjs/react": "^0.1.14",
+    "@olonjs/studio": "^0.1.14",
     "clsx": "^2.1.1",
     "lucide-react": "^0.474.0",
     "next": "^15.5.0",
@@ -600,6 +600,9 @@ import { getFilePages } from '../src/lib/loaders/getFilePages';
 import { getFileSiteBundle } from '../src/lib/loaders/getFileSiteConfig';
 
 const {
+  assertCollectionRecordKeys,
+  buildCollectionContract,
+  buildCollectionContractHref,
   buildPageContract,
   buildPageManifest,
   buildPageManifestHref,
@@ -766,10 +769,28 @@ async function main(): Promise<void> {
 
   await writePublicJson('config/site.json', siteConfig);
 
+  // Emit collection contracts and validate keyed-object invariant
+  for (const [source, schema] of Object.entries(collectionSchemas)) {
+    const collectionPath = path.resolve(collectionsDir, source, `${source}.json`);
+    try {
+      const collectionData = (await readJsonFile(collectionPath)) as Record<string, unknown>;
+      assertCollectionRecordKeys(source, collectionData);
+      console.log(`[bake] Collection "${source}" keyed-object invariant OK`);
+    } catch (err) {
+      throw new Error(`[bake] Collection key invariant failed: ${(err as Error).message}`);
+    }
+
+    const contract = buildCollectionContract({ source, schema: schema as never });
+    const contractRelPath = buildCollectionContractHref(source).replace(/^\//, '');
+    await writePublicJson(contractRelPath, contract);
+    console.log(`[bake] Collection contract emitted: ${contractRelPath}`);
+  }
+
   const mcpManifest = buildSiteManifest({
     pages: pagesForManifest,
     schemas: schemas as never,
     siteConfig,
+    collectionSchemas: collectionSchemas as never,
   });
   await writePublicJson('mcp-manifest.json', mcpManifest);
 

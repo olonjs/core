@@ -1,6 +1,6 @@
 {
   "name": "@jsonpages/stack",
-  "version": "1.0.161",
+  "version": "1.0.162",
   "private": false,
   "type": "module",
   "description": "Compatibility bridge package. Use @olonjs/stack instead.",
@@ -18,7 +18,7 @@
     "stack-versions.json"
   ],
   "dependencies": {
-    "@olonjs/stack": "^1.0.161"
+    "@olonjs/stack": "^1.0.162"
   },
   "publishConfig": {
     "access": "public"
