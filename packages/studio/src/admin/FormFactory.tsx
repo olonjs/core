@@ -4,6 +4,8 @@ import { InputWidgets, WidgetType } from './InputRegistry';
 import { Plus, Trash2, ChevronDown, ChevronUp, ArrowUp, ArrowDown } from 'lucide-react';
 import { BaseWidgetProps } from '../lib/shared-types';
 import type { JsonPagesConfig } from '@olonjs/core';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
 
 /**
  * 🛠️ HELPER: Generates a default value based on the Zod schema.
@@ -176,6 +178,113 @@ export const FormFactory: React.FC<FormFactoryProps> = ({
         if (uiHint.startsWith('ui:collection-ref')) {
           const isFocusedField = fieldKeyMatches(effectiveFocusedFieldKey, key);
           const relationSource = getCollectionRefSource(uiHint);
+
+          // Multi-relation: one dropdown per {$ref}, same picker as libro→autore.
+          // "Create item" in the dropdown header is intentionally out of scope.
+          if (relationSource && effectiveSchema instanceof z.ZodArray) {
+            const relationCollection = isRecord(collections?.[relationSource])
+              ? (collections?.[relationSource] as Record<string, unknown>)
+              : {};
+            const relationEntries = Object.entries(relationCollection).filter(([, item]) =>
+              isRecord(item),
+            );
+            const relationItems = Array.isArray(value) ? value : [];
+            const selectedIds = relationItems
+              .map((item) => getRelationSelectedId(item))
+              .filter((id) => id.length > 0);
+            const fieldLabel = humanizeLabel(key);
+
+            return (
+              <div
+                key={key}
+                className={`mb-4 grid w-full gap-2 transition-opacity duration-200 ${fadeWhenUnfocused(inItemScope, isFocusedField)}`}
+                {...(isFocusedField ? { 'data-jp-focused-field': key } : {})}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <Label className="text-[11px] font-semibold tracking-[0.02em] text-zinc-300">
+                    {fieldLabel}
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      onChange({
+                        ...data,
+                        [key]: [...relationItems, { $ref: '' }],
+                      });
+                    }}
+                  >
+                    <Plus size={12} />
+                    Add {fieldLabel}
+                  </Button>
+                </div>
+
+                {relationItems.length === 0 ? (
+                  <p className="text-[11px] text-zinc-500">No relations yet.</p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {relationItems.map((item, index) => {
+                      const selectId = `collection-ref-${key}-${index}`;
+                      const selectedId = getRelationSelectedId(item);
+                      return (
+                        <div key={`${key}-${index}`} className="flex items-center gap-2">
+                          <label htmlFor={selectId} className="sr-only">
+                            {fieldLabel} {index + 1}
+                          </label>
+                          <select
+                            id={selectId}
+                            className="h-9 min-w-0 flex-1 rounded-md border border-zinc-700 bg-zinc-900/50 px-3 text-[13px] text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                            value={selectedId}
+                            onChange={(event) => {
+                              const itemId = event.target.value;
+                              if (!itemId) return;
+                              const next = [...relationItems];
+                              next[index] = buildCollectionItemRef(
+                                relationSource,
+                                itemId,
+                                collectionSource,
+                              );
+                              onChange({ ...data, [key]: next });
+                            }}
+                          >
+                            <option value="" disabled>
+                              Select...
+                            </option>
+                            {relationEntries.map(([recordKey, entry], entryIndex) => {
+                              const itemRecord = entry as Record<string, unknown>;
+                              const itemId =
+                                typeof itemRecord.id === 'string' ? itemRecord.id : recordKey;
+                              const takenByOther =
+                                selectedIds.includes(itemId) && itemId !== selectedId;
+                              return (
+                                <option key={itemId} value={itemId} disabled={takenByOther}>
+                                  {getRecordItemLabel(recordKey, itemRecord, entryIndex)}
+                                </option>
+                              );
+                            })}
+                          </select>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={`Remove ${fieldLabel} ${index + 1}`}
+                            onClick={() => {
+                              const next = relationItems.filter((_, i) => i !== index);
+                              onChange({ ...data, [key]: next });
+                            }}
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           if (
             relationSource &&
             !(effectiveSchema instanceof z.ZodRecord) &&

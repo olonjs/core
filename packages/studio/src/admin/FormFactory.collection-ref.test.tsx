@@ -122,6 +122,53 @@ describe('FormFactory ui:collection-ref', () => {
     expect(lastChange.item.title).toBe('Dune');
   });
 
+  it('renders array collection relations as one select per ref and can add/remove rows', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const postWithTagsSchema = z.object({
+      id: z.string().describe('ui:text'),
+      tags: z
+        .array(z.union([authorSchema, z.object({ $ref: z.string() })]))
+        .describe('ui:collection-ref:tags'),
+    });
+
+    render(
+      <StatefulFormFactory
+        schema={postWithTagsSchema}
+        initialData={{
+          id: 'post-1',
+          tags: [{ $ref: '../tags/tags.json#/design' }],
+        }}
+        collections={{
+          tags: {
+            design: { id: 'design', name: 'Design' },
+            process: { id: 'process', name: 'Process' },
+            writing: { id: 'writing', name: 'Writing' },
+          },
+        }}
+        collectionSource="posts"
+        onChange={onChange}
+      />
+    );
+
+    expect(screen.getByLabelText('Tags 1')).toHaveValue('design');
+
+    await user.click(screen.getByRole('button', { name: /add tags/i }));
+    expect(screen.getByLabelText('Tags 2')).toHaveValue('');
+
+    await user.selectOptions(screen.getByLabelText('Tags 2'), 'process');
+
+    const afterSelect = onChange.mock.calls[onChange.mock.calls.length - 1]?.[0];
+    expect(afterSelect.tags).toEqual([
+      { $ref: '../tags/tags.json#/design' },
+      { $ref: '../tags/tags.json#/process' },
+    ]);
+
+    await user.click(screen.getByRole('button', { name: /remove tags 1/i }));
+    const afterRemove = onChange.mock.calls[onChange.mock.calls.length - 1]?.[0];
+    expect(afterRemove.tags).toEqual([{ $ref: '../tags/tags.json#/process' }]);
+  });
+
   it('renders nested collection relations as selectors that emit authored refs', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
