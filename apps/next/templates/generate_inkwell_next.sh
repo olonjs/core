@@ -170,6 +170,8 @@ mkdir -p src/components/header \
          src/collections/tags \
          src/data/config \
          src/data/pages \
+         src/data/pages/posts \
+         src/data/pages/tags \
          src/data/collections/posts \
          src/data/collections/tags \
          src/lib
@@ -3184,7 +3186,7 @@ cat > src/data/pages/tags.json << 'EOF'
 EOF
 
 echo "-- Writing page: posts/[slug] (post detail + related-tags)..."
-cat > src/data/pages/post-detail.json << 'EOF'
+cat > src/data/pages/posts/[slug].json << 'EOF'
 {
   "id": "post-detail-page",
   "slug": "posts/[slug]",
@@ -3211,7 +3213,7 @@ cat > src/data/pages/post-detail.json << 'EOF'
         "title": "Filed under",
         "emptyLabel": "This post has no topics yet.",
         "item": { "$ref": "collection:current" },
-        "tags": { "$ref": "../collections/tags/tags.json" }
+        "tags": { "$ref": "../../collections/tags/tags.json" }
       },
       "settings": {}
     },
@@ -3229,7 +3231,7 @@ cat > src/data/pages/post-detail.json << 'EOF'
 EOF
 
 echo "-- Writing page: tags/[slug] (tag detail + tag-posts)..."
-cat > src/data/pages/tag-detail.json << 'EOF'
+cat > src/data/pages/tags/[slug].json << 'EOF'
 {
   "id": "tag-detail-page",
   "slug": "tags/[slug]",
@@ -3255,7 +3257,7 @@ cat > src/data/pages/tag-detail.json << 'EOF'
         "title": "Posts on this topic",
         "emptyLabel": "No posts carry this tag yet.",
         "item": { "$ref": "collection:current" },
-        "posts": { "$ref": "../collections/posts/posts.json" }
+        "posts": { "$ref": "../../collections/posts/posts.json" }
       },
       "settings": {}
     },
