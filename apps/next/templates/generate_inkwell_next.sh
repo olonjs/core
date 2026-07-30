@@ -9,8 +9,8 @@ echo "  INKWELL JOURNAL — OlonJS Next harness generator"
 echo "  CWD = tenant root ($(pwd))"
 echo "  No ThemeProvider — light/dark via document.documentElement.dataset.theme"
 echo "  Collections + cross-collection relations demo"
-echo "  posts -> tags  (post.tags = tag keys)"
-echo "  tags  -> posts (resolved at render by filtering posts)"
+echo "  posts -> tags  (post.tags = \$ref pointers / ui:collection-ref:tags)"
+echo "  tags  -> posts (resolved at render via tag-refs helpers)"
 echo "=============================================================="
 
 # -----------------------------------------------------------------------------
@@ -2897,7 +2897,13 @@ cat > src/data/config/theme.json << 'EOF'
         "weight": "800"
       }
     },
-    "borderRadius": { "sm": "4px", "md": "8px", "lg": "14px", "xl": "20px", "full": "9999px" },
+    "borderRadius": {
+      "sm": "4px",
+      "md": "8px",
+      "lg": "14px",
+      "xl": "20px",
+      "full": "9999px"
+    },
     "spacing": {
       "container-max": "1200px",
       "section-y": "96px",
@@ -2905,8 +2911,13 @@ cat > src/data/config/theme.json << 'EOF'
       "sidebar-w": "240px"
     },
     "zIndex": {
-      "base": "0", "elevated": "10", "dropdown": "100",
-      "sticky": "200", "overlay": "300", "modal": "400", "toast": "500"
+      "base": "0",
+      "elevated": "10",
+      "dropdown": "100",
+      "sticky": "200",
+      "overlay": "300",
+      "modal": "400",
+      "toast": "500"
     },
     "modes": {
       "light": {
@@ -2956,9 +2967,13 @@ cat > src/data/config/site.json << 'EOF'
       "logoText": "Inkwell",
       "logoHighlight": "journal",
       "announcement": "Collections demo: posts and tags, linked both ways",
-      "menu": { "$ref": "../config/menu.json#/main" }
+      "menu": {
+        "$ref": "../config/menu.json#/main"
+      }
     },
-    "settings": { "sticky": true }
+    "settings": {
+      "sticky": true
+    }
   },
   "footer": {
     "id": "global-footer",
@@ -2968,11 +2983,17 @@ cat > src/data/config/site.json << 'EOF'
       "tagline": "Notes on the craft of making software. An OlonJS demo tenant showing collections and cross-collection relations.",
       "email": "hello@inkwell-journal.example",
       "copyright": "© 2026 Inkwell Journal. Written slowly, shipped quietly.",
-      "menu": { "$ref": "../config/menu.json#/footer" }
+      "menu": {
+        "$ref": "../config/menu.json#/footer"
+      }
     },
-    "settings": { "showLogo": true }
+    "settings": {
+      "showLogo": true
+    }
   },
-  "identity": { "title": "Inkwell Journal" }
+  "identity": {
+    "title": "Inkwell Journal"
+  }
 }
 EOF
 
@@ -2980,17 +3001,54 @@ echo "-- Writing src/data/config/menu.json..."
 cat > src/data/config/menu.json << 'EOF'
 {
   "main": [
-    { "id": "menu-home", "label": "Home", "href": "/" },
-    { "id": "menu-posts", "label": "Posts", "href": "/posts" },
-    { "id": "menu-tags", "label": "Topics", "href": "/tags" },
-    { "id": "menu-about", "label": "About", "href": "/about" },
-    { "id": "menu-contact", "label": "Contact", "href": "/contact", "isCta": true }
+    {
+      "id": "menu-home",
+      "label": "Home",
+      "href": "/"
+    },
+    {
+      "id": "menu-posts",
+      "label": "Posts",
+      "href": "/posts"
+    },
+    {
+      "id": "menu-tags",
+      "label": "Topics",
+      "href": "/tags"
+    },
+    {
+      "id": "menu-about",
+      "label": "About",
+      "href": "/about"
+    },
+    {
+      "id": "menu-contact",
+      "label": "Contact",
+      "href": "/contact",
+      "isCta": true
+    }
   ],
   "footer": [
-    { "id": "footer-posts", "label": "Posts", "href": "/posts" },
-    { "id": "footer-tags", "label": "Topics", "href": "/tags" },
-    { "id": "footer-about", "label": "About", "href": "/about" },
-    { "id": "footer-contact", "label": "Contact", "href": "/contact" }
+    {
+      "id": "footer-posts",
+      "label": "Posts",
+      "href": "/posts"
+    },
+    {
+      "id": "footer-tags",
+      "label": "Topics",
+      "href": "/tags"
+    },
+    {
+      "id": "footer-about",
+      "label": "About",
+      "href": "/about"
+    },
+    {
+      "id": "footer-contact",
+      "label": "Contact",
+      "href": "/contact"
+    }
   ]
 }
 EOF
@@ -3016,11 +3074,27 @@ cat > src/data/pages/home.json << 'EOF'
         "title": "Notes on the",
         "titleHighlight": "craft of software",
         "subtitle": "Essays on design, engineering and process — published as a living demo of cross-collection relations: every post belongs to many tags, and every tag knows its posts without storing them twice.",
-        "primaryCta": { "id": "home-hero-cta-1", "label": "Read the posts", "href": "/posts", "variant": "primary" },
-        "secondaryCta": { "id": "home-hero-cta-2", "label": "Browse topics", "href": "/tags", "variant": "secondary" },
-        "image": { "url": "https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?w=2000&q=80", "alt": "Fountain pen nib in sharp close-up over paper" }
+        "primaryCta": {
+          "id": "home-hero-cta-1",
+          "label": "Read the posts",
+          "href": "/posts",
+          "variant": "primary"
+        },
+        "secondaryCta": {
+          "id": "home-hero-cta-2",
+          "label": "Browse topics",
+          "href": "/tags",
+          "variant": "secondary"
+        },
+        "image": {
+          "url": "https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?w=2000&q=80",
+          "alt": "Fountain pen nib in sharp close-up over paper"
+        }
       },
-      "settings": { "paddingTop": "xl", "paddingBottom": "none" }
+      "settings": {
+        "paddingTop": "xl",
+        "paddingBottom": "none"
+      }
     },
     {
       "id": "home-featured-posts",
@@ -3031,9 +3105,13 @@ cat > src/data/pages/home.json << 'EOF'
         "description": "The four most recent essays, pulled live from the posts collection and sorted by date.",
         "variant": "bento",
         "limit": 4,
-        "items": { "$ref": "../collections/posts/posts.json" }
+        "items": {
+          "$ref": "../collections/posts/posts.json"
+        }
       },
-      "settings": { "paddingTop": "xl" }
+      "settings": {
+        "paddingTop": "xl"
+      }
     },
     {
       "id": "home-tags",
@@ -3042,7 +3120,9 @@ cat > src/data/pages/home.json << 'EOF'
         "label": "Topics",
         "title": "Browse by topic",
         "description": "Six tags, one collection. Each card links to a tag page that computes its own post list from the relation.",
-        "items": { "$ref": "../collections/tags/tags.json" }
+        "items": {
+          "$ref": "../collections/tags/tags.json"
+        }
       },
       "settings": {}
     },
@@ -3053,10 +3133,30 @@ cat > src/data/pages/home.json << 'EOF'
         "label": "The journal in numbers",
         "title": "Small, deliberate, linked",
         "stats": [
-          { "id": "stat-posts", "icon": "pen-line", "value": "8", "label": "Essays published, each in a posts collection entry" },
-          { "id": "stat-tags", "icon": "tag", "value": "6", "label": "Topics in the tags collection" },
-          { "id": "stat-relations", "icon": "sparkles", "value": "14", "label": "Post-to-tag links resolved at render time" },
-          { "id": "stat-authors", "icon": "users", "value": "4", "label": "Writers behind the desk" }
+          {
+            "id": "stat-posts",
+            "icon": "pen-line",
+            "value": "8",
+            "label": "Essays published, each in a posts collection entry"
+          },
+          {
+            "id": "stat-tags",
+            "icon": "tag",
+            "value": "6",
+            "label": "Topics in the tags collection"
+          },
+          {
+            "id": "stat-relations",
+            "icon": "sparkles",
+            "value": "14",
+            "label": "Post-to-tag links resolved at render time"
+          },
+          {
+            "id": "stat-authors",
+            "icon": "users",
+            "value": "4",
+            "label": "Writers behind the desk"
+          }
         ]
       },
       "settings": {}
@@ -3068,10 +3168,23 @@ cat > src/data/pages/home.json << 'EOF'
         "label": "Start anywhere",
         "title": "Pick a thread, pull it",
         "description": "Every post links to its topics and every topic links back to its posts. That is the whole demo — and the whole point.",
-        "primaryCta": { "id": "home-cta-1", "label": "Read the latest", "href": "/posts", "variant": "primary" },
-        "secondaryCta": { "id": "home-cta-2", "label": "About this demo", "href": "/about", "variant": "secondary" }
+        "primaryCta": {
+          "id": "home-cta-1",
+          "label": "Read the latest",
+          "href": "/posts",
+          "variant": "primary"
+        },
+        "secondaryCta": {
+          "id": "home-cta-2",
+          "label": "About this demo",
+          "href": "/about",
+          "variant": "secondary"
+        }
       },
-      "settings": { "paddingTop": "xl", "paddingBottom": "xl" }
+      "settings": {
+        "paddingTop": "xl",
+        "paddingBottom": "xl"
+      }
     }
   ]
 }
@@ -3448,9 +3561,9 @@ echo "              CollectionRegistry, ui:collection-ref bindings,"
 echo "              posts/[slug] + tags/[slug] dynamic pages,"
 echo "              collection:current refs on detail sections"
 echo "  [x] Step 9  IconResolver (6 icons) + AdminStudioClient wiring verified"
-echo "  [x] Relations: posts->tags stored on post side only;"
+echo "  [x] Relations: posts->tags authored as \$ref pointers (tag-refs.ts);"
 echo "              tags->posts computed at render (tag-posts capsule);"
-echo "              post detail resolves tag keys (related-tags capsule)"
+echo "              related-tags resolves Tag objects / legacy keys"
 echo "  [x] Light/dark: both palettes designed; header toggle via dataset.theme"
 echo "  [x] Typography: Bricolage Grotesque / Instrument Sans / JetBrains Mono"
 echo "  [x] No emoji, no hardcoded theme colors, CTAs use .label,"

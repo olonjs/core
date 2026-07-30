@@ -60,3 +60,46 @@ describe('generate_inkwell_next.sh harness gates', () => {
     assert.doesNotMatch(src, /src\/components\/books-list/);
   });
 });
+
+describe('generate_inkwell_next.sh collection-ref model', () => {
+  it('emits posts tag-refs helper', () => {
+    const src = readScript();
+    assert.match(src, /cat > src\/collections\/posts\/tag-refs\.ts/);
+    assert.match(src, /export function resolveTagId/);
+    assert.match(src, /export function postHasTag/);
+  });
+
+  it('uses ui:collection-ref:tags on posts schema (not string ui:list tags)', () => {
+    const src = readScript();
+    assert.match(src, /ui:collection-ref:tags/);
+    assert.match(src, /CollectionPointerSchema/);
+    // posts schema must not regress to string-only tags list widget
+    assert.doesNotMatch(
+      src,
+      /tags: z\.array\(z\.string\(\)\)\.describe\('ui:list'\)/,
+    );
+  });
+
+  it('authors post tags as \$ref pointers in posts.json', () => {
+    const src = readScript();
+    assert.match(src, /"\$ref": "\.\.\/tags\/tags\.json#\//);
+  });
+
+  it('emits nested dynamic page paths posts/[slug] and tags/[slug]', () => {
+    const src = readScript();
+    assert.match(src, /cat > src\/data\/pages\/posts\/\[slug\]\.json/);
+    assert.match(src, /cat > src\/data\/pages\/tags\/\[slug\]\.json/);
+    assert.doesNotMatch(src, /cat > src\/data\/pages\/post-detail\.json/);
+    assert.doesNotMatch(src, /cat > src\/data\/pages\/tag-detail\.json/);
+    assert.match(src, /src\/data\/pages\/posts \\/);
+    assert.match(src, /src\/data\/pages\/tags \\/);
+  });
+
+  it('wires relation Views through tag-refs helpers', () => {
+    const src = readScript();
+    assert.match(src, /from '@\/collections\/posts\/tag-refs'/);
+    assert.match(src, /resolveTagId/);
+    assert.match(src, /isResolvedTag/);
+    assert.match(src, /postHasTag/);
+  });
+});
