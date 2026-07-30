@@ -366,6 +366,12 @@ echo "-- Writing collection contract: posts..."
 cat > src/collections/posts/schema.ts << 'EOF'
 import { z } from 'zod';
 import { BaseCollectionItem, ImageSelectionSchema } from '@olonjs/core';
+import { TagSchema } from '@/collections/tags/schema';
+
+/** Authored collection pointer; bake/runtime expand to the target Tag. */
+const CollectionPointerSchema = z.object({
+  $ref: z.string(),
+});
 
 export const PostSchema = BaseCollectionItem.extend({
   title: z.string().describe('ui:text'),
@@ -375,10 +381,11 @@ export const PostSchema = BaseCollectionItem.extend({
   date: z.string().describe('ui:text'),
   author: z.string().describe('ui:text'),
   readingTime: z.string().describe('ui:text'),
-  // Relation posts -> tags: each string is a key of the `tags` collection.
-  // The relation lives ONLY on the post side (single source of truth);
-  // the inverse (tags -> posts) is computed at render time by filtering.
-  tags: z.array(z.string()).describe('ui:list'),
+  // Relation posts -> tags via $ref pointers (SOT on the post side).
+  // Authored: { $ref: "../tags/tags.json#/<id>" }; after resolve: Tag objects.
+  // Inverse (tags -> posts) is computed at render time by filtering.
+  // Studio: ui:collection-ref:tags → one dropdown per relation (multi-ref).
+  tags: z.array(z.union([TagSchema, CollectionPointerSchema])).describe('ui:collection-ref:tags'),
 });
 
 export const PostsCollectionSchema = z.record(z.string(), PostSchema);
@@ -396,6 +403,49 @@ cat > src/collections/posts/index.ts << 'EOF'
 export { PostSchema, PostsCollectionSchema } from './schema';
 export type { Post, PostsCollection } from './types';
 EOF
+echo "-- Writing src/collections/posts/tag-refs.ts..."
+cat > src/collections/posts/tag-refs.ts << 'EOF'
+import type { Tag } from '@/collections/tags';
+
+type CollectionPointer = { $ref: string };
+
+export function isResolvedTag(value: unknown): value is Tag {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !('$ref' in value) &&
+    typeof (value as Tag).id === 'string'
+  );
+}
+
+export function isCollectionPointer(value: unknown): value is CollectionPointer {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as CollectionPointer).$ref === 'string'
+  );
+}
+
+/** Tag id from a resolved Tag, authored $ref, or legacy string key. */
+export function resolveTagId(value: unknown): string | null {
+  if (typeof value === 'string' && value.length > 0) return value;
+  if (isResolvedTag(value) && value.id) return value.id;
+  if (isCollectionPointer(value)) {
+    const hash = value.$ref.split('#/')[1];
+    return hash || null;
+  }
+  return null;
+}
+
+export function postHasTag(
+  tags: unknown[] | undefined,
+  tagId: string,
+): boolean {
+  if (!tagId) return false;
+  return (tags ?? []).some((tag) => resolveTagId(tag) === tagId);
+}
+EOF
+
 
 # -----------------------------------------------------------------------------
 # COLLECTIONS — tags (COP v1.1)
@@ -454,88 +504,171 @@ cat > src/data/collections/posts/posts.json << 'EOF'
     "title": "Designing with constraints, on purpose",
     "excerpt": "Every strong interface we have shipped started with a constraint we refused to negotiate away. Here is how we pick them.",
     "body": "Constraints are not the enemy of good design. They are the only reliable way to make a hundred small decisions coherent with each other. A palette of four colors forces hierarchy; a single display font forces rhythm.\n\nOn Inkwell we hold three constraints fixed: one measure for body text, one accent per surface, and no decoration that does not encode meaning. Everything else is allowed to move.\n\nThe result is not austerity. It is that rare feeling of a page where nothing competes with the words.",
-    "image": { "url": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80", "alt": "Fountain pen resting on a notebook with handwritten notes" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80",
+      "alt": "Fountain pen resting on a notebook with handwritten notes"
+    },
     "date": "2026-06-28",
     "author": "June Park",
     "readingTime": "6 min",
-    "tags": ["design", "process"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/design"
+      },
+      {
+        "$ref": "../tags/tags.json#/process"
+      },
+      {
+        "$ref": "../collections/tags/tags.json#/engineering"
+      }
+    ]
   },
   "the-boring-stack": {
     "id": "the-boring-stack",
     "title": "The boring stack is a feature",
     "excerpt": "We rebuilt our pipeline on tools nobody tweets about. Deploys got faster and the on-call channel went quiet.",
     "body": "There is a special kind of silence that follows choosing boring technology. The pager stops. The changelog reads like a grocery list. Nobody has to relearn the build system on a Tuesday.\n\nBoring does not mean old. It means the failure modes are documented, the upgrade path is known, and the second engineer to touch the code can predict what the first one did.\n\nWe budget our novelty. One genuinely new tool per quarter, everything else deliberately dull. That budget is the most productive constraint we have.",
-    "image": { "url": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&q=80", "alt": "Close-up of a circuit board with soldered components" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&q=80",
+      "alt": "Close-up of a circuit board with soldered components"
+    },
     "date": "2026-06-19",
     "author": "Tomas Lindgren",
     "readingTime": "5 min",
-    "tags": ["engineering", "tooling"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/engineering"
+      },
+      {
+        "$ref": "../tags/tags.json#/tooling"
+      }
+    ]
   },
   "write-the-readme-first": {
     "id": "write-the-readme-first",
     "title": "Write the README first",
     "excerpt": "If you cannot explain the tool before building it, you are about to build the wrong tool. A practice we stole from technical writers.",
     "body": "Before any code exists, we write the README as if the project were finished: what it does, how you install it, the three commands you will actually use. It takes an hour and it kills bad ideas while they are still cheap.\n\nThe README-first draft exposes the seams. If the usage section needs four paragraphs of caveats, the interface is wrong. If the install steps require a diagram, the packaging is wrong.\n\nDocumentation is not what you write after the work. Often, it is the work.",
-    "image": { "url": "https://images.unsplash.com/photo-1517842645767-c639042777db?w=1600&q=80", "alt": "Open notebook with a pen on a wooden desk beside a laptop" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1517842645767-c639042777db?w=1600&q=80",
+      "alt": "Open notebook with a pen on a wooden desk beside a laptop"
+    },
     "date": "2026-06-10",
     "author": "Ada Osei",
     "readingTime": "4 min",
-    "tags": ["writing", "process"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/writing"
+      },
+      {
+        "$ref": "../tags/tags.json#/process"
+      }
+    ]
   },
   "tokens-not-pixels": {
     "id": "tokens-not-pixels",
     "title": "Tokens, not pixels",
     "excerpt": "The day we deleted every hardcoded hex value was the day dark mode became a data change instead of a rewrite.",
     "body": "A design token is a promise: this value has a name, the name has a meaning, and the meaning survives a redesign. A hex code in a component is the opposite — a decision nobody can find later.\n\nOur rule is mechanical. Components consume semantic variables; variables resolve from a theme document; the theme document is data. Light mode, dark mode, a client rebrand: all of them become edits to one JSON file.\n\nIt is the least glamorous migration we ever ran, and the one with the highest return. Every surface in this journal, including the one you are reading, is painted through that chain.",
-    "image": { "url": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1600&q=80", "alt": "Monitor showing colorful code in a dark editor theme" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1600&q=80",
+      "alt": "Monitor showing colorful code in a dark editor theme"
+    },
     "date": "2026-05-30",
     "author": "June Park",
     "readingTime": "7 min",
-    "tags": ["design", "engineering", "tooling"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/design"
+      },
+      {
+        "$ref": "../tags/tags.json#/engineering"
+      },
+      {
+        "$ref": "../tags/tags.json#/tooling"
+      }
+    ]
   },
   "shipping-on-fridays": {
     "id": "shipping-on-fridays",
     "title": "Yes, we ship on Fridays",
     "excerpt": "The no-Friday-deploy rule treats the symptom. We fixed the disease instead, and the weekend stayed quiet anyway.",
     "body": "Teams that fear Friday deploys do not have a calendar problem, they have a confidence problem. The fix is not a freeze window; it is making deploys so small and so reversible that the day of the week stops mattering.\n\nWe ship changes measured in tens of lines, behind flags, with a rollback that takes one command and no meeting. When a deploy is that cheap, Friday afternoon is just another afternoon.\n\nThe cultural shift matters more than the tooling: nobody gets praised here for a heroic weekend fix. We praise the boring deploy that nobody noticed.",
-    "image": { "url": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1600&q=80", "alt": "Laptop and coffee cup on a tidy desk in warm morning light" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1600&q=80",
+      "alt": "Laptop and coffee cup on a tidy desk in warm morning light"
+    },
     "date": "2026-05-18",
     "author": "Marco Bellini",
     "readingTime": "5 min",
-    "tags": ["culture", "process"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/culture"
+      },
+      {
+        "$ref": "../tags/tags.json#/process"
+      }
+    ]
   },
   "notes-on-code-review": {
     "id": "notes-on-code-review",
     "title": "Code review is a writing exercise",
     "excerpt": "The best reviewers on our team are not the fastest readers of code. They are the most careful writers of comments.",
     "body": "A review comment is a tiny piece of technical writing with a hostile audience: a tired author who wants to merge. Precision and kindness are not in tension there — they are the same skill.\n\nWe rewrote our review guidelines around sentences, not checklists. Say what you observed, say why it matters, say what you would accept. Three sentences, no verdicts without reasons.\n\nReview latency dropped by half. Not because people read faster, but because nobody has to decode what a one-word comment meant.",
-    "image": { "url": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&q=80", "alt": "Two colleagues discussing work in front of a shared screen" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&q=80",
+      "alt": "Two colleagues discussing work in front of a shared screen"
+    },
     "date": "2026-05-04",
     "author": "Ada Osei",
     "readingTime": "6 min",
-    "tags": ["engineering", "culture"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/engineering"
+      },
+      {
+        "$ref": "../tags/tags.json#/culture"
+      }
+    ]
   },
   "the-second-draft": {
     "id": "the-second-draft",
     "title": "The second draft is the real one",
     "excerpt": "Everything on this journal is published twice: once to find out what we think, once to say it properly.",
     "body": "First drafts are for discovering the argument. They meander, they hedge, they bury the point in paragraph four. That is fine — their job is excavation, not presentation.\n\nThe second draft starts from one question: what is the single sentence this piece exists to deliver? Everything that does not serve that sentence gets cut, no matter how much we liked writing it.\n\nOur average post loses forty percent of its words between drafts. Readers never miss them.",
-    "image": { "url": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80", "alt": "Handwritten manuscript pages with edits and crossed-out lines" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80",
+      "alt": "Handwritten manuscript pages with edits and crossed-out lines"
+    },
     "date": "2026-04-22",
     "author": "June Park",
     "readingTime": "4 min",
-    "tags": ["writing"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/writing"
+      }
+    ]
   },
   "tools-that-disappear": {
     "id": "tools-that-disappear",
     "title": "Good tools disappear",
     "excerpt": "The highest compliment for a tool is that nobody remembers using it. On interfaces that get out of the way.",
     "body": "You do not think about a doorknob when you open a door. That is the standard: a tool succeeded when the person forgot it was there and remembers only the work.\n\nEvery affordance we add is tested against one question — does this move attention toward the content or toward the chrome? Toolbars lost that argument here more than once.\n\nInvisible does not mean minimal for its own sake. It means every visible element earns its place by carrying meaning the content cannot carry alone.",
-    "image": { "url": "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=1600&q=80", "alt": "Minimal workspace with a laptop, plant and empty desk surface" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=1600&q=80",
+      "alt": "Minimal workspace with a laptop, plant and empty desk surface"
+    },
     "date": "2026-04-09",
     "author": "Tomas Lindgren",
     "readingTime": "5 min",
-    "tags": ["tooling", "design"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/tooling"
+      },
+      {
+        "$ref": "../tags/tags.json#/design"
+      }
+    ]
   }
 }
 EOF
