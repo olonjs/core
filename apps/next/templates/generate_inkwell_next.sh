@@ -1292,6 +1292,7 @@ EOF
 cat > src/components/posts-list/View.tsx << 'EOF'
 // Layout: Features=A (BENTO) default variant, C (TIMELINE) alternative variant
 import React from 'react';
+import { resolveTagId } from '@/collections/posts/tag-refs';
 import { Card, CardContent } from '@/components/ui/card';
 import type { PostsListData, PostsListSettings } from './types';
 
@@ -1391,11 +1392,14 @@ export const PostsList: React.FC<{ data: PostsListData; settings: PostsListSetti
                 </h3>
                 <p className="mt-2 max-w-[64ch] text-sm leading-relaxed text-[var(--local-text-muted)]">{post.excerpt}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {post.tags.map((tagId) => (
-                    <span key={tagId} className="font-mono text-[0.65rem] uppercase tracking-widest text-[var(--local-accent)]">
-                      #{tagId}
-                    </span>
-                  ))}
+                  {(post.tags ?? []).map((tag, tagIdx) => {
+                    const tagId = resolveTagId(tag) ?? `tag-${tagIdx}`;
+                    return (
+                      <span key={tagId} className="font-mono text-[0.65rem] uppercase tracking-widest text-[var(--local-accent)]">
+                        #{tagId}
+                      </span>
+                    );
+                  })}
                 </div>
               </a>
             ))}
@@ -1429,11 +1433,14 @@ export const PostsList: React.FC<{ data: PostsListData; settings: PostsListSetti
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed text-[var(--local-text-muted)]">{post.excerpt}</p>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      {post.tags.map((tagId) => (
-                        <span key={tagId} className="font-mono text-[0.65rem] uppercase tracking-widest text-[var(--local-accent)]">
-                          #{tagId}
-                        </span>
-                      ))}
+                      {(post.tags ?? []).map((tag, tagIdx) => {
+                        const tagId = resolveTagId(tag) ?? `tag-${tagIdx}`;
+                        return (
+                          <span key={tagId} className="font-mono text-[0.65rem] uppercase tracking-widest text-[var(--local-accent)]">
+                            #{tagId}
+                          </span>
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>
@@ -1776,6 +1783,7 @@ EOF
 
 cat > src/components/related-tags/View.tsx << 'EOF'
 import React from 'react';
+import { isResolvedTag } from '@/collections/posts/tag-refs';
 import type { Tag } from '@/collections/tags';
 import type { RelatedTagsData, RelatedTagsSettings } from './types';
 
@@ -1825,10 +1833,15 @@ export const RelatedTags: React.FC<{ data: RelatedTagsData; settings: RelatedTag
   };
   const t = SECTION_THEME_VARS[sectionTheme] ?? SECTION_THEME_VARS.dark;
 
-  // Relation resolution: post.tags is an array of tag collection keys.
+  // After bake/runtime resolve, post.tags are expanded Tag objects.
+  // Fall back to the tags map for unresolved keys if present.
   const tagMap = data.tags ?? {};
   const related = (data.item.tags ?? [])
-    .map((tagId) => tagMap[tagId])
+    .map((tag) => {
+      if (isResolvedTag(tag)) return tag;
+      if (typeof tag === 'string') return tagMap[tag];
+      return undefined;
+    })
     .filter((tag): tag is Tag => Boolean(tag));
 
   return (
@@ -2052,6 +2065,7 @@ EOF
 
 cat > src/components/tag-posts/View.tsx << 'EOF'
 import React from 'react';
+import { postHasTag } from '@/collections/posts/tag-refs';
 import { Card, CardContent } from '@/components/ui/card';
 import type { TagPostsData, TagPostsSettings } from './types';
 
@@ -2095,11 +2109,10 @@ export const TagPosts: React.FC<{ data: TagPostsData; settings: TagPostsSettings
   };
   const t = SECTION_THEME_VARS[sectionTheme] ?? SECTION_THEME_VARS.dark;
 
-  // Inverse relation tag -> posts, computed from the single source of truth
-  // (post.tags) by filtering the full posts collection.
+  // Inverse relation tag -> posts from post.tags ($ref / resolved Tag).
   const tagId = data.item.id || '';
   const posts = Object.values(data.posts ?? {})
-    .filter((post) => (post.tags ?? []).includes(tagId))
+    .filter((post) => postHasTag(post.tags, tagId))
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
   return (
