@@ -1,0 +1,52 @@
+---
+description: Next DNA WebMCP runtime parity with Vite (tools/resources)
+globs: apps/next/**/*
+alwaysApply: false
+---
+
+# Next App — WebMCP runtime
+
+When working on WebMCP for `apps/next`, load:
+
+- Plan: `docs/plan/002-next-webmcp-runtime-parity.md`
+- Contract: `docs/webmcp.md`
+- Bridge: `packages/core/src/webmcp/runtime/webmcp-bridge.ts` (`document.modelContext` only)
+
+## Everything is runtime on Next — no bake
+
+| Layer | What | Where |
+|-------|------|-------|
+| **HTTP discovery** | `/mcp-manifest.json`, `/mcp-manifests/*`, `/schemas/*`, `/llms.txt`, `/robots.txt`, `/sitemap.xml` | Route handlers `app/api/webmcp/*`, `app/api/seo/*` + rewrites in `next.config.ts`; builders in `src/lib/webmcp/runtime/agenticSurface.ts` |
+| **Page JSON** | `/{slug}.json`, `/pages/{slug}.json` | `app/api/public-page/[...slug]` (pre-existing) |
+| **Browser API** | `ensureWebMcpRuntime` + `registerWebMcpTool` on `document.modelContext` | Admin via `webmcp.enabled`; visitor via `WebMcpVisitorRuntime` island |
+
+Never add a prebuild step that writes agentic artifacts into `public/`. Vite's `bake.mjs` is not a model for Next.
+
+## Where tools come from
+
+- Registration: `@olonjs/studio` `StudioRouteBody` when `config.webmcp?.enabled`
+- Next admin wiring: `apps/next/src/components/admin/AdminStudioClient.tsx` → `AdminIsland` → `JsonPagesEngine`
+- Vite reference: `apps/tenant-alpha/src/App.tsx` `webmcp: { enabled: true, namespace: window.location.href }`
+- Visitor pages must **not** register mutation tools (parity with Vite `VisitorRoute`)
+
+## Do not
+
+- Reintroduce `navigator.modelContext`
+- Duplicate tool registration inside `apps/next`
+- Port Vite SSG / HTML bake for WebMCP
+- Assume HotSave is required for WebMCP (Next v1: local save / cold save)
+
+## Verify
+
+```bash
+# WSL — server on :3000
+npm run verify:webmcp --workspace=tenant-next
+# or: cd apps/next && npm run verify:webmcp
+```
+
+Harness: `apps/next/scripts/webmcp-feature-check.mjs` (Playwright → `/admin`).
+
+**API surface:** use `document.modelContextProtocol` (`listTools` / `executeTool` / `readResource`).  
+`document.modelContextTesting` is **never assigned** by `ensureWebMcpRuntime` — do not treat its absence as “tools missing.”
+
+**Known open bugs (plan 002):** Studio local `update-section` vs authored `items.$ref`; verify harness still may read `modelContextTesting` until Task 3b.

@@ -3,9 +3,23 @@ import type { NextConfig } from 'next';
 /**
  * Keep rewrites inline — next.config is loaded via Node/CJS and cannot reliably
  * import `@olonjs/next/server` (exports are ESM `import`-only).
- * Contract guarded by `buildPublicPageJsonRewrites` unit tests in the package.
+ * Public-page contract guarded by `buildPublicPageJsonRewrites` unit tests in the
+ * package; the WebMCP/SEO runtime rewrites below are guarded by
+ * `src/lib/webmcp/runtime/nextConfigRewrites.test.ts`.
+ *
+ * Order matters: explicit agentic hrefs first, generic `/:path*.json` last.
  */
-const publicPageJsonRewrites = [
+export const webmcpRuntimeRewrites = [
+  { source: '/mcp-manifest.json', destination: '/api/webmcp/site-manifest' },
+  { source: '/mcp-manifests/:path*.json', destination: '/api/webmcp/page-manifest/:path*' },
+  { source: '/schemas/collections/:source.schema.json', destination: '/api/webmcp/collection-contract/:source' },
+  { source: '/schemas/:path*.schema.json', destination: '/api/webmcp/page-contract/:path*' },
+  { source: '/llms.txt', destination: '/api/webmcp/llms' },
+  { source: '/robots.txt', destination: '/api/seo/robots' },
+  { source: '/sitemap.xml', destination: '/api/seo/sitemap' },
+];
+
+export const publicPageJsonRewrites = [
   {
     source: '/pages/:path*.json',
     destination: '/api/public-page/:path*',
@@ -29,7 +43,7 @@ const nextConfig: NextConfig = {
     '/*': ['./src/data/**/*'],
   },
   async rewrites() {
-    return publicPageJsonRewrites;
+    return [...webmcpRuntimeRewrites, ...publicPageJsonRewrites];
   },
 };
 
