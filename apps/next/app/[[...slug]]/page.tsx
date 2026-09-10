@@ -9,6 +9,7 @@ import {
 } from '@olonjs/core';
 import { loadVisitorPage } from '@olonjs/next/server';
 import { EmptyTenantView } from '@/components/empty-tenant';
+import { WebMcpVisitorRuntime } from '@/components/webmcp/WebMcpVisitorRuntime';
 import { CollectionRegistry } from '@/lib/CollectionRegistry';
 import { buildVisitorWebPageJsonLd } from '@/lib/buildVisitorWebPageJsonLd';
 import { getFileCollections } from '@/lib/loaders/getFileCollections';
@@ -59,8 +60,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * Public visitor catch-all — RSC only.
- * Must not import @olonjs/studio or JsonPagesEngine (ADR-0017).
+ * Public visitor catch-all — RSC + thin WebMCP client island (ADR-0017).
+ * Must not import @olonjs/studio or JsonPagesEngine.
  */
 export default async function VisitorCatchAllPage({ params, searchParams }: PageProps) {
   const { slug: segments } = await params;
@@ -113,6 +114,7 @@ export default async function VisitorCatchAllPage({ params, searchParams }: Page
 
   return (
     <>
+      <WebMcpVisitorRuntime />
       <link rel="mcp-manifest" href={buildPageManifestHref(requestSlug)} />
       <link rel="olon-contract" href={buildPageContractHref(requestSlug)} />
       <script
