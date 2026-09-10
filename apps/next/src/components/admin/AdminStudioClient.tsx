@@ -16,6 +16,7 @@ import { CollectionRegistry } from '@/lib/CollectionRegistry';
 import { ComponentRegistry } from '@/lib/ComponentRegistry';
 import { iconMap } from '@/lib/IconResolver';
 import { SECTION_SCHEMAS } from '@/lib/schemas';
+import { buildEnabledWebMcpConfig } from '@/lib/webmcp/buildEnabledWebMcpConfig';
 
 export type AdminStudioClientProps = {
   tenantId?: string;
@@ -103,6 +104,7 @@ export function AdminStudioClient({
       themeCss: { tenant: '' },
       iconRegistry: iconMap,
       addSection: addSectionConfig,
+      webmcp: buildEnabledWebMcpConfig(),
       persistence: {
         saveToFile,
         ...(coldSave ? { coldSave } : {}),
