@@ -14,12 +14,13 @@ const SCRIPT = path.join(__dirname, 'webmcp-feature-check.mjs');
 const PKG = path.join(ROOT, 'package.json');
 
 describe('next verify:webmcp script', () => {
-  it('exists and uses document.modelContextTesting only', () => {
+  it('probes document.modelContextProtocol (the surface ensureWebMcpRuntime assigns)', () => {
     assert.ok(fs.existsSync(SCRIPT), `missing ${SCRIPT}`);
     const src = fs.readFileSync(SCRIPT, 'utf8');
-    assert.match(src, /document\.modelContextTesting/);
-    assert.doesNotMatch(src, /navigator\.modelContextTesting/);
-    assert.doesNotMatch(src, /navigator\.modelContext(?!Testing)/);
+    assert.match(src, /document\.modelContextProtocol/);
+    // modelContextTesting is never assigned by the runtime — probing it is a false negative.
+    assert.doesNotMatch(src, /modelContextTesting/);
+    assert.doesNotMatch(src, /navigator\.modelContext/);
   });
 
   it('is wired as verify:webmcp and not in prebuild', () => {

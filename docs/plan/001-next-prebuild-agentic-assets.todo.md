@@ -17,7 +17,7 @@ Plan: [`001-next-prebuild-agentic-assets.md`](./001-next-prebuild-agentic-assets
   - Done: `56b3e82`
 
 - [x] **Task 3:** Port `webmcp-feature-check.mjs` + `"verify:webmcp"` in `package.json`
-  - AC: usa `document.modelContextTesting` (no navigator fallback); non in prebuild
+  - AC: usa `document.modelContextProtocol` (no navigator fallback; `modelContextTesting` non esiste — vedi plan 002); non in prebuild
   - Verify: script parte / fallisce chiaro senza server (comportamento atteso)
   - Scope: S · Deps: none
   - Done: `168e895`

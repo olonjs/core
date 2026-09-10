@@ -331,8 +331,8 @@ export function ensureWebMcpRuntime(): void {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
   // If registerTool already exists — Chrome native WebMCP on document, or our polyfill
-  // from a previous call — leave it intact so tools flow into the registry the WebMCP
-  // Inspector reads via document.modelContextTesting.
+  // from a previous call — leave it intact so tools flow into the registry exposed via
+  // document.modelContextProtocol (listTools / executeTool / readResource).
   const existing = resolveModelContext();
   if (typeof existing?.registerTool === 'function') return;
 
