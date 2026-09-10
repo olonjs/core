@@ -10,15 +10,6 @@ vi.mock('./loadLocalPublicPageBundle', () => ({
   })),
 }));
 
-vi.mock('./loadStaticPublicPageBundle', () => ({
-  loadStaticPublicPageBundle: vi.fn(async () => ({
-    pages: { home: { id: 'static', slug: 'home', meta: { title: 'Static' }, sections: [] } },
-    siteConfig: { identity: { title: 'S' } },
-    themeConfig: {},
-    menuConfig: {},
-  })),
-}));
-
 vi.mock('./loadLivePublicPageBundle', () => ({
   loadLivePublicPageBundle: vi.fn(async () => ({
     pages: { home: { id: 'live', slug: 'home', meta: { title: 'Live' }, sections: [] } },
@@ -29,7 +20,6 @@ vi.mock('./loadLivePublicPageBundle', () => ({
 }));
 
 import { loadLocalPublicPageBundle } from './loadLocalPublicPageBundle';
-import { loadStaticPublicPageBundle } from './loadStaticPublicPageBundle';
 import { loadLivePublicPageBundle } from './loadLivePublicPageBundle';
 import { loadPublicPageBundleForRequest } from './loadPublicPageBundleForRequest';
 
@@ -45,20 +35,21 @@ describe('loadPublicPageBundleForRequest', () => {
     });
     expect(bundle.pages.home?.meta?.title).toBe('Local');
     expect(loadLocalPublicPageBundle).toHaveBeenCalled();
-    expect(loadStaticPublicPageBundle).not.toHaveBeenCalled();
     expect(loadLivePublicPageBundle).not.toHaveBeenCalled();
   });
 
-  it('selects Static when bootSource is static', async () => {
+  it('static (Save2Repo) reads the deployed repo from disk and never self-fetches', async () => {
+    const fetchImpl = vi.fn();
     const bundle = await loadPublicPageBundleForRequest({
       bootSource: 'static',
       slug: 'home',
       requestUrl: 'http://localhost:3000/home.json',
       appRoot,
-      fetchImpl: vi.fn() as unknown as typeof fetch,
+      fetchImpl: fetchImpl as unknown as typeof fetch,
     });
-    expect(bundle.pages.home?.meta?.title).toBe('Static');
-    expect(loadStaticPublicPageBundle).toHaveBeenCalled();
+    expect(bundle.pages.home?.meta?.title).toBe('Local');
+    expect(fetchImpl).not.toHaveBeenCalled();
+    expect(loadLivePublicPageBundle).not.toHaveBeenCalled();
   });
 
   it('selects Live when bootSource is live', async () => {

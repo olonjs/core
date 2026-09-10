@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import nextConfig, { publicPageJsonRewrites, webmcpRuntimeRewrites } from '../../../../next.config';
+import nextConfig, {
+  publicPageJsonRewrites,
+  publishedContentRewrites,
+  webmcpRuntimeRewrites,
+} from '../../../../next.config';
 
 describe('next.config rewrites — runtime agentic surface', () => {
   it('maps every public agentic href onto a runtime route handler', () => {
@@ -13,6 +17,12 @@ describe('next.config rewrites — runtime agentic surface', () => {
     expect(bySource['/sitemap.xml']).toBe('/api/seo/sitemap');
   });
 
+  it('maps JSP published documents (collections, config) onto runtime route handlers', () => {
+    const bySource = Object.fromEntries(publishedContentRewrites.map((r) => [r.source, r.destination]));
+    expect(bySource['/collections/:source/:file.json']).toBe('/api/public-collection/:source/:file');
+    expect(bySource['/config/:file.json']).toBe('/api/public-config/:file');
+  });
+
   it('places collection contracts before page contracts and all agentic rewrites before /:path*.json', async () => {
     const all = await nextConfig.rewrites!();
     const list = Array.isArray(all) ? all : [...all.beforeFiles, ...all.afterFiles, ...all.fallback];
@@ -22,7 +32,7 @@ describe('next.config rewrites — runtime agentic surface', () => {
       sources.indexOf('/schemas/:path*.schema.json'),
     );
     const catchAll = sources.indexOf('/:path*.json');
-    for (const r of webmcpRuntimeRewrites) {
+    for (const r of [...webmcpRuntimeRewrites, ...publishedContentRewrites]) {
       expect(sources.indexOf(r.source)).toBeLessThan(catchAll);
     }
     expect(sources.slice(-publicPageJsonRewrites.length)).toEqual(publicPageJsonRewrites.map((r) => r.source));

@@ -19,6 +19,12 @@ export const webmcpRuntimeRewrites = [
   { source: '/sitemap.xml', destination: '/api/seo/sitemap' },
 ];
 
+/** JSP published documents (formerly copied into public/ by sync-pages-to-public). */
+export const publishedContentRewrites = [
+  { source: '/collections/:source/:file.json', destination: '/api/public-collection/:source/:file' },
+  { source: '/config/:file.json', destination: '/api/public-config/:file' },
+];
+
 export const publicPageJsonRewrites = [
   {
     source: '/pages/:path*.json',
@@ -43,7 +49,7 @@ const nextConfig: NextConfig = {
     '/*': ['./src/data/**/*'],
   },
   async rewrites() {
-    return [...webmcpRuntimeRewrites, ...publicPageJsonRewrites];
+    return [...webmcpRuntimeRewrites, ...publishedContentRewrites, ...publicPageJsonRewrites];
   },
 };
 

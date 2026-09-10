@@ -23,10 +23,10 @@ describe('next verify:webmcp script', () => {
     assert.doesNotMatch(src, /navigator\.modelContext/);
   });
 
-  it('is wired as verify:webmcp and not in prebuild', () => {
+  it('is wired as verify:webmcp; Next has no prebuild (everything is runtime)', () => {
     const pkg = JSON.parse(fs.readFileSync(PKG, 'utf8'));
     assert.equal(pkg.scripts?.['verify:webmcp'], 'node scripts/webmcp-feature-check.mjs');
-    assert.ok(pkg.scripts?.prebuild);
-    assert.doesNotMatch(pkg.scripts.prebuild, /webmcp-feature-check/);
+    assert.equal(pkg.scripts?.prebuild, undefined);
+    assert.doesNotMatch(pkg.scripts?.build ?? '', /webmcp-feature-check|sync-pages-to-public|bake/);
   });
 });

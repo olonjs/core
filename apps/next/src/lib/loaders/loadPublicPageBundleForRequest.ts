@@ -5,12 +5,11 @@ import {
 } from '@/lib/env/serverCloudPolicy';
 import { loadLivePublicPageBundle } from './loadLivePublicPageBundle';
 import { loadLocalPublicPageBundle } from './loadLocalPublicPageBundle';
-import { loadStaticPublicPageBundle } from './loadStaticPublicPageBundle';
 
 export type LoadPublicPageBundleForRequestInput = {
   bootSource: ServerCloudBootSource;
   slug: string;
-  /** Absolute request URL (used for Static same-origin base). */
+  /** Absolute request URL (kept for signature parity with route handlers). */
   requestUrl: string;
   appRoot?: string;
   apiUrl?: string;
@@ -19,21 +18,18 @@ export type LoadPublicPageBundleForRequestInput = {
 };
 
 /**
- * Select Local / Static / Live content bundle from server cloud policy bootSource.
+ * Select the content bundle from the server cloud policy bootSource.
+ *
+ * - `local`  → tenant DNA on disk (`src/data`).
+ * - `static` → Save2Repo: the published content *is* the deployed repo, so it is the
+ *              same filesystem read. No same-origin HTTP self-fetch (that looped back
+ *              into `/api/public-page` via the `/pages/:path*.json` rewrite).
+ * - `live`   → hot-save cloud render for the requested slug.
  */
 export async function loadPublicPageBundleForRequest(
   input: LoadPublicPageBundleForRequestInput,
 ): Promise<PublicPageContentBundle> {
   const appRoot = input.appRoot ?? process.cwd();
-
-  if (input.bootSource === 'static') {
-    const origin = new URL(input.requestUrl).origin;
-    return loadStaticPublicPageBundle({
-      baseUrl: `${origin}/`,
-      appRoot,
-      fetchImpl: input.fetchImpl,
-    });
-  }
 
   if (input.bootSource === 'live') {
     const apiUrl = (input.apiUrl ?? '').trim();

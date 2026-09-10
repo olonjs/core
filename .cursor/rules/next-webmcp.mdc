@@ -18,9 +18,10 @@ When working on WebMCP for `apps/next`, load:
 |-------|------|-------|
 | **HTTP discovery** | `/mcp-manifest.json`, `/mcp-manifests/*`, `/schemas/*`, `/llms.txt`, `/robots.txt`, `/sitemap.xml` | Route handlers `app/api/webmcp/*`, `app/api/seo/*` + rewrites in `next.config.ts`; builders in `src/lib/webmcp/runtime/agenticSurface.ts` |
 | **Page JSON** | `/{slug}.json`, `/pages/{slug}.json` | `app/api/public-page/[...slug]` (pre-existing) |
+| **Published JSP docs** | `/collections/{source}/{source}.json`, `/config/{site\|menu\|theme}.json` | `app/api/public-collection`, `app/api/public-config` |
 | **Browser API** | `ensureWebMcpRuntime` + `registerWebMcpTool` on `document.modelContext` | Admin via `webmcp.enabled`; visitor via `WebMcpVisitorRuntime` island |
 
-Never add a prebuild step that writes agentic artifacts into `public/`. Vite's `bake.mjs` is not a model for Next.
+Never add a prebuild step that writes agentic artifacts or copies `src/data` into `public/`. Vite's `bake.mjs` / `sync-pages-to-public` are not a model for Next. Server loaders must never HTTP-fetch their own origin for `/pages/*.json` or `/config/*.json` (rewrite loop): `bootSource: 'static'` reads the deployed repo from disk.
 
 ## Where tools come from
 

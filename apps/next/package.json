@@ -8,7 +8,6 @@
   },
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/sync-pages-to-public.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

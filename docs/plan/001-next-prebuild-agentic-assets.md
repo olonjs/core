@@ -22,12 +22,14 @@ Same `webmcp.*` builders from `@olonjs/core` as the Vite bake, executed per requ
 | `/robots.txt` | `/api/seo/robots` |
 | `/sitemap.xml` | `/api/seo/sitemap` |
 | `/pages/{slug}.json`, `/{slug}.json` | `/api/public-page/{slug}` (pre-existing) |
+| `/collections/{source}/{source}.json` | `/api/public-collection/{source}/{file}` |
+| `/config/{site\|menu\|theme}.json` | `/api/public-config/{file}` |
 
 - Builders: `apps/next/src/lib/webmcp/runtime/agenticSurface.ts` (+ tests)
 - Loaders: `apps/next/src/lib/webmcp/runtime/loadRuntimeSurface.ts` — per-slug follows the server cloud policy (local/static/live) like `/api/public-page`; site-wide uses the DNA registry on disk
 - Rewrites: `apps/next/next.config.ts` (`webmcpRuntimeRewrites`, explicit, before the generic `/:path*.json`) — guarded by `nextConfigRewrites.test.ts`
 - Dynamic pages (`libri/[slug]`) are expanded into concrete slugs from the bound collection in the site index / sitemap / llms.txt; every advertised href resolves 200
 
-Removed: `scripts/bake.mjs`, `scripts/bake.ts`, `scripts/generate-llms-txt.mjs`, `scripts/robots.mjs`, `scripts/sitemap.mjs`, their `prebuild-*.test.mjs`, the tracked `public/` artifacts, `tsx` devDependency. `prebuild` = `sync-pages-to-public.mjs` only (pre-existing; see 002 for its future).
+Removed: `scripts/bake.mjs`, `scripts/bake.ts`, `scripts/generate-llms-txt.mjs`, `scripts/robots.mjs`, `scripts/sitemap.mjs`, `scripts/sync-pages-to-public.mjs`, their `prebuild-*.test.mjs`, the tracked/generated `public/` artifacts, `tsx` devDependency, and the `prebuild` script itself. `public/` holds no generated content.
 
 `verify:webmcp` (`scripts/webmcp-feature-check.mjs`) is unchanged and still out of prebuild.
