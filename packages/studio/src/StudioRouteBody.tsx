@@ -37,6 +37,7 @@ import { AdminSidebar, type LayerItem } from './admin/AdminSidebar';
 import { StudioStage } from './admin/StudioStage';
 import { useStudioPersistence } from './orchestration/useStudioPersistence';
 import { useStudioSelectionState } from './orchestration/useStudioSelectionState';
+import { resolveLocalSectionMutationBase } from './webmcp/resolveLocalSectionMutationBase';
 
 /**
  * Studio orchestration body: draft state, WebMCP tool wiring, save flows,
@@ -430,7 +431,9 @@ export const StudioRouteBody: React.FC<StudioRouteBodyProps> = ({
           throw new Error(`Missing schema for section type "${sectionTypeToUse}".`);
         }
 
-        const currentData = isRecord(targetSection.data) ? targetSection.data : {};
+        // Validate against the resolved section (collection $ref expanded), like the
+        // global path; the authored $ref is restored by applyCollectionRefBindingsToDraft.
+        const currentData = resolveLocalSectionMutationBase(targetSection, resolvedDraft);
         const nextData = resolveWebMcpMutationData(currentData, args);
         const parsedData = schema.parse(nextData) as Record<string, unknown>;
         const collectionResult = applyCollectionRefBindingsToDraft(
@@ -472,7 +475,7 @@ export const StudioRouteBody: React.FC<StudioRouteBodyProps> = ({
         isError: false,
       };
     },
-    [applyGlobalSectionUpdate, collectionSchemas, commitCollectionsDraft, getResolvedGlobalSection, requestInlineFlush, resolvedCollectionContext, resolvedRuntime.siteConfig, schemas, slug]
+    [applyGlobalSectionUpdate, collectionSchemas, commitCollectionsDraft, getResolvedGlobalSection, requestInlineFlush, resolvedCollectionContext, resolvedDraft, resolvedRuntime.siteConfig, schemas, slug]
   );
 
   const executeWebMcpSave = useCallback(
