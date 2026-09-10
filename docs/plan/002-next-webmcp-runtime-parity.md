@@ -65,7 +65,7 @@ Docs: [`docs/webmcp.md`](../webmcp.md) · bridge: `packages/core/src/webmcp/runt
 ### Open
 
 - [ ] Task 3c: save-to-file "Failed to fetch" — **not reproduced** live on `next start :3000` (POST → 200, twice). Needs user repro: URL/port, Network status
-- [ ] Task 3d: `webmcp-feature-check.mjs` target selection is stale — requires `tool.sectionType` on manifest tools, but manifests now expose the generic `update-section`/`save` pair. Select from `contract.sectionInstances` + `sectionSchemas`, pass `sectionType`, call `save`
+- [x] Task 3d: harness target selection from contract `sectionInstances` + `sectionSchemas`, passes `sectionType`, calls `save` after `update-section`; `verify:webmcp` green on Next (`authors` / `authors-list-1` / `title`); alpha + olonjs.io copies synced (not live-run)
 - [x] Task 3e: discovery surface moved to runtime route handlers; dynamic pages expanded from collections; every index href resolves 200 (live check, 70 urls)
 - [ ] Task 3f: local save writes LF and rewrites all config/collection files on a CRLF tree → noise-only diffs
 - [ ] Task 3g: `scripts/sync-pages-to-public.mjs` (pre-existing) still copies `src/data` → `public/{pages,collections,config}` at prebuild so `/pages/*.json` and `/collections/*` are served as static files instead of hitting `/api/public-page`. Decide: runtime route for `/collections/{source}/{source}.json` + `/config/site.json`, and fix the static-boot self-fetch loop, then drop the sync
