@@ -8,6 +8,17 @@
  * The generator script (`scripts/bump-schemas.ts`) imports from this file
  * directly via relative path and emits Draft-07 JSON Schemas.
  *
+ * ## Why `zod/v3` here (zod v4-only migration)
+ *
+ * The runtime engine (and the rest of the repo) is zod v4-only, but this
+ * single authoring file imports the `zod/v3` compat subpath that the zod v4
+ * package ships. Reason: the generator uses `zod-to-json-schema`, which is
+ * no longer maintained (Nov 2025) and supports v3-dialect schemas only — its
+ * own README recommends authoring via `zod/v3`. This keeps the published
+ * JSON Schema output byte-identical while the dependency tree stays zod v4.
+ * Follow-up (tracked): migrate `bump-schemas.ts` to zod v4's native
+ * `z.toJSONSchema()` and retire `zod-to-json-schema`.
+ *
  * ## Authoring gotchas (see ADR-0013)
  *
  * 1. **Field-level `.describe()` on `definitions`-registered schemas breaks
@@ -29,7 +40,7 @@
  * semantically off, or harder to read than necessary, fix THIS file — never
  * the .schema.json output.
  */
-import { z } from 'zod';
+import { z } from 'zod/v3';
 import type { MenuItem } from './kernel';
 
 export const MenuItemSchema: z.ZodType<MenuItem> = z.lazy(() =>

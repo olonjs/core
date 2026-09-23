@@ -18,7 +18,7 @@
   "files": [
     "dist"
   ],
-  "description": "The framework-agnostic Sovereign Core Engine for OlonJS: protocol types, config/collection resolution, theme-token logic, WebMCP contracts, and routing helpers. Zero React dependency — consumed by @olonjs/react and @olonjs/studio.",
+  "description": "The framework-agnostic Sovereign Core Engine for OlonJS: protocol types, config/collection resolution, theme-token logic, WebMCP contracts, and routing helpers. Zero React dependency \u2014 consumed by @olonjs/react and @olonjs/studio.",
   "author": "JsonPages Team",
   "license": "MIT",
   "homepage": "https://github.com/olonjs/npm-jpcore#readme",
@@ -38,9 +38,6 @@
     "prepack": "node scripts/sync-peers-from-stack.js",
     "test": "vitest run"
   },
-  "peerDependencies": {
-    "zod": "^4.0.0"
-  },
   "dependencies": {
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.0.1"
@@ -52,6 +49,6 @@
     "vite": "^6.0.0",
     "vite-plugin-dts": "^4.0.0",
     "vitest": "^3.0.0",
-    "zod": "^4.6.5"
+    "zod": "^4.6.0"
   }
 }

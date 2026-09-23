@@ -18,7 +18,7 @@
   "files": [
     "dist"
   ],
-  "description": "The schema-driven Studio editor UI for OlonJS (AdminSidebar, FormFactory, StudioStage). Depends only on @olonjs/core — reusable by any future rendering-framework binding, not just @olonjs/react.",
+  "description": "The schema-driven Studio editor UI for OlonJS (AdminSidebar, FormFactory, StudioStage). Depends only on @olonjs/core \u2014 reusable by any future rendering-framework binding, not just @olonjs/react.",
   "author": "JsonPages Team",
   "license": "MIT",
   "homepage": "https://github.com/olonjs/npm-jpcore#readme",
@@ -42,7 +42,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.29.0",
-    "zod": "^4.0.0"
+    "zod": "^4.6.0"
   },
   "dependencies": {
     "@olonjs/core": "^2.0.0",
@@ -71,6 +71,6 @@
     "vite": "^6.0.0",
     "vite-plugin-dts": "^4.0.0",
     "vitest": "^3.0.0",
-    "zod": "^4.0.0"
+    "zod": "^4.6.0"
   }
 }
