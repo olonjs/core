@@ -1,6 +1,6 @@
 {
   "name": "@olonjs/next",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "private": false,
   "type": "module",
   "description": "Next.js App Router host binding for OlonJS — RSC visitors + admin client island (ADR-0017).",
@@ -62,7 +62,7 @@
     "react-router-dom": "^6.29.0 || ^7.0.0"
   },
   "dependencies": {
-    "@olonjs/core": "^2.0.0"
+    "@olonjs/core": "^2.0.1"
   },
   "peerDependenciesMeta": {
     "@olonjs/react": {
