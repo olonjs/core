@@ -127,8 +127,20 @@ function cloneJson<T>(value: T): T {
   return value == null ? value : (JSON.parse(JSON.stringify(value)) as T);
 }
 
-function getTypeName(schema: z.ZodTypeAny): z.ZodFirstPartyTypeKind | undefined {
-  return schema?._def?.typeName as z.ZodFirstPartyTypeKind | undefined;
+/**
+ * Zod v4 runtime discriminator: every classic schema carries `_def.type`
+ * (a stable string such as "string", "object", "optional", ...). The v3
+ * `_def.typeName` + `z.ZodFirstPartyTypeKind` enum is gone in v4 (the enum
+ * survives only as an empty compat declaration), so we read `_def.type`.
+ */
+type ZodDefLike = { type?: string; [key: string]: unknown };
+
+function getDef(schema: z.ZodTypeAny): ZodDefLike {
+  return (schema?._def ?? {}) as ZodDefLike;
+}
+
+function getTypeName(schema: z.ZodTypeAny): string | undefined {
+  return getDef(schema).type;
 }
 
 function unwrapSchema(schema: z.ZodTypeAny) {
@@ -139,26 +151,23 @@ function unwrapSchema(schema: z.ZodTypeAny) {
 
   for (;;) {
     const typeName = getTypeName(current);
-    if (typeName === z.ZodFirstPartyTypeKind.ZodOptional) {
+    if (typeName === 'optional') {
       isOptional = true;
-      current = (current as z.ZodOptional<z.ZodTypeAny>)._def.innerType;
+      current = getDef(current).innerType as z.ZodTypeAny;
       continue;
     }
-    if (typeName === z.ZodFirstPartyTypeKind.ZodDefault) {
+    if (typeName === 'default') {
       isOptional = true;
       if (defaultValue === undefined) {
-        try {
-          defaultValue = (current as z.ZodDefault<z.ZodTypeAny>)._def.defaultValue();
-        } catch {
-          defaultValue = undefined;
-        }
+        // v4: `_def.defaultValue` stores the value directly (v3 stored a thunk).
+        defaultValue = getDef(current).defaultValue;
       }
-      current = (current as z.ZodDefault<z.ZodTypeAny>)._def.innerType;
+      current = getDef(current).innerType as z.ZodTypeAny;
       continue;
     }
-    if (typeName === z.ZodFirstPartyTypeKind.ZodNullable) {
+    if (typeName === 'nullable') {
       isNullable = true;
-      current = (current as z.ZodNullable<z.ZodTypeAny>)._def.innerType;
+      current = getDef(current).innerType as z.ZodTypeAny;
       continue;
     }
     break;
@@ -193,8 +202,9 @@ function unionToEnum(options: readonly z.ZodTypeAny[]): Record<string, unknown> 
     const unwrapped = unwrapSchema(option).schema;
     const typeName = getTypeName(unwrapped);
 
-    if (typeName === z.ZodFirstPartyTypeKind.ZodLiteral) {
-      const literal = (unwrapped as z.ZodLiteral<unknown>)._def.value;
+    if (typeName === 'literal') {
+      // v4: ZodLiteral stores `_def.values` (single-element array).
+      const literal = (getDef(unwrapped).values as [unknown] | undefined)?.[0];
       values.push(literal);
       const literalType = typeof literal;
       if (literalType === 'string' || literalType === 'number' || literalType === 'boolean') {
@@ -204,8 +214,9 @@ function unionToEnum(options: readonly z.ZodTypeAny[]): Record<string, unknown> 
       return null;
     }
 
-    if (typeName === z.ZodFirstPartyTypeKind.ZodEnum) {
-      values.push(...(unwrapped as z.ZodEnum<[string, ...string[]]>)._def.values);
+    if (typeName === 'enum') {
+      // v4: ZodEnum stores `_def.entries` (a {value: value} record).
+      values.push(...Object.values((getDef(unwrapped).entries ?? {}) as Record<string, string>));
       primitiveType = primitiveType ?? 'string';
       continue;
     }
@@ -225,8 +236,9 @@ function zodToJsonSchema(schema: z.ZodTypeAny): Record<string, unknown> {
   const typeName = getTypeName(current);
 
   switch (typeName) {
-    case z.ZodFirstPartyTypeKind.ZodObject: {
-      const shape = (current as z.AnyZodObject)._def.shape();
+    case 'object': {
+      // v4: `_def.shape` is a plain object map (v3 exposed it via `shape()`).
+      const shape = (getDef(current).shape ?? {}) as Record<string, z.ZodTypeAny>;
       const properties: Record<string, unknown> = {};
       const required: string[] = [];
 
@@ -246,36 +258,40 @@ function zodToJsonSchema(schema: z.ZodTypeAny): Record<string, unknown> {
       return withSchemaMetadata(schema, objectSchema, meta);
     }
 
-    case z.ZodFirstPartyTypeKind.ZodString:
+    case 'string':
       return withSchemaMetadata(schema, { type: 'string' }, meta);
 
-    case z.ZodFirstPartyTypeKind.ZodBoolean:
+    case 'boolean':
       return withSchemaMetadata(schema, { type: 'boolean' }, meta);
 
-    case z.ZodFirstPartyTypeKind.ZodNumber: {
-      const checks = Array.isArray((current as z.ZodNumber)._def.checks)
-        ? (current as z.ZodNumber)._def.checks
+    case 'number': {
+      const checks = Array.isArray(getDef(current).checks)
+        ? (getDef(current).checks as Array<{ def?: { format?: string } }>)
         : [];
-      const isInteger = checks.some((check) => check.kind === 'int');
+      // v4: `.int()` emits a number_format check with format "safeint".
+      const isInteger = checks.some((check) => check?.def?.format === 'safeint');
       return withSchemaMetadata(schema, { type: isInteger ? 'integer' : 'number' }, meta);
     }
 
-    case z.ZodFirstPartyTypeKind.ZodArray:
+    case 'array':
       return withSchemaMetadata(
         schema,
-        { type: 'array', items: zodToJsonSchema((current as z.ZodArray<z.ZodTypeAny>)._def.type) },
+        // v4: the element schema lives in `_def.element` (v3 used `_def.type`).
+        { type: 'array', items: zodToJsonSchema(getDef(current).element as z.ZodTypeAny) },
         meta
       );
 
-    case z.ZodFirstPartyTypeKind.ZodEnum:
+    case 'enum':
+      // v4: `_def.entries` is a {value: value} record (v3 used `_def.values` array).
       return withSchemaMetadata(
         schema,
-        { type: 'string', enum: [...(current as z.ZodEnum<[string, ...string[]]>)._def.values] },
+        { type: 'string', enum: [...Object.values((getDef(current).entries ?? {}) as Record<string, string>)] },
         meta
       );
 
-    case z.ZodFirstPartyTypeKind.ZodLiteral: {
-      const literal = (current as z.ZodLiteral<unknown>)._def.value;
+    case 'literal': {
+      // v4: `_def.values` is a single-element array (v3 used `_def.value`).
+      const literal = (getDef(current).values as [unknown] | undefined)?.[0];
       const primitiveType = literal === null ? 'null' : typeof literal;
       const literalSchema: Record<string, unknown> = { const: literal };
       if (primitiveType !== 'object') {
@@ -284,20 +300,20 @@ function zodToJsonSchema(schema: z.ZodTypeAny): Record<string, unknown> {
       return withSchemaMetadata(schema, literalSchema, meta);
     }
 
-    case z.ZodFirstPartyTypeKind.ZodRecord:
+    case 'record':
       return withSchemaMetadata(
         schema,
         {
           type: 'object',
           additionalProperties: zodToJsonSchema(
-            (current as z.ZodRecord<z.ZodString, z.ZodTypeAny>)._def.valueType
+            getDef(current).valueType as z.ZodTypeAny
           ),
         },
         meta
       );
 
-    case z.ZodFirstPartyTypeKind.ZodUnion: {
-      const options = (current as z.ZodUnion<readonly [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]]>)._def.options;
+    case 'union': {
+      const options = (getDef(current).options ?? []) as readonly z.ZodTypeAny[];
       const enumSchema = unionToEnum(options);
       if (enumSchema) return withSchemaMetadata(schema, enumSchema, meta);
       return withSchemaMetadata(
@@ -570,8 +586,8 @@ export function buildCollectionContract({ source, schema }: BuildCollectionContr
   const typeName = getTypeName(current);
 
   let valueSchema: z.ZodTypeAny;
-  if (typeName === z.ZodFirstPartyTypeKind.ZodRecord) {
-    valueSchema = (current as z.ZodRecord<z.ZodString, z.ZodTypeAny>)._def.valueType;
+  if (typeName === 'record') {
+    valueSchema = getDef(current).valueType as z.ZodTypeAny;
   } else {
     valueSchema = schema;
   }

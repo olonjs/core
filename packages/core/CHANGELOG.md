@@ -8,6 +8,7 @@
 
 ### Breaking changes
 
+- **Zod v4-only.** `peerDependencies.zod` moves to `^4.0.0` (from `^3.24.1`). The hand-rolled Zod → JSON Schema serializer in `contract/webmcp-contracts.ts` was migrated from v3 internals (`_def.typeName` + `z.ZodFirstPartyTypeKind`, `_def.defaultValue()`, `_def.shape()`, `_def.checks[].kind`) to v4 internals (`_def.type`, `_def.defaultValue` value, `_def.shape` plain map, `_def.entries` / `_def.values` / `_def.element`, `number_format`/`safeint` checks). Emitted JSON Schema output is unchanged (golden tests in `contract/webmcp-contracts-v4.test.ts`). Tenants must install `zod@^4`; replace `z.string().email()` with `z.email()`.
 - `JsonPagesEngine`, `OlonJSEngine`, `ConfigProvider`, `PageRenderer`, `StudioProvider`, `ThemeLoader`, `useConfig`, `useStudio`, `OlonFormsContext`, `useFormState` moved to the new `@olonjs/react` package.
 - `AdminSidebar`, `FormFactory`, `StudioStage`, `StudioRouteBody`, image/icon pickers moved to the new `@olonjs/studio` package.
 - The `@olonjs/core/runtime` subpath (ADR-0009) is retired. There is now a single `@olonjs/core` build with a single import surface.
