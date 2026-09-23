@@ -87,12 +87,13 @@
   - Verify: entrambi i comandi verdi; diff dei template riesaminato.
   - Files: `packages/cli/assets/**` (rigenerati)
 
-- [ ] **T15 — Changelog `/changelog/<nome-commit>.md`**
+- [x] **T15 — Changelog `/changelog/<nome-commit>.md`**
   - Acceptance: file changelog con: breaking change (peer zod v4), migration note tenant (`z.string().email()` → `z.email()`), tabella semver con **entrambe le colonne** — pre-set (core 2.0.0, studio/react 0.2.0, mcp 1.0.153, stack 1.1.0) e pubblicate via release:enterprise (core 2.0.1, studio/react 0.2.1, mcp 1.0.154, stack 1.1.1, compat allineati).
   - Verify: revisione utente.
   - Files: `changelog/<nome-commit>.md` (nuovo)
 
-- [ ] **T16 — Rilascio: dry-run poi `release:enterprise`**
+- [ ] **T16 —
+  - Status: **BLOCCATO** — `NPM_TOKEN` in `.env` non valido (E401 su `npm whoami`). Il dry-run è stato eseguito e il piano comandi validato fino a mcp; il rilascio reale si è fermato al primo publish (stack) per auth. Azione richiesta: token npm con diritti di publish sul scope `@olonjs`, poi `node scripts/release-enterprise.js`. Rilascio: dry-run poi `release:enterprise`**
   - Acceptance: `node scripts/release.js --dry-run` (o `npm run release:enterprise` dopo review del dry-run) eseguito; piano comandi verificato; release reale con `NPM_TOKEN` presente; versioni pubblicate coerenti con la colonna "pubblicate" del changelog.
   - Verify: dry-run review → release → `npm view @olonjs/core version` = 2.0.1 (o successiva patch libera).
   - Files: nessuno atteso nel repo (solo bump di package.json post-release, da committare)
