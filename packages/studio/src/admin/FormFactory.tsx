@@ -11,9 +11,16 @@ import { Label } from '../ui/label';
  * 🛠️ HELPER: Generates a default value based on the Zod schema.
  * 🛡️ FIX: Now injects a deterministic UUID for every object created.
  */
+/**
+ * zod v4: `_def.innerType`, `_def.shape` values and `.element` are typed as the
+ * core `$ZodType` (which lacks the classic `_def` surface), while these helpers
+ * operate on classic instances. Runtime values are always classic — cast once.
+ */
+const asZodTypeAny = (schema: unknown): z.ZodTypeAny => schema as z.ZodTypeAny;
+
 const generateDefaultValue = (schema: z.ZodTypeAny): unknown => {
   if (schema instanceof z.ZodOptional || schema instanceof z.ZodDefault) {
-    return generateDefaultValue(schema._def.innerType);
+    return generateDefaultValue(asZodTypeAny(schema._def.innerType));
   }
   
   if (schema instanceof z.ZodObject) {
@@ -44,7 +51,7 @@ const generateDefaultValue = (schema: z.ZodTypeAny): unknown => {
  */
 const getEffectiveSchema = (schema: z.ZodTypeAny): z.ZodTypeAny => {
   if (schema instanceof z.ZodOptional || schema instanceof z.ZodDefault || schema instanceof z.ZodNullable) {
-    return getEffectiveSchema(schema._def.innerType);
+    return getEffectiveSchema(asZodTypeAny(schema._def.innerType));
   }
   return schema;
 };
@@ -167,8 +174,8 @@ export const FormFactory: React.FC<FormFactoryProps> = ({
         const fieldSchema = shape[key];
         if (!fieldSchema) return null;
 
-        const effectiveSchema = getEffectiveSchema(fieldSchema);
-        const uiHint = getUiHint(fieldSchema) || 'ui:text';
+        const effectiveSchema = getEffectiveSchema(asZodTypeAny(fieldSchema));
+        const uiHint = getUiHint(asZodTypeAny(fieldSchema)) || 'ui:text';
         const value = data[key];
 
         // Editorial fields are edited directly on Stage and not in Inspector form.
@@ -473,7 +480,7 @@ export const FormFactory: React.FC<FormFactoryProps> = ({
         // 2. ARRAY HANDLING
         if (effectiveSchema instanceof z.ZodArray) {
           const items = (Array.isArray(value) ? value : []) as unknown[];
-          const itemSchema = getEffectiveSchema(effectiveSchema.element);
+          const itemSchema = getEffectiveSchema(asZodTypeAny(effectiveSchema.element));
 
           const moveItem = (from: number, to: number) => {
             if (to < 0 || to >= items.length) return;

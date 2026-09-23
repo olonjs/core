@@ -105,9 +105,16 @@ interface AdminSidebarProps {
 const SETTINGS_KEYS = new Set(['anchorId', 'paddingTop', 'paddingBottom', 'theme', 'container']);
 const INLINE_EDITOR_UI_HINTS = new Set(['ui:editorial-markdown']);
 
+/**
+ * zod v4: `_def.innerType` and `_def.shape` values are typed as the core
+ * `$ZodType` (which lacks the classic `_def` surface), while these helpers
+ * operate on classic instances. Runtime values are always classic — cast once.
+ */
+const asZodTypeAny = (schema: unknown): z.ZodTypeAny => schema as z.ZodTypeAny;
+
 const unwrapSchema = (schema: z.ZodTypeAny): z.ZodTypeAny => {
   if (schema instanceof z.ZodOptional || schema instanceof z.ZodDefault || schema instanceof z.ZodNullable) {
-    return unwrapSchema(schema._def.innerType);
+    return unwrapSchema(asZodTypeAny(schema._def.innerType));
   }
   return schema;
 };
@@ -441,7 +448,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     const shape = formSchema.shape;
     const contentKeys = Object.keys(shape).filter((k) => !SETTINGS_KEYS.has(k));
     if (contentKeys.length === 0) return false;
-    return contentKeys.every((k) => INLINE_EDITOR_UI_HINTS.has(getUiHint(shape[k])));
+    return contentKeys.every((k) => INLINE_EDITOR_UI_HINTS.has(getUiHint(asZodTypeAny(shape[k]))));
   }, [formSchema]);
   useEffect(() => {
     if (selectedSection?.id != null && isInlineEditorialSection) {
@@ -477,7 +484,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Header: Inspector + page context or type|scope */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 shrink-0">
           <div className="min-w-0">
-            <h2 className="text-sm font-bold text-white">Inspector</h2>
+            <h2 className="text-sm font-bold text-white">Studio</h2>
             <p className="text-[10px] tracking-[0.06em] text-zinc-600 mt-0.5">
               {selectedSection ? (
                 <>
@@ -712,7 +719,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             const contentKeys = shapeKeys.filter(
               (k) =>
                 !SETTINGS_KEYS.has(k) &&
-                !INLINE_EDITOR_UI_HINTS.has(getUiHint(formSchema.shape[k]))
+                !INLINE_EDITOR_UI_HINTS.has(getUiHint(asZodTypeAny(formSchema.shape[k])))
             );
             const data = (formSection?.data as Record<string, unknown>) || {};
             if (contentKeys.length === 0) {
