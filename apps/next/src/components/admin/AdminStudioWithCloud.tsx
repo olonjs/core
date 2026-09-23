@@ -1,28 +1,31 @@
 'use client';
 
-import { lazy, Suspense, useCallback } from 'react';
+import { lazy, Suspense, useCallback, useMemo } from 'react';
 import type {
-  JsonPagesConfig,
-  MenuConfig,
-  PageConfig,
-  ProjectState,
-  SiteConfig,
-  ThemeConfig,
+	JsonPagesConfig,
+	MenuConfig,
+	PageConfig,
+	ProjectState,
+	SiteConfig,
+	ThemeConfig,
 } from '@olonjs/core';
 import { AdminStudioClient } from '@/components/admin/AdminStudioClient';
-import { useCloudSave } from '@/lib/admin/useCloudSave';
+import {
+	type CloudSaveBaseline,
+	useCloudSave,
+} from '@/lib/admin/useCloudSave';
 import { getCloudPolicy, TENANT_ID } from '@/lib/env/tenantEnv';
 
 const ColdSaveDrawer = lazy(() =>
-  import('@/components/admin/ColdSaveDrawer').then((m) => ({ default: m.ColdSaveDrawer })),
+	import('@/components/admin/ColdSaveDrawer').then((m) => ({ default: m.ColdSaveDrawer })),
 );
 
 export type AdminStudioWithCloudProps = {
-  initialPages: Record<string, PageConfig>;
-  initialSiteConfig: SiteConfig;
-  initialMenuConfig: MenuConfig;
-  initialThemeConfig: ThemeConfig;
-  initialCollections: NonNullable<JsonPagesConfig['collections']>;
+	initialPages: Record<string, PageConfig>;
+	initialSiteConfig: SiteConfig;
+	initialMenuConfig: MenuConfig;
+	initialThemeConfig: ThemeConfig;
+	initialCollections: NonNullable<JsonPagesConfig['collections']>;
 };
 
 /**
@@ -30,45 +33,61 @@ export type AdminStudioWithCloudProps = {
  * Local save when cloud credentials are absent; cold save when Save2Repo is enabled.
  */
 export function AdminStudioWithCloud(props: AdminStudioWithCloudProps) {
-  const cloudPolicy = getCloudPolicy();
-  const { cloudSaveUi, runCloudSave, closeCloudDrawer, retryCloudSave } = useCloudSave({
-    apiUrl: cloudPolicy.apiUrl,
-    apiKey: cloudPolicy.apiKey,
-  });
+	const cloudPolicy = getCloudPolicy();
+	const baseline = useMemo<CloudSaveBaseline>(
+		() => ({
+			pages: props.initialPages,
+			site: props.initialSiteConfig,
+			menu: props.initialMenuConfig,
+			collections: props.initialCollections,
+		}),
+		[
+			props.initialPages,
+			props.initialSiteConfig,
+			props.initialMenuConfig,
+			props.initialCollections,
+		],
+	);
 
-  const coldSave = useCallback(
-    async (state: ProjectState, slug: string) => {
-      await runCloudSave({ state, slug }, true);
-    },
-    [runCloudSave],
-  );
+	const { cloudSaveUi, runCloudSave, closeCloudDrawer, retryCloudSave } = useCloudSave({
+		apiUrl: cloudPolicy.apiUrl,
+		apiKey: cloudPolicy.apiKey,
+		baseline,
+	});
 
-  const mountDrawer =
-    cloudPolicy.showColdSave && (cloudSaveUi.isOpen || cloudSaveUi.phase !== 'idle');
+	const coldSave = useCallback(
+		async (state: ProjectState, slug: string) => {
+			await runCloudSave({ state, slug }, true);
+		},
+		[runCloudSave],
+	);
 
-  return (
-    <AdminStudioClient
-      tenantId={TENANT_ID}
-      {...props}
-      showLocalSave={cloudPolicy.showLocalSave}
-      showColdSave={cloudPolicy.showColdSave}
-      coldSave={cloudPolicy.showColdSave ? coldSave : undefined}
-    >
-      {mountDrawer ? (
-        <Suspense fallback={null}>
-          <ColdSaveDrawer
-            isOpen={cloudSaveUi.isOpen}
-            phase={cloudSaveUi.phase}
-            currentStepId={cloudSaveUi.currentStepId}
-            doneSteps={cloudSaveUi.doneSteps}
-            progress={cloudSaveUi.progress}
-            errorMessage={cloudSaveUi.errorMessage}
-            deployUrl={cloudSaveUi.deployUrl}
-            onClose={closeCloudDrawer}
-            onRetry={retryCloudSave}
-          />
-        </Suspense>
-      ) : null}
-    </AdminStudioClient>
-  );
+	const mountDrawer =
+		cloudPolicy.showColdSave && (cloudSaveUi.isOpen || cloudSaveUi.phase !== 'idle');
+
+	return (
+		<AdminStudioClient
+			tenantId={TENANT_ID}
+			{...props}
+			showLocalSave={cloudPolicy.showLocalSave}
+			showColdSave={cloudPolicy.showColdSave}
+			coldSave={cloudPolicy.showColdSave ? coldSave : undefined}
+		>
+			{mountDrawer ? (
+				<Suspense fallback={null}>
+					<ColdSaveDrawer
+						isOpen={cloudSaveUi.isOpen}
+						phase={cloudSaveUi.phase}
+						currentStepId={cloudSaveUi.currentStepId}
+						doneSteps={cloudSaveUi.doneSteps}
+						progress={cloudSaveUi.progress}
+						errorMessage={cloudSaveUi.errorMessage}
+						deployUrl={cloudSaveUi.deployUrl}
+						onClose={closeCloudDrawer}
+						onRetry={retryCloudSave}
+					/>
+				</Suspense>
+			) : null}
+		</AdminStudioClient>
+	);
 }

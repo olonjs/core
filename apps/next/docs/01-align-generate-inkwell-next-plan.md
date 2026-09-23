@@ -56,45 +56,45 @@ generator test gates (apps/next/scripts/...)
 
 ### Phase 1: Foundation — contratto collezioni `$ref`
 
-- [x] Task 1: Emit `tag-refs.ts` (body da `temp/next-inkwell`)
-- [x] Task 2: Align posts collection schema
-- [x] Task 3: Align `posts.json` heredoc (keep anomalous `$ref`)
+- [ ] Task 1: Emit `tag-refs.ts` (body da `temp/next-inkwell`)
+- [ ] Task 2: Align posts collection schema
+- [ ] Task 3: Align `posts.json` heredoc (keep anomalous `$ref`)
 
 ### Checkpoint: Foundation
-- [x] Script contains `tag-refs.ts` heredoc and `ui:collection-ref:tags`
-- [x] No remaining posts `z.array(z.string()).describe('ui:list')`
+- [ ] Script contains `tag-refs.ts` heredoc and `ui:collection-ref:tags`
+- [ ] No remaining posts `z.array(z.string()).describe('ui:list')`
 
 ### Phase 2: Views
 
-- [x] Task 4: Align `posts-list/View.tsx`
-- [x] Task 5: Align `related-tags/View.tsx`
-- [x] Task 6: Align `tag-posts/View.tsx`
+- [ ] Task 4: Align `posts-list/View.tsx`
+- [ ] Task 5: Align `related-tags/View.tsx`
+- [ ] Task 6: Align `tag-posts/View.tsx`
 
 ### Checkpoint: Views
-- [x] All three View heredocs import `@/collections/posts/tag-refs`
+- [ ] All three View heredocs import `@/collections/posts/tag-refs`
 
 ### Phase 3: Dynamic page paths
 
-- [x] Task 7: Switch emits + mkdir to nested `[slug].json` paths
-- [x] Task 8: Align detail page JSON bodies (`../../collections/...`)
+- [ ] Task 7: Switch emits + mkdir to nested `[slug].json` paths
+- [ ] Task 8: Align detail page JSON bodies (`../../collections/...`)
 
 ### Checkpoint: Pages
-- [x] Zero flat `post-detail.json` / `tag-detail.json` targets
+- [ ] Zero flat `post-detail.json` / `tag-detail.json` targets
 
 ### Phase 4: Exact JSON + docs
 
-- [x] Task 9: Sync pretty-printed JSON heredocs from SOT
-- [x] Task 10: Update banner + checklist text
+- [ ] Task 9: Sync pretty-printed JSON heredocs from SOT
+- [ ] Task 10: Update banner + checklist text
 
 ### Phase 5: Verification
 
-- [x] Task 11: Extend `apps/next/scripts/generate-inkwell-next.test.mjs`
-- [x] Task 12: Static re-diff script targets vs `temp/next-inkwell` (0 semantic DIFFER; anomalous `$ref` preserved)
+- [ ] Task 11: Extend `apps/next/scripts/generate-inkwell-next.test.mjs`
+- [ ] Task 12: Static re-diff script targets vs `temp/next-inkwell` (0 semantic DIFFER; anomalous `$ref` preserved)
 
 ### Checkpoint: Complete
-- [x] Generator unit tests pass in npm-jpcore
-- [x] Diff clean vs SOT
-- [x] Ready for optional live `bash templates/generate_inkwell_next.sh` on `apps/next` (distruttivo — solo con OK esplicito)
+- [ ] Generator unit tests pass in npm-jpcore
+- [ ] Diff clean vs SOT
+- [ ] Ready for optional live `bash templates/generate_inkwell_next.sh` on `apps/next` (distruttivo — solo con OK esplicito)
 
 ## Risks and Mitigations
 

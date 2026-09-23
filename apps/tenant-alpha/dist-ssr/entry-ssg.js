@@ -21,21 +21,21 @@ function requireReactJsxRuntime_production() {
   if (hasRequiredReactJsxRuntime_production) return reactJsxRuntime_production;
   hasRequiredReactJsxRuntime_production = 1;
   var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
-  function jsxProd(type, config, maybeKey) {
+  function jsxProd(type, config2, maybeKey) {
     var key = null;
     void 0 !== maybeKey && (key = "" + maybeKey);
-    void 0 !== config.key && (key = "" + config.key);
-    if ("key" in config) {
+    void 0 !== config2.key && (key = "" + config2.key);
+    if ("key" in config2) {
       maybeKey = {};
-      for (var propName in config)
-        "key" !== propName && (maybeKey[propName] = config[propName]);
-    } else maybeKey = config;
-    config = maybeKey.ref;
+      for (var propName in config2)
+        "key" !== propName && (maybeKey[propName] = config2[propName]);
+    } else maybeKey = config2;
+    config2 = maybeKey.ref;
     return {
       $$typeof: REACT_ELEMENT_TYPE,
       type,
       key,
-      ref: void 0 !== config ? config : null,
+      ref: void 0 !== config2 ? config2 : null,
       props: maybeKey
     };
   }
@@ -124,8 +124,8 @@ function requireReact_production() {
   function cloneAndReplaceKey(oldElement, newKey) {
     return ReactElement(oldElement.type, newKey, oldElement.props);
   }
-  function isValidElement(object) {
-    return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
+  function isValidElement(object2) {
+    return "object" === typeof object2 && null !== object2 && object2.$$typeof === REACT_ELEMENT_TYPE;
   }
   function escape(key) {
     var escaperLookup = { "=": "=0", ":": "=2" };
@@ -148,8 +148,8 @@ function requireReact_production() {
           function(fulfilledValue) {
             "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
           },
-          function(error) {
-            "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+          function(error2) {
+            "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error2);
           }
         )), thenable.status) {
           case "fulfilled":
@@ -160,7 +160,7 @@ function requireReact_production() {
     }
     throw thenable;
   }
-  function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
+  function mapIntoArray(children, array2, escapedPrefix, nameSoFar, callback) {
     var type = typeof children;
     if ("undefined" === type || "boolean" === type) children = null;
     var invokeCallback = false;
@@ -181,7 +181,7 @@ function requireReact_production() {
             case REACT_LAZY_TYPE:
               return invokeCallback = children._init, mapIntoArray(
                 invokeCallback(children._payload),
-                array,
+                array2,
                 escapedPrefix,
                 nameSoFar,
                 callback
@@ -189,7 +189,7 @@ function requireReact_production() {
           }
       }
     if (invokeCallback)
-      return callback = callback(children), invokeCallback = "" === nameSoFar ? "." + getElementKey(children, 0) : nameSoFar, isArrayImpl(callback) ? (escapedPrefix = "", null != invokeCallback && (escapedPrefix = invokeCallback.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c) {
+      return callback = callback(children), invokeCallback = "" === nameSoFar ? "." + getElementKey(children, 0) : nameSoFar, isArrayImpl(callback) ? (escapedPrefix = "", null != invokeCallback && (escapedPrefix = invokeCallback.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array2, escapedPrefix, "", function(c) {
         return c;
       })) : null != callback && (isValidElement(callback) && (callback = cloneAndReplaceKey(
         callback,
@@ -197,14 +197,14 @@ function requireReact_production() {
           userProvidedKeyEscapeRegex,
           "$&/"
         ) + "/") + invokeCallback
-      )), array.push(callback)), 1;
+      )), array2.push(callback)), 1;
     invokeCallback = 0;
     var nextNamePrefix = "" === nameSoFar ? "." : nameSoFar + ":";
     if (isArrayImpl(children))
       for (var i = 0; i < children.length; i++)
         nameSoFar = children[i], type = nextNamePrefix + getElementKey(nameSoFar, i), invokeCallback += mapIntoArray(
           nameSoFar,
-          array,
+          array2,
           escapedPrefix,
           type,
           callback
@@ -213,7 +213,7 @@ function requireReact_production() {
       for (children = i.call(children), i = 0; !(nameSoFar = children.next()).done; )
         nameSoFar = nameSoFar.value, type = nextNamePrefix + getElementKey(nameSoFar, i++), invokeCallback += mapIntoArray(
           nameSoFar,
-          array,
+          array2,
           escapedPrefix,
           type,
           callback
@@ -222,14 +222,14 @@ function requireReact_production() {
       if ("function" === typeof children.then)
         return mapIntoArray(
           resolveThenable(children),
-          array,
+          array2,
           escapedPrefix,
           nameSoFar,
           callback
         );
-      array = String(children);
+      array2 = String(children);
       throw Error(
-        "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
+        "Objects are not valid as a React child (found: " + ("[object Object]" === array2 ? "object with keys {" + Object.keys(children).join(", ") + "}" : array2) + "). If you meant to render a collection of children, use an array instead."
       );
     }
     return invokeCallback;
@@ -251,9 +251,9 @@ function requireReact_production() {
           if (0 === payload._status || -1 === payload._status)
             payload._status = 1, payload._result = moduleObject;
         },
-        function(error) {
+        function(error2) {
           if (0 === payload._status || -1 === payload._status)
-            payload._status = 2, payload._result = error;
+            payload._status = 2, payload._result = error2;
         }
       );
       -1 === payload._status && (payload._status = 0, payload._result = ctor);
@@ -261,20 +261,20 @@ function requireReact_production() {
     if (1 === payload._status) return payload._result.default;
     throw payload._result;
   }
-  var reportGlobalError = "function" === typeof reportError ? reportError : function(error) {
+  var reportGlobalError = "function" === typeof reportError ? reportError : function(error2) {
     if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
       var event = new window.ErrorEvent("error", {
         bubbles: true,
         cancelable: true,
-        message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
-        error
+        message: "object" === typeof error2 && null !== error2 && "string" === typeof error2.message ? String(error2.message) : String(error2),
+        error: error2
       });
       if (!window.dispatchEvent(event)) return;
     } else if ("object" === typeof process && "function" === typeof process.emit) {
-      process.emit("uncaughtException", error);
+      process.emit("uncaughtException", error2);
       return;
     }
-    console.error(error);
+    console.error(error2);
   }, Children = {
     map: mapChildren,
     forEach: function(children, forEachFunc, forEachContext) {
@@ -329,15 +329,15 @@ function requireReact_production() {
   react_production.cacheSignal = function() {
     return null;
   };
-  react_production.cloneElement = function(element, config, children) {
+  react_production.cloneElement = function(element, config2, children) {
     if (null === element || void 0 === element)
       throw Error(
         "The argument must be a React element, but you passed " + element + "."
       );
     var props = assign({}, element.props), key = element.key;
-    if (null != config)
-      for (propName in void 0 !== config.key && (key = "" + config.key), config)
-        !hasOwnProperty.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
+    if (null != config2)
+      for (propName in void 0 !== config2.key && (key = "" + config2.key), config2)
+        !hasOwnProperty.call(config2, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config2.ref || (props[propName] = config2[propName]);
     var propName = arguments.length - 2;
     if (1 === propName) props.children = children;
     else if (1 < propName) {
@@ -363,11 +363,11 @@ function requireReact_production() {
     };
     return defaultValue;
   };
-  react_production.createElement = function(type, config, children) {
+  react_production.createElement = function(type, config2, children) {
     var propName, props = {}, key = null;
-    if (null != config)
-      for (propName in void 0 !== config.key && (key = "" + config.key), config)
-        hasOwnProperty.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (props[propName] = config[propName]);
+    if (null != config2)
+      for (propName in void 0 !== config2.key && (key = "" + config2.key), config2)
+        hasOwnProperty.call(config2, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (props[propName] = config2[propName]);
     var childrenLength = arguments.length - 2;
     if (1 === childrenLength) props.children = children;
     else if (1 < childrenLength) {
@@ -408,8 +408,8 @@ function requireReact_production() {
       var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals.S;
       null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
       "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && returnValue.then(noop, reportGlobalError);
-    } catch (error) {
-      reportGlobalError(error);
+    } catch (error2) {
+      reportGlobalError(error2);
     } finally {
       null !== prevTransition && null !== currentTransition.types && (prevTransition.types = currentTransition.types), ReactSharedInternals.T = prevTransition;
     }
@@ -625,12 +625,12 @@ function requireReact_development() {
       function UnknownOwner() {
         return Error("react-stack-top-frame");
       }
-      function hasValidKey(config) {
-        if (hasOwnProperty.call(config, "key")) {
-          var getter = Object.getOwnPropertyDescriptor(config, "key").get;
+      function hasValidKey(config2) {
+        if (hasOwnProperty.call(config2, "key")) {
+          var getter = Object.getOwnPropertyDescriptor(config2, "key").get;
           if (getter && getter.isReactWarning) return false;
         }
-        return void 0 !== config.key;
+        return void 0 !== config2.key;
       }
       function defineKeyPropWarningGetter(props, displayName) {
         function warnAboutAccessingKey() {
@@ -706,11 +706,11 @@ function requireReact_development() {
         oldElement._store && (newKey._store.validated = oldElement._store.validated);
         return newKey;
       }
-      function validateChildKeys(node) {
-        isValidElement(node) ? node._store && (node._store.validated = 1) : "object" === typeof node && null !== node && node.$$typeof === REACT_LAZY_TYPE && ("fulfilled" === node._payload.status ? isValidElement(node._payload.value) && node._payload.value._store && (node._payload.value._store.validated = 1) : node._store && (node._store.validated = 1));
+      function validateChildKeys(node2) {
+        isValidElement(node2) ? node2._store && (node2._store.validated = 1) : "object" === typeof node2 && null !== node2 && node2.$$typeof === REACT_LAZY_TYPE && ("fulfilled" === node2._payload.status ? isValidElement(node2._payload.value) && node2._payload.value._store && (node2._payload.value._store.validated = 1) : node2._store && (node2._store.validated = 1));
       }
-      function isValidElement(object) {
-        return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
+      function isValidElement(object2) {
+        return "object" === typeof object2 && null !== object2 && object2.$$typeof === REACT_ELEMENT_TYPE;
       }
       function escape(key) {
         var escaperLookup = { "=": "=0", ":": "=2" };
@@ -732,8 +732,8 @@ function requireReact_development() {
               function(fulfilledValue) {
                 "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
               },
-              function(error) {
-                "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+              function(error2) {
+                "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error2);
               }
             )), thenable.status) {
               case "fulfilled":
@@ -744,7 +744,7 @@ function requireReact_development() {
         }
         throw thenable;
       }
-      function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
+      function mapIntoArray(children, array2, escapedPrefix, nameSoFar, callback) {
         var type = typeof children;
         if ("undefined" === type || "boolean" === type) children = null;
         var invokeCallback = false;
@@ -765,7 +765,7 @@ function requireReact_development() {
                 case REACT_LAZY_TYPE:
                   return invokeCallback = children._init, mapIntoArray(
                     invokeCallback(children._payload),
-                    array,
+                    array2,
                     escapedPrefix,
                     nameSoFar,
                     callback
@@ -776,7 +776,7 @@ function requireReact_development() {
           invokeCallback = children;
           callback = callback(invokeCallback);
           var childKey = "" === nameSoFar ? "." + getElementKey(invokeCallback, 0) : nameSoFar;
-          isArrayImpl(callback) ? (escapedPrefix = "", null != childKey && (escapedPrefix = childKey.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c) {
+          isArrayImpl(callback) ? (escapedPrefix = "", null != childKey && (escapedPrefix = childKey.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array2, escapedPrefix, "", function(c) {
             return c;
           })) : null != callback && (isValidElement(callback) && (null != callback.key && (invokeCallback && invokeCallback.key === callback.key || checkKeyStringCoercion(callback.key)), escapedPrefix = cloneAndReplaceKey(
             callback,
@@ -784,7 +784,7 @@ function requireReact_development() {
               userProvidedKeyEscapeRegex,
               "$&/"
             ) + "/") + childKey
-          ), "" !== nameSoFar && null != invokeCallback && isValidElement(invokeCallback) && null == invokeCallback.key && invokeCallback._store && !invokeCallback._store.validated && (escapedPrefix._store.validated = 2), callback = escapedPrefix), array.push(callback));
+          ), "" !== nameSoFar && null != invokeCallback && isValidElement(invokeCallback) && null == invokeCallback.key && invokeCallback._store && !invokeCallback._store.validated && (escapedPrefix._store.validated = 2), callback = escapedPrefix), array2.push(callback));
           return 1;
         }
         invokeCallback = 0;
@@ -793,7 +793,7 @@ function requireReact_development() {
           for (var i = 0; i < children.length; i++)
             nameSoFar = children[i], type = childKey + getElementKey(nameSoFar, i), invokeCallback += mapIntoArray(
               nameSoFar,
-              array,
+              array2,
               escapedPrefix,
               type,
               callback
@@ -804,7 +804,7 @@ function requireReact_development() {
           ), didWarnAboutMaps = true), children = i.call(children), i = 0; !(nameSoFar = children.next()).done; )
             nameSoFar = nameSoFar.value, type = childKey + getElementKey(nameSoFar, i++), invokeCallback += mapIntoArray(
               nameSoFar,
-              array,
+              array2,
               escapedPrefix,
               type,
               callback
@@ -813,14 +813,14 @@ function requireReact_development() {
           if ("function" === typeof children.then)
             return mapIntoArray(
               resolveThenable(children),
-              array,
+              array2,
               escapedPrefix,
               nameSoFar,
               callback
             );
-          array = String(children);
+          array2 = String(children);
           throw Error(
-            "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
+            "Objects are not valid as a React child (found: " + ("[object Object]" === array2 ? "object with keys {" + Object.keys(children).join(", ") + "}" : array2) + "). If you meant to render a collection of children, use an array instead."
           );
         }
         return invokeCallback;
@@ -849,13 +849,13 @@ function requireReact_development() {
                 void 0 === thenable.status && (thenable.status = "fulfilled", thenable.value = moduleObject);
               }
             },
-            function(error) {
+            function(error2) {
               if (0 === payload._status || -1 === payload._status) {
                 payload._status = 2;
-                payload._result = error;
+                payload._result = error2;
                 var _ioInfo2 = payload._ioInfo;
                 null != _ioInfo2 && (_ioInfo2.end = performance.now());
-                void 0 === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+                void 0 === thenable.status && (thenable.status = "rejected", thenable.reason = error2);
               }
             }
           );
@@ -926,8 +926,8 @@ function requireReact_development() {
                 return recursivelyFlushAsyncActWork(returnValue, resolve, reject);
               });
               return;
-            } catch (error) {
-              ReactSharedInternals.thrownErrors.push(error);
+            } catch (error2) {
+              ReactSharedInternals.thrownErrors.push(error2);
             }
           else ReactSharedInternals.actQueue = null;
         0 < ReactSharedInternals.thrownErrors.length ? (queue = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, reject(queue)) : resolve(returnValue);
@@ -953,8 +953,8 @@ function requireReact_development() {
               } while (1);
             }
             queue.length = 0;
-          } catch (error) {
-            queue.splice(0, i + 1), ReactSharedInternals.thrownErrors.push(error);
+          } catch (error2) {
+            queue.splice(0, i + 1), ReactSharedInternals.thrownErrors.push(error2);
           } finally {
             isFlushing = false;
           }
@@ -1032,20 +1032,20 @@ function requireReact_development() {
         UnknownOwner
       )();
       var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
-      var didWarnAboutMaps = false, userProvidedKeyEscapeRegex = /\/+/g, reportGlobalError = "function" === typeof reportError ? reportError : function(error) {
+      var didWarnAboutMaps = false, userProvidedKeyEscapeRegex = /\/+/g, reportGlobalError = "function" === typeof reportError ? reportError : function(error2) {
         if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
           var event = new window.ErrorEvent("error", {
             bubbles: true,
             cancelable: true,
-            message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
-            error
+            message: "object" === typeof error2 && null !== error2 && "string" === typeof error2.message ? String(error2.message) : String(error2),
+            error: error2
           });
           if (!window.dispatchEvent(event)) return;
         } else if ("object" === typeof process && "function" === typeof process.emit) {
-          process.emit("uncaughtException", error);
+          process.emit("uncaughtException", error2);
           return;
         }
-        console.error(error);
+        console.error(error2);
       }, didWarnAboutMessageChannel = false, enqueueTaskImpl = null, actScopeDepth = 0, didWarnNoAwaitAct = false, isFlushing = false, queueSeveralMicrotasks = "function" === typeof queueMicrotask ? function(callback) {
         queueMicrotask(function() {
           return queueMicrotask(callback);
@@ -1104,8 +1104,8 @@ function requireReact_development() {
         var queue = ReactSharedInternals.actQueue = null !== prevActQueue ? prevActQueue : [], didAwaitActCall = false;
         try {
           var result = callback();
-        } catch (error) {
-          ReactSharedInternals.thrownErrors.push(error);
+        } catch (error2) {
+          ReactSharedInternals.thrownErrors.push(error2);
         }
         if (0 < ReactSharedInternals.thrownErrors.length)
           throw popActScope(prevActQueue, prevActScopeDepth), callback = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, callback;
@@ -1143,11 +1143,11 @@ function requireReact_development() {
                     }
                   } else resolve(returnValue);
                 },
-                function(error) {
+                function(error2) {
                   popActScope(prevActQueue, prevActScopeDepth);
-                  0 < ReactSharedInternals.thrownErrors.length ? (error = aggregateErrors(
+                  0 < ReactSharedInternals.thrownErrors.length ? (error2 = aggregateErrors(
                     ReactSharedInternals.thrownErrors
-                  ), ReactSharedInternals.thrownErrors.length = 0, reject(error)) : reject(error);
+                  ), ReactSharedInternals.thrownErrors.length = 0, reject(error2)) : reject(error2);
                 }
               );
             }
@@ -1187,28 +1187,28 @@ function requireReact_development() {
         var getCurrentStack = ReactSharedInternals.getCurrentStack;
         return null === getCurrentStack ? null : getCurrentStack();
       };
-      exports.cloneElement = function(element, config, children) {
+      exports.cloneElement = function(element, config2, children) {
         if (null === element || void 0 === element)
           throw Error(
             "The argument must be a React element, but you passed " + element + "."
           );
         var props = assign({}, element.props), key = element.key, owner = element._owner;
-        if (null != config) {
+        if (null != config2) {
           var JSCompiler_inline_result;
           a: {
-            if (hasOwnProperty.call(config, "ref") && (JSCompiler_inline_result = Object.getOwnPropertyDescriptor(
-              config,
+            if (hasOwnProperty.call(config2, "ref") && (JSCompiler_inline_result = Object.getOwnPropertyDescriptor(
+              config2,
               "ref"
             ).get) && JSCompiler_inline_result.isReactWarning) {
               JSCompiler_inline_result = false;
               break a;
             }
-            JSCompiler_inline_result = void 0 !== config.ref;
+            JSCompiler_inline_result = void 0 !== config2.ref;
           }
           JSCompiler_inline_result && (owner = getOwner());
-          hasValidKey(config) && (checkKeyStringCoercion(config.key), key = "" + config.key);
-          for (propName in config)
-            !hasOwnProperty.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
+          hasValidKey(config2) && (checkKeyStringCoercion(config2.key), key = "" + config2.key);
+          for (propName in config2)
+            !hasOwnProperty.call(config2, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config2.ref || (props[propName] = config2[propName]);
         }
         var propName = arguments.length - 2;
         if (1 === propName) props.children = children;
@@ -1248,16 +1248,16 @@ function requireReact_development() {
         defaultValue._currentRenderer2 = null;
         return defaultValue;
       };
-      exports.createElement = function(type, config, children) {
+      exports.createElement = function(type, config2, children) {
         for (var i = 2; i < arguments.length; i++)
           validateChildKeys(arguments[i]);
         i = {};
         var key = null;
-        if (null != config)
-          for (propName in didWarnAboutOldJSXRuntime || !("__self" in config) || "key" in config || (didWarnAboutOldJSXRuntime = true, console.warn(
+        if (null != config2)
+          for (propName in didWarnAboutOldJSXRuntime || !("__self" in config2) || "key" in config2 || (didWarnAboutOldJSXRuntime = true, console.warn(
             "Your app (or one of its dependencies) is using an outdated JSX transform. Update to the modern JSX transform for faster performance: https://react.dev/link/new-jsx-transform"
-          )), hasValidKey(config) && (checkKeyStringCoercion(config.key), key = "" + config.key), config)
-            hasOwnProperty.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (i[propName] = config[propName]);
+          )), hasValidKey(config2) && (checkKeyStringCoercion(config2.key), key = "" + config2.key), config2)
+            hasOwnProperty.call(config2, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (i[propName] = config2[propName]);
         var childrenLength = arguments.length - 2;
         if (1 === childrenLength) i.children = children;
         else if (1 < childrenLength) {
@@ -1367,8 +1367,8 @@ function requireReact_development() {
           var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals.S;
           null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
           "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && (ReactSharedInternals.asyncTransitions++, returnValue.then(releaseAsyncTransition, releaseAsyncTransition), returnValue.then(noop, reportGlobalError));
-        } catch (error) {
-          reportGlobalError(error);
+        } catch (error2) {
+          reportGlobalError(error2);
         } finally {
           null === prevTransition && currentTransition._updatedFibers && (scope = currentTransition._updatedFibers.size, currentTransition._updatedFibers.clear(), 10 < scope && console.warn(
             "Detected a large number of updates inside startTransition. If this is due to a subscription please re-write it to use React provided hooks. Otherwise concurrent mode guarantees are off the table."
@@ -1575,12 +1575,12 @@ function requireReactJsxRuntime_development() {
     function UnknownOwner() {
       return Error("react-stack-top-frame");
     }
-    function hasValidKey(config) {
-      if (hasOwnProperty.call(config, "key")) {
-        var getter = Object.getOwnPropertyDescriptor(config, "key").get;
+    function hasValidKey(config2) {
+      if (hasOwnProperty.call(config2, "key")) {
+        var getter = Object.getOwnPropertyDescriptor(config2, "key").get;
         if (getter && getter.isReactWarning) return false;
       }
-      return void 0 !== config.key;
+      return void 0 !== config2.key;
     }
     function defineKeyPropWarningGetter(props, displayName) {
       function warnAboutAccessingKey() {
@@ -1644,8 +1644,8 @@ function requireReactJsxRuntime_development() {
       Object.freeze && (Object.freeze(type.props), Object.freeze(type));
       return type;
     }
-    function jsxDEVImpl(type, config, maybeKey, isStaticChildren, debugStack, debugTask) {
-      var children = config.children;
+    function jsxDEVImpl(type, config2, maybeKey, isStaticChildren, debugStack, debugTask) {
+      var children = config2.children;
       if (void 0 !== children)
         if (isStaticChildren)
           if (isArrayImpl(children)) {
@@ -1657,9 +1657,9 @@ function requireReactJsxRuntime_development() {
               "React.jsx: Static children should always be an array. You are likely explicitly calling React.jsxs or React.jsxDEV. Use the Babel transform instead."
             );
         else validateChildKeys(children);
-      if (hasOwnProperty.call(config, "key")) {
+      if (hasOwnProperty.call(config2, "key")) {
         children = getComponentNameFromType(type);
-        var keys = Object.keys(config).filter(function(k) {
+        var keys = Object.keys(config2).filter(function(k) {
           return "key" !== k;
         });
         isStaticChildren = 0 < keys.length ? "{key: someKey, " + keys.join(": ..., ") + ": ...}" : "{key: someKey}";
@@ -1673,12 +1673,12 @@ function requireReactJsxRuntime_development() {
       }
       children = null;
       void 0 !== maybeKey && (checkKeyStringCoercion(maybeKey), children = "" + maybeKey);
-      hasValidKey(config) && (checkKeyStringCoercion(config.key), children = "" + config.key);
-      if ("key" in config) {
+      hasValidKey(config2) && (checkKeyStringCoercion(config2.key), children = "" + config2.key);
+      if ("key" in config2) {
         maybeKey = {};
-        for (var propName in config)
-          "key" !== propName && (maybeKey[propName] = config[propName]);
-      } else maybeKey = config;
+        for (var propName in config2)
+          "key" !== propName && (maybeKey[propName] = config2[propName]);
+      } else maybeKey = config2;
       children && defineKeyPropWarningGetter(
         maybeKey,
         "function" === typeof type ? type.displayName || type.name || "Unknown" : type
@@ -1692,11 +1692,11 @@ function requireReactJsxRuntime_development() {
         debugTask
       );
     }
-    function validateChildKeys(node) {
-      isValidElement(node) ? node._store && (node._store.validated = 1) : "object" === typeof node && null !== node && node.$$typeof === REACT_LAZY_TYPE && ("fulfilled" === node._payload.status ? isValidElement(node._payload.value) && node._payload.value._store && (node._payload.value._store.validated = 1) : node._store && (node._store.validated = 1));
+    function validateChildKeys(node2) {
+      isValidElement(node2) ? node2._store && (node2._store.validated = 1) : "object" === typeof node2 && null !== node2 && node2.$$typeof === REACT_LAZY_TYPE && ("fulfilled" === node2._payload.status ? isValidElement(node2._payload.value) && node2._payload.value._store && (node2._payload.value._store.validated = 1) : node2._store && (node2._store.validated = 1));
     }
-    function isValidElement(object) {
-      return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
+    function isValidElement(object2) {
+      return "object" === typeof object2 && null !== object2 && object2.$$typeof === REACT_ELEMENT_TYPE;
     }
     var React = requireReact(), REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference"), ReactSharedInternals = React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
       return null;
@@ -1715,22 +1715,22 @@ function requireReactJsxRuntime_development() {
     var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
     var didWarnAboutKeySpread = {};
     reactJsxRuntime_development.Fragment = REACT_FRAGMENT_TYPE;
-    reactJsxRuntime_development.jsx = function(type, config, maybeKey) {
+    reactJsxRuntime_development.jsx = function(type, config2, maybeKey) {
       var trackActualOwner = 1e4 > ReactSharedInternals.recentlyCreatedOwnerStacks++;
       return jsxDEVImpl(
         type,
-        config,
+        config2,
         maybeKey,
         false,
         trackActualOwner ? Error("react-stack-top-frame") : unknownOwnerDebugStack,
         trackActualOwner ? createTask(getTaskName(type)) : unknownOwnerDebugTask
       );
     };
-    reactJsxRuntime_development.jsxs = function(type, config, maybeKey) {
+    reactJsxRuntime_development.jsxs = function(type, config2, maybeKey) {
       var trackActualOwner = 1e4 > ReactSharedInternals.recentlyCreatedOwnerStacks++;
       return jsxDEVImpl(
         type,
-        config,
+        config2,
         maybeKey,
         true,
         trackActualOwner ? Error("react-stack-top-frame") : unknownOwnerDebugStack,
@@ -4500,11 +4500,11 @@ function requireReactDomServerLegacy_node_production() {
               fulfilledThenable.value = fulfilledValue;
             }
           },
-          function(error) {
+          function(error2) {
             if ("pending" === thenable.status) {
               var rejectedThenable = thenable;
               rejectedThenable.status = "rejected";
-              rejectedThenable.reason = error;
+              rejectedThenable.reason = error2;
             }
           }
         ));
@@ -4935,20 +4935,20 @@ function requireReactDomServerLegacy_node_production() {
   function isEligibleForOutlining(request, boundary) {
     return (500 < boundary.byteSize || false) && null === boundary.contentPreamble;
   }
-  function defaultErrorHandler(error) {
-    if ("object" === typeof error && null !== error && "string" === typeof error.environmentName) {
-      var JSCompiler_inline_result = error.environmentName;
-      error = [error].slice(0);
-      "string" === typeof error[0] ? error.splice(
+  function defaultErrorHandler(error2) {
+    if ("object" === typeof error2 && null !== error2 && "string" === typeof error2.environmentName) {
+      var JSCompiler_inline_result = error2.environmentName;
+      error2 = [error2].slice(0);
+      "string" === typeof error2[0] ? error2.splice(
         0,
         1,
-        "[%s] " + error[0],
+        "[%s] " + error2[0],
         " " + JSCompiler_inline_result + " "
-      ) : error.splice(0, 0, "[%s]", " " + JSCompiler_inline_result + " ");
-      error.unshift(console);
-      JSCompiler_inline_result = bind.apply(console.error, error);
+      ) : error2.splice(0, 0, "[%s]", " " + JSCompiler_inline_result + " ");
+      error2.unshift(console);
+      JSCompiler_inline_result = bind.apply(console.error, error2);
       JSCompiler_inline_result();
-    } else console.error(error);
+    } else console.error(error2);
     return null;
   }
   function RequestInstance(resumableState, renderState, rootFormatContext, progressiveChunkSize, onError2, onAllReady, onShellReady, onShellError, onFatalError, onPostpone, formState) {
@@ -5048,13 +5048,13 @@ function requireReactDomServerLegacy_node_production() {
     null !== row && (row.pendingTasks++, contentPreamble = row.boundaries, null !== contentPreamble && (request.allPendingTasks++, fallbackAbortableTasks.pendingTasks++, contentPreamble.push(fallbackAbortableTasks)), request = row.inheritedHoistables, null !== request && hoistHoistables(fallbackAbortableTasks.contentState, request));
     return fallbackAbortableTasks;
   }
-  function createRenderTask(request, thenableState2, node, childIndex, blockedBoundary, blockedSegment, blockedPreamble, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack) {
+  function createRenderTask(request, thenableState2, node2, childIndex, blockedBoundary, blockedSegment, blockedPreamble, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack) {
     request.allPendingTasks++;
     null === blockedBoundary ? request.pendingRootTasks++ : blockedBoundary.pendingTasks++;
     null !== row && row.pendingTasks++;
     var task = {
       replay: null,
-      node,
+      node: node2,
       childIndex,
       ping: function() {
         return pingTask(request, task);
@@ -5075,14 +5075,14 @@ function requireReactDomServerLegacy_node_production() {
     abortSet.add(task);
     return task;
   }
-  function createReplayTask(request, thenableState2, replay, node, childIndex, blockedBoundary, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack) {
+  function createReplayTask(request, thenableState2, replay, node2, childIndex, blockedBoundary, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack) {
     request.allPendingTasks++;
     null === blockedBoundary ? request.pendingRootTasks++ : blockedBoundary.pendingTasks++;
     null !== row && row.pendingTasks++;
     replay.pendingTasks++;
     var task = {
       replay,
-      node,
+      node: node2,
       childIndex,
       ping: function() {
         return pingTask(request, task);
@@ -5119,11 +5119,11 @@ function requireReactDomServerLegacy_node_production() {
     };
   }
   function pushComponentStack(task) {
-    var node = task.node;
-    if ("object" === typeof node && null !== node)
-      switch (node.$$typeof) {
+    var node2 = task.node;
+    if ("object" === typeof node2 && null !== node2)
+      switch (node2.$$typeof) {
         case REACT_ELEMENT_TYPE:
-          task.componentStack = { parent: task.componentStack, type: node.type };
+          task.componentStack = { parent: task.componentStack, type: node2.type };
       }
   }
   function replaceSuspenseComponentStackWithSuspenseFallbackStack(componentStack) {
@@ -5136,10 +5136,10 @@ function requireReactDomServerLegacy_node_production() {
       enumerable: true,
       get: function() {
         try {
-          var info = "", node = node$jscomp$0;
+          var info = "", node2 = node$jscomp$0;
           do
-            info += describeComponentStackByType(node.type), node = node.parent;
-          while (node);
+            info += describeComponentStackByType(node2.type), node2 = node2.parent;
+          while (node2);
           var JSCompiler_inline_result = info;
         } catch (x2) {
           JSCompiler_inline_result = "\nError generating stack: " + x2.message + "\n" + x2.stack;
@@ -5152,16 +5152,16 @@ function requireReactDomServerLegacy_node_production() {
     });
     return errorInfo;
   }
-  function logRecoverableError(request, error, errorInfo) {
+  function logRecoverableError(request, error2, errorInfo) {
     request = request.onError;
-    error = request(error, errorInfo);
-    if (null == error || "string" === typeof error) return error;
+    error2 = request(error2, errorInfo);
+    if (null == error2 || "string" === typeof error2) return error2;
   }
-  function fatalError(request, error) {
+  function fatalError(request, error2) {
     var onShellError = request.onShellError, onFatalError = request.onFatalError;
-    onShellError(error);
-    onFatalError(error);
-    null !== request.destination ? (request.status = 14, request.destination.destroy(error)) : (request.status = 13, request.fatalError = error);
+    onShellError(error2);
+    onFatalError(error2);
+    null !== request.destination ? (request.status = 14, request.destination.destroy(error2)) : (request.status = 13, request.fatalError = error2);
   }
   function finishSuspenseListRow(request, row) {
     unblockSuspenseListRow(request, row.next, row.hoistables);
@@ -5218,13 +5218,13 @@ function requireReactDomServerLegacy_node_production() {
       var resumeSlots = task.replay.slots;
       if (null !== resumeSlots && "object" === typeof resumeSlots)
         for (var n = 0; n < keyPath; n++) {
-          var i = "backwards" !== revealOrder && "unstable_legacy-backwards" !== revealOrder ? n : keyPath - 1 - n, node = rows[i];
+          var i = "backwards" !== revealOrder && "unstable_legacy-backwards" !== revealOrder ? n : keyPath - 1 - n, node2 = rows[i];
           task.row = previousSuspenseListRow = createSuspenseListRow(
             previousSuspenseListRow
           );
           task.treeContext = pushTreeContext(prevTreeContext, keyPath, i);
           var resumeSegmentID = resumeSlots[i];
-          "number" === typeof resumeSegmentID ? (resumeNode(request, task, resumeSegmentID, node, i), delete resumeSlots[i]) : renderNode(request, task, node, i);
+          "number" === typeof resumeSegmentID ? (resumeNode(request, task, resumeSegmentID, node2, i), delete resumeSlots[i]) : renderNode(request, task, node2, i);
           0 === --previousSuspenseListRow.pendingTasks && finishSuspenseListRow(request, previousSuspenseListRow);
         }
       else
@@ -5242,7 +5242,7 @@ function requireReactDomServerLegacy_node_production() {
       resumeSlots = revealOrder.children.length;
       n = revealOrder.chunks.length;
       for (i = keyPath - 1; 0 <= i; i--) {
-        node = rows[i];
+        node2 = rows[i];
         task.row = previousSuspenseListRow = createSuspenseListRow(
           previousSuspenseListRow
         );
@@ -5258,7 +5258,7 @@ function requireReactDomServerLegacy_node_production() {
         revealOrder.children.splice(resumeSlots, 0, resumeSegmentID);
         task.blockedSegment = resumeSegmentID;
         try {
-          renderNode(request, task, node, i), pushSegmentFinale(
+          renderNode(request, task, node2, i), pushSegmentFinale(
             resumeSegmentID.chunks,
             request.renderState,
             resumeSegmentID.lastPushedText,
@@ -5742,7 +5742,7 @@ function requireReactDomServerLegacy_node_production() {
       );
     }
   }
-  function resumeNode(request, task, segmentId, node, childIndex) {
+  function resumeNode(request, task, segmentId, node2, childIndex) {
     var prevReplay = task.replay, blockedBoundary = task.blockedBoundary, resumedSegment = createPendingSegment(
       request,
       0,
@@ -5754,30 +5754,30 @@ function requireReactDomServerLegacy_node_production() {
     resumedSegment.id = segmentId;
     resumedSegment.parentFlushed = true;
     try {
-      task.replay = null, task.blockedSegment = resumedSegment, renderNode(request, task, node, childIndex), resumedSegment.status = 1, null === blockedBoundary ? request.completedRootSegment = resumedSegment : (queueCompletedSegment(blockedBoundary, resumedSegment), blockedBoundary.parentFlushed && request.partialBoundaries.push(blockedBoundary));
+      task.replay = null, task.blockedSegment = resumedSegment, renderNode(request, task, node2, childIndex), resumedSegment.status = 1, null === blockedBoundary ? request.completedRootSegment = resumedSegment : (queueCompletedSegment(blockedBoundary, resumedSegment), blockedBoundary.parentFlushed && request.partialBoundaries.push(blockedBoundary));
     } finally {
       task.replay = prevReplay, task.blockedSegment = null;
     }
   }
-  function renderNodeDestructive(request, task, node, childIndex) {
-    null !== task.replay && "number" === typeof task.replay.slots ? resumeNode(request, task, task.replay.slots, node, childIndex) : (task.node = node, task.childIndex = childIndex, node = task.componentStack, pushComponentStack(task), retryNode(request, task), task.componentStack = node);
+  function renderNodeDestructive(request, task, node2, childIndex) {
+    null !== task.replay && "number" === typeof task.replay.slots ? resumeNode(request, task, task.replay.slots, node2, childIndex) : (task.node = node2, task.childIndex = childIndex, node2 = task.componentStack, pushComponentStack(task), retryNode(request, task), task.componentStack = node2);
   }
   function retryNode(request, task) {
-    var node = task.node, childIndex = task.childIndex;
-    if (null !== node) {
-      if ("object" === typeof node) {
-        switch (node.$$typeof) {
+    var node2 = task.node, childIndex = task.childIndex;
+    if (null !== node2) {
+      if ("object" === typeof node2) {
+        switch (node2.$$typeof) {
           case REACT_ELEMENT_TYPE:
-            var type = node.type, key = node.key, props = node.props;
-            node = props.ref;
-            var ref = void 0 !== node ? node : null, name2 = getComponentNameFromType(type), keyOrIndex = null == key ? -1 === childIndex ? 0 : childIndex : key;
+            var type = node2.type, key = node2.key, props = node2.props;
+            node2 = props.ref;
+            var ref = void 0 !== node2 ? node2 : null, name2 = getComponentNameFromType(type), keyOrIndex = null == key ? -1 === childIndex ? 0 : childIndex : key;
             key = [task.keyPath, name2, keyOrIndex];
             if (null !== task.replay)
               a: {
                 var replay = task.replay;
                 childIndex = replay.nodes;
-                for (node = 0; node < childIndex.length; node++) {
-                  var node$jscomp$0 = childIndex[node];
+                for (node2 = 0; node2 < childIndex.length; node2++) {
+                  var node$jscomp$0 = childIndex[node2];
                   if (keyOrIndex === node$jscomp$0[1]) {
                     if (4 === node$jscomp$0.length) {
                       if (null !== name2 && name2 !== node$jscomp$0[0])
@@ -5801,7 +5801,7 @@ function requireReactDomServerLegacy_node_production() {
                         task.replay.pendingTasks--;
                       } catch (x2) {
                         if ("object" === typeof x2 && null !== x2 && (x2 === SuspenseException || "function" === typeof x2.then))
-                          throw task.node === keyOrIndex ? task.replay = replay : childIndex.splice(node, 1), x2;
+                          throw task.node === keyOrIndex ? task.replay = replay : childIndex.splice(node2, 1), x2;
                         task.replay.pendingTasks--;
                         props = getThrownInfo(task.componentStack);
                         key = request;
@@ -5865,10 +5865,10 @@ function requireReactDomServerLegacy_node_production() {
                             request.completedBoundaries.push(props);
                             break b;
                           }
-                        } catch (error) {
+                        } catch (error2) {
                           props.status = 4, childNodes = getThrownInfo(task.componentStack), replay = logRecoverableError(
                             request,
-                            error,
+                            error2,
                             childNodes
                           ), props.errorDigest = replay, task.replay.pendingTasks--, request.clientRenderedBoundaries.push(props);
                         } finally {
@@ -5903,7 +5903,7 @@ function requireReactDomServerLegacy_node_production() {
                         request.pingedTasks.push(childNodes);
                       }
                     }
-                    childIndex.splice(node, 1);
+                    childIndex.splice(node2, 1);
                     break a;
                   }
                 }
@@ -5915,54 +5915,54 @@ function requireReactDomServerLegacy_node_production() {
               "Portals are not currently supported by the server renderer. Render them conditionally so that they only appear on the client render."
             );
           case REACT_LAZY_TYPE:
-            childNodes = node._init;
-            node = childNodes(node._payload);
+            childNodes = node2._init;
+            node2 = childNodes(node2._payload);
             if (12 === request.status) throw null;
-            renderNodeDestructive(request, task, node, childIndex);
+            renderNodeDestructive(request, task, node2, childIndex);
             return;
         }
-        if (isArrayImpl(node)) {
-          renderChildrenArray(request, task, node, childIndex);
+        if (isArrayImpl(node2)) {
+          renderChildrenArray(request, task, node2, childIndex);
           return;
         }
-        if (childNodes = getIteratorFn(node)) {
-          if (childNodes = childNodes.call(node)) {
-            node = childNodes.next();
-            if (!node.done) {
+        if (childNodes = getIteratorFn(node2)) {
+          if (childNodes = childNodes.call(node2)) {
+            node2 = childNodes.next();
+            if (!node2.done) {
               props = [];
               do
-                props.push(node.value), node = childNodes.next();
-              while (!node.done);
+                props.push(node2.value), node2 = childNodes.next();
+              while (!node2.done);
               renderChildrenArray(request, task, props, childIndex);
             }
             return;
           }
         }
-        if ("function" === typeof node.then)
-          return task.thenableState = null, renderNodeDestructive(request, task, unwrapThenable(node), childIndex);
-        if (node.$$typeof === REACT_CONTEXT_TYPE)
+        if ("function" === typeof node2.then)
+          return task.thenableState = null, renderNodeDestructive(request, task, unwrapThenable(node2), childIndex);
+        if (node2.$$typeof === REACT_CONTEXT_TYPE)
           return renderNodeDestructive(
             request,
             task,
-            node._currentValue2,
+            node2._currentValue2,
             childIndex
           );
-        childIndex = Object.prototype.toString.call(node);
+        childIndex = Object.prototype.toString.call(node2);
         throw Error(
-          "Objects are not valid as a React child (found: " + ("[object Object]" === childIndex ? "object with keys {" + Object.keys(node).join(", ") + "}" : childIndex) + "). If you meant to render a collection of children, use an array instead."
+          "Objects are not valid as a React child (found: " + ("[object Object]" === childIndex ? "object with keys {" + Object.keys(node2).join(", ") + "}" : childIndex) + "). If you meant to render a collection of children, use an array instead."
         );
       }
-      if ("string" === typeof node)
+      if ("string" === typeof node2)
         childIndex = task.blockedSegment, null !== childIndex && (childIndex.lastPushedText = pushTextInstance(
           childIndex.chunks,
-          node,
+          node2,
           request.renderState,
           childIndex.lastPushedText
         ));
-      else if ("number" === typeof node || "bigint" === typeof node)
+      else if ("number" === typeof node2 || "bigint" === typeof node2)
         childIndex = task.blockedSegment, null !== childIndex && (childIndex.lastPushedText = pushTextInstance(
           childIndex.chunks,
-          "" + node,
+          "" + node2,
           request.renderState,
           childIndex.lastPushedText
         ));
@@ -5972,11 +5972,11 @@ function requireReactDomServerLegacy_node_production() {
     var prevKeyPath = task.keyPath;
     if (-1 !== childIndex && (task.keyPath = [task.keyPath, "Fragment", childIndex], null !== task.replay)) {
       for (var replay = task.replay, replayNodes = replay.nodes, j = 0; j < replayNodes.length; j++) {
-        var node = replayNodes[j];
-        if (node[1] === childIndex) {
-          childIndex = node[2];
-          node = node[3];
-          task.replay = { nodes: childIndex, slots: node, pendingTasks: 1 };
+        var node2 = replayNodes[j];
+        if (node2[1] === childIndex) {
+          childIndex = node2[2];
+          node2 = node2[3];
+          task.replay = { nodes: childIndex, slots: node2, pendingTasks: 1 };
           try {
             renderChildrenArray(request, task, children, -1);
             if (1 === task.replay.pendingTasks && 0 < task.replay.nodes.length)
@@ -5989,14 +5989,14 @@ function requireReactDomServerLegacy_node_production() {
               throw x2;
             task.replay.pendingTasks--;
             children = getThrownInfo(task.componentStack);
-            var boundary = task.blockedBoundary, error = x2;
-            children = logRecoverableError(request, error, children);
+            var boundary = task.blockedBoundary, error2 = x2;
+            children = logRecoverableError(request, error2, children);
             abortRemainingReplayNodes(
               request,
               boundary,
               childIndex,
-              node,
-              error,
+              node2,
+              error2,
               children
             );
           }
@@ -6012,7 +6012,7 @@ function requireReactDomServerLegacy_node_production() {
     replayNodes = children.length;
     if (null !== task.replay && (j = task.replay.slots, null !== j && "object" === typeof j)) {
       for (childIndex = 0; childIndex < replayNodes; childIndex++)
-        node = children[childIndex], task.treeContext = pushTreeContext(replay, replayNodes, childIndex), boundary = j[childIndex], "number" === typeof boundary ? (resumeNode(request, task, boundary, node, childIndex), delete j[childIndex]) : renderNode(request, task, node, childIndex);
+        node2 = children[childIndex], task.treeContext = pushTreeContext(replay, replayNodes, childIndex), boundary = j[childIndex], "number" === typeof boundary ? (resumeNode(request, task, boundary, node2, childIndex), delete j[childIndex]) : renderNode(request, task, node2, childIndex);
       task.treeContext = replay;
       task.keyPath = prevKeyPath;
       return;
@@ -6138,18 +6138,18 @@ function requireReactDomServerLegacy_node_production() {
       task.componentStack
     );
   }
-  function renderNode(request, task, node, childIndex) {
+  function renderNode(request, task, node2, childIndex) {
     var previousFormatContext = task.formatContext, previousContext = task.context, previousKeyPath = task.keyPath, previousTreeContext = task.treeContext, previousComponentStack = task.componentStack, segment = task.blockedSegment;
     if (null === segment) {
       segment = task.replay;
       try {
-        return renderNodeDestructive(request, task, node, childIndex);
+        return renderNodeDestructive(request, task, node2, childIndex);
       } catch (thrownValue) {
-        if (resetHooksState(), node = thrownValue === SuspenseException ? getSuspendedThenable() : thrownValue, 12 !== request.status && "object" === typeof node && null !== node) {
-          if ("function" === typeof node.then) {
+        if (resetHooksState(), node2 = thrownValue === SuspenseException ? getSuspendedThenable() : thrownValue, 12 !== request.status && "object" === typeof node2 && null !== node2) {
+          if ("function" === typeof node2.then) {
             childIndex = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
             request = spawnNewSuspendedReplayTask(request, task, childIndex).ping;
-            node.then(request, request);
+            node2.then(request, request);
             task.formatContext = previousFormatContext;
             task.context = previousContext;
             task.keyPath = previousKeyPath;
@@ -6159,10 +6159,10 @@ function requireReactDomServerLegacy_node_production() {
             switchContext(previousContext);
             return;
           }
-          if ("Maximum call stack size exceeded" === node.message) {
-            node = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
-            node = spawnNewSuspendedReplayTask(request, task, node);
-            request.pingedTasks.push(node);
+          if ("Maximum call stack size exceeded" === node2.message) {
+            node2 = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
+            node2 = spawnNewSuspendedReplayTask(request, task, node2);
+            request.pingedTasks.push(node2);
             task.formatContext = previousFormatContext;
             task.context = previousContext;
             task.keyPath = previousKeyPath;
@@ -6177,13 +6177,13 @@ function requireReactDomServerLegacy_node_production() {
     } else {
       var childrenLength = segment.children.length, chunkLength = segment.chunks.length;
       try {
-        return renderNodeDestructive(request, task, node, childIndex);
+        return renderNodeDestructive(request, task, node2, childIndex);
       } catch (thrownValue$62) {
-        if (resetHooksState(), segment.children.length = childrenLength, segment.chunks.length = chunkLength, node = thrownValue$62 === SuspenseException ? getSuspendedThenable() : thrownValue$62, 12 !== request.status && "object" === typeof node && null !== node) {
-          if ("function" === typeof node.then) {
-            segment = node;
-            node = thrownValue$62 === SuspenseException ? getThenableStateAfterSuspending() : null;
-            request = spawnNewSuspendedRenderTask(request, task, node).ping;
+        if (resetHooksState(), segment.children.length = childrenLength, segment.chunks.length = chunkLength, node2 = thrownValue$62 === SuspenseException ? getSuspendedThenable() : thrownValue$62, 12 !== request.status && "object" === typeof node2 && null !== node2) {
+          if ("function" === typeof node2.then) {
+            segment = node2;
+            node2 = thrownValue$62 === SuspenseException ? getThenableStateAfterSuspending() : null;
+            request = spawnNewSuspendedRenderTask(request, task, node2).ping;
             segment.then(request, request);
             task.formatContext = previousFormatContext;
             task.context = previousContext;
@@ -6193,7 +6193,7 @@ function requireReactDomServerLegacy_node_production() {
             switchContext(previousContext);
             return;
           }
-          if ("Maximum call stack size exceeded" === node.message) {
+          if ("Maximum call stack size exceeded" === node2.message) {
             segment = thrownValue$62 === SuspenseException ? getThenableStateAfterSuspending() : null;
             segment = spawnNewSuspendedRenderTask(request, task, segment);
             request.pingedTasks.push(segment);
@@ -6213,26 +6213,26 @@ function requireReactDomServerLegacy_node_production() {
     task.keyPath = previousKeyPath;
     task.treeContext = previousTreeContext;
     switchContext(previousContext);
-    throw node;
+    throw node2;
   }
   function abortTaskSoft(task) {
     var boundary = task.blockedBoundary, segment = task.blockedSegment;
     null !== segment && (segment.status = 3, finishedTask(this, boundary, task.row, segment));
   }
-  function abortRemainingReplayNodes(request$jscomp$0, boundary, nodes, slots, error, errorDigest$jscomp$0) {
+  function abortRemainingReplayNodes(request$jscomp$0, boundary, nodes, slots, error2, errorDigest$jscomp$0) {
     for (var i = 0; i < nodes.length; i++) {
-      var node = nodes[i];
-      if (4 === node.length)
+      var node2 = nodes[i];
+      if (4 === node2.length)
         abortRemainingReplayNodes(
           request$jscomp$0,
           boundary,
-          node[2],
-          node[3],
-          error,
+          node2[2],
+          node2[3],
+          error2,
           errorDigest$jscomp$0
         );
       else {
-        node = node[5];
+        node2 = node2[5];
         var request = request$jscomp$0, errorDigest = errorDigest$jscomp$0, resumedBoundary = createSuspenseBoundary(
           request,
           null,
@@ -6241,7 +6241,7 @@ function requireReactDomServerLegacy_node_production() {
           null
         );
         resumedBoundary.parentFlushed = true;
-        resumedBoundary.rootSegmentID = node;
+        resumedBoundary.rootSegmentID = node2;
         resumedBoundary.status = 4;
         resumedBoundary.errorDigest = errorDigest;
         resumedBoundary.parentFlushed && request.clientRenderedBoundaries.push(resumedBoundary);
@@ -6257,7 +6257,7 @@ function requireReactDomServerLegacy_node_production() {
       if ("object" === typeof slots) for (var index in slots) delete slots[index];
     }
   }
-  function abortTask(task, request, error) {
+  function abortTask(task, request, error2) {
     var boundary = task.blockedBoundary, segment = task.blockedSegment;
     if (null !== segment) {
       if (6 === segment.status) return;
@@ -6268,16 +6268,16 @@ function requireReactDomServerLegacy_node_production() {
       if (13 !== request.status && 14 !== request.status) {
         boundary = task.replay;
         if (null === boundary) {
-          null !== request.trackedPostpones && null !== segment ? (boundary = request.trackedPostpones, logRecoverableError(request, error, errorInfo), trackPostpone(request, boundary, task, segment), finishedTask(request, null, task.row, segment)) : (logRecoverableError(request, error, errorInfo), fatalError(request, error));
+          null !== request.trackedPostpones && null !== segment ? (boundary = request.trackedPostpones, logRecoverableError(request, error2, errorInfo), trackPostpone(request, boundary, task, segment), finishedTask(request, null, task.row, segment)) : (logRecoverableError(request, error2, errorInfo), fatalError(request, error2));
           return;
         }
         boundary.pendingTasks--;
-        0 === boundary.pendingTasks && 0 < boundary.nodes.length && (segment = logRecoverableError(request, error, errorInfo), abortRemainingReplayNodes(
+        0 === boundary.pendingTasks && 0 < boundary.nodes.length && (segment = logRecoverableError(request, error2, errorInfo), abortRemainingReplayNodes(
           request,
           null,
           boundary.nodes,
           boundary.slots,
-          error,
+          error2,
           segment
         ));
         request.pendingRootTasks--;
@@ -6287,11 +6287,11 @@ function requireReactDomServerLegacy_node_production() {
       var trackedPostpones$63 = request.trackedPostpones;
       if (4 !== boundary.status) {
         if (null !== trackedPostpones$63 && null !== segment)
-          return logRecoverableError(request, error, errorInfo), trackPostpone(request, trackedPostpones$63, task, segment), boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
-            return abortTask(fallbackTask, request, error);
+          return logRecoverableError(request, error2, errorInfo), trackPostpone(request, trackedPostpones$63, task, segment), boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
+            return abortTask(fallbackTask, request, error2);
           }), boundary.fallbackAbortableTasks.clear(), finishedTask(request, boundary, task.row, segment);
         boundary.status = 4;
-        segment = logRecoverableError(request, error, errorInfo);
+        segment = logRecoverableError(request, error2, errorInfo);
         boundary.status = 4;
         boundary.errorDigest = segment;
         untrackBoundary(request, boundary);
@@ -6301,7 +6301,7 @@ function requireReactDomServerLegacy_node_production() {
       segment = boundary.row;
       null !== segment && 0 === --segment.pendingTasks && finishSuspenseListRow(request, segment);
       boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
-        return abortTask(fallbackTask, request, error);
+        return abortTask(fallbackTask, request, error2);
       });
       boundary.fallbackAbortableTasks.clear();
     }
@@ -6341,8 +6341,8 @@ function requireReactDomServerLegacy_node_production() {
           linkHeader ? onHeaders({ Link: linkHeader }) : onHeaders({});
         }
       }
-    } catch (error) {
-      logRecoverableError(request, error, {});
+    } catch (error2) {
+      logRecoverableError(request, error2, {});
     }
   }
   function completeShell(request) {
@@ -6544,8 +6544,8 @@ function requireReactDomServerLegacy_node_production() {
         }
         pingedTasks.splice(0, i);
         null !== request$jscomp$2.destination && flushCompletedQueues(request$jscomp$2, request$jscomp$2.destination);
-      } catch (error) {
-        logRecoverableError(request$jscomp$2, error, {}), fatalError(request$jscomp$2, error);
+      } catch (error2) {
+        logRecoverableError(request$jscomp$2, error2, {}), fatalError(request$jscomp$2, error2);
       } finally {
         currentResumableState = prevResumableState, ReactSharedInternals.H = prevDispatcher, ReactSharedInternals.A = prevAsyncDispatcher, prevDispatcher === HooksDispatcher && switchContext(prevContext), currentRequest = prevRequest;
       }
@@ -6987,8 +6987,8 @@ function requireReactDomServerLegacy_node_production() {
       request.destination = destination;
       try {
         flushCompletedQueues(request, destination);
-      } catch (error) {
-        logRecoverableError(request, error, {}), fatalError(request, error);
+      } catch (error2) {
+        logRecoverableError(request, error2, {}), fatalError(request, error2);
       }
     }
   }
@@ -6997,10 +6997,10 @@ function requireReactDomServerLegacy_node_production() {
     try {
       var abortableTasks = request.abortableTasks;
       if (0 < abortableTasks.size) {
-        var error = void 0 === reason ? Error("The render was aborted by the server without a reason.") : "object" === typeof reason && null !== reason && "function" === typeof reason.then ? Error("The render was aborted by the server with a promise.") : reason;
-        request.fatalError = error;
+        var error2 = void 0 === reason ? Error("The render was aborted by the server without a reason.") : "object" === typeof reason && null !== reason && "function" === typeof reason.then ? Error("The render was aborted by the server with a promise.") : reason;
+        request.fatalError = error2;
         abortableTasks.forEach(function(task) {
-          return abortTask(task, request, error);
+          return abortTask(task, request, error2);
         });
         abortableTasks.clear();
       }
@@ -7009,12 +7009,12 @@ function requireReactDomServerLegacy_node_production() {
       logRecoverableError(request, error$71, {}), fatalError(request, error$71);
     }
   }
-  function addToReplayParent(node, parentKeyPath, trackedPostpones) {
-    if (null === parentKeyPath) trackedPostpones.rootNodes.push(node);
+  function addToReplayParent(node2, parentKeyPath, trackedPostpones) {
+    if (null === parentKeyPath) trackedPostpones.rootNodes.push(node2);
     else {
       var workingMap = trackedPostpones.workingMap, parentNode = workingMap.get(parentKeyPath);
       void 0 === parentNode && (parentNode = [parentKeyPath[1], parentKeyPath[2], [], null], workingMap.set(parentKeyPath, parentNode), addToReplayParent(parentNode, parentKeyPath[0], trackedPostpones));
-      parentNode[2].push(node);
+      parentNode[2].push(node2);
     }
   }
   function onError() {
@@ -7047,9 +7047,9 @@ function requireReactDomServerLegacy_node_production() {
         null !== chunk && (result += chunk);
         return true;
       },
-      destroy: function(error) {
+      destroy: function(error2) {
         didFatal = true;
-        fatalError2 = error;
+        fatalError2 = error2;
       }
     });
     if (didFatal && fatalError2 !== abortReason) throw fatalError2;
@@ -7092,7 +7092,7 @@ var hasRequiredReactDomServer_node_production;
 function requireReactDomServer_node_production() {
   if (hasRequiredReactDomServer_node_production) return reactDomServer_node_production;
   hasRequiredReactDomServer_node_production = 1;
-  var util2 = require$$0, crypto2 = require$$1, async_hooks = require$$2, React = requireReact(), ReactDOM = requireReactDom(), stream = require$$5, REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_SCOPE_TYPE = Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
+  var util = require$$0, crypto2 = require$$1, async_hooks = require$$2, React = requireReact(), ReactDOM = requireReactDom(), stream = require$$5, REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_SCOPE_TYPE = Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
   function getIteratorFn(maybeIterable) {
     if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
     maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
@@ -7146,7 +7146,7 @@ function requireReactDomServer_node_production() {
     writtenBytes = 0;
     destinationHasCapacity$1 = true;
   }
-  var textEncoder = new util2.TextEncoder();
+  var textEncoder = new util.TextEncoder();
   function stringToPrecomputedChunk(content) {
     return textEncoder.encode(content);
   }
@@ -9562,11 +9562,11 @@ function requireReactDomServer_node_production() {
               fulfilledThenable.value = fulfilledValue;
             }
           },
-          function(error) {
+          function(error2) {
             if ("pending" === thenable.status) {
               var rejectedThenable = thenable;
               rejectedThenable.status = "rejected";
-              rejectedThenable.reason = error;
+              rejectedThenable.reason = error2;
             }
           }
         ));
@@ -9852,11 +9852,11 @@ function requireReactDomServer_node_production() {
       throw Error("Not implemented.");
     }
   };
-  function prepareStackTrace(error, structuredStackTrace) {
-    error = (error.name || "Error") + ": " + (error.message || "");
+  function prepareStackTrace(error2, structuredStackTrace) {
+    error2 = (error2.name || "Error") + ": " + (error2.message || "");
     for (var i = 0; i < structuredStackTrace.length; i++)
-      error += "\n    at " + structuredStackTrace[i].toString();
-    return error;
+      error2 += "\n    at " + structuredStackTrace[i].toString();
+    return error2;
   }
   var prefix, suffix;
   function describeBuiltInComponentFrame(name2) {
@@ -10008,18 +10008,18 @@ function requireReactDomServer_node_production() {
   function isEligibleForOutlining(request, boundary) {
     return (500 < boundary.byteSize || hasSuspenseyContent(boundary.contentState)) && null === boundary.contentPreamble;
   }
-  function defaultErrorHandler(error) {
-    if ("object" === typeof error && null !== error && "string" === typeof error.environmentName) {
-      var JSCompiler_inline_result = error.environmentName;
-      error = [error].slice(0);
-      "string" === typeof error[0] ? error.splice(
+  function defaultErrorHandler(error2) {
+    if ("object" === typeof error2 && null !== error2 && "string" === typeof error2.environmentName) {
+      var JSCompiler_inline_result = error2.environmentName;
+      error2 = [error2].slice(0);
+      "string" === typeof error2[0] ? error2.splice(
         0,
         1,
-        "\x1B[0m\x1B[7m%c%s\x1B[0m%c " + error[0],
+        "\x1B[0m\x1B[7m%c%s\x1B[0m%c " + error2[0],
         "background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px",
         " " + JSCompiler_inline_result + " ",
         ""
-      ) : error.splice(
+      ) : error2.splice(
         0,
         0,
         "\x1B[0m\x1B[7m%c%s\x1B[0m%c",
@@ -10027,10 +10027,10 @@ function requireReactDomServer_node_production() {
         " " + JSCompiler_inline_result + " ",
         ""
       );
-      error.unshift(console);
-      JSCompiler_inline_result = bind.apply(console.error, error);
+      error2.unshift(console);
+      JSCompiler_inline_result = bind.apply(console.error, error2);
       JSCompiler_inline_result();
-    } else console.error(error);
+    } else console.error(error2);
     return null;
   }
   function RequestInstance(resumableState, renderState, rootFormatContext, progressiveChunkSize, onError, onAllReady, onShellReady, onShellError, onFatalError, onPostpone, formState) {
@@ -10244,13 +10244,13 @@ function requireReactDomServer_node_production() {
     null !== row && (row.pendingTasks++, contentPreamble = row.boundaries, null !== contentPreamble && (request.allPendingTasks++, fallbackAbortableTasks.pendingTasks++, contentPreamble.push(fallbackAbortableTasks)), request = row.inheritedHoistables, null !== request && hoistHoistables(fallbackAbortableTasks.contentState, request));
     return fallbackAbortableTasks;
   }
-  function createRenderTask(request, thenableState2, node, childIndex, blockedBoundary, blockedSegment, blockedPreamble, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack) {
+  function createRenderTask(request, thenableState2, node2, childIndex, blockedBoundary, blockedSegment, blockedPreamble, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack) {
     request.allPendingTasks++;
     null === blockedBoundary ? request.pendingRootTasks++ : blockedBoundary.pendingTasks++;
     null !== row && row.pendingTasks++;
     var task = {
       replay: null,
-      node,
+      node: node2,
       childIndex,
       ping: function() {
         return pingTask(request, task);
@@ -10271,14 +10271,14 @@ function requireReactDomServer_node_production() {
     abortSet.add(task);
     return task;
   }
-  function createReplayTask(request, thenableState2, replay, node, childIndex, blockedBoundary, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack) {
+  function createReplayTask(request, thenableState2, replay, node2, childIndex, blockedBoundary, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack) {
     request.allPendingTasks++;
     null === blockedBoundary ? request.pendingRootTasks++ : blockedBoundary.pendingTasks++;
     null !== row && row.pendingTasks++;
     replay.pendingTasks++;
     var task = {
       replay,
-      node,
+      node: node2,
       childIndex,
       ping: function() {
         return pingTask(request, task);
@@ -10315,11 +10315,11 @@ function requireReactDomServer_node_production() {
     };
   }
   function pushComponentStack(task) {
-    var node = task.node;
-    if ("object" === typeof node && null !== node)
-      switch (node.$$typeof) {
+    var node2 = task.node;
+    if ("object" === typeof node2 && null !== node2)
+      switch (node2.$$typeof) {
         case REACT_ELEMENT_TYPE:
-          task.componentStack = { parent: task.componentStack, type: node.type };
+          task.componentStack = { parent: task.componentStack, type: node2.type };
       }
   }
   function replaceSuspenseComponentStackWithSuspenseFallbackStack(componentStack) {
@@ -10332,10 +10332,10 @@ function requireReactDomServer_node_production() {
       enumerable: true,
       get: function() {
         try {
-          var info = "", node = node$jscomp$0;
+          var info = "", node2 = node$jscomp$0;
           do
-            info += describeComponentStackByType(node.type), node = node.parent;
-          while (node);
+            info += describeComponentStackByType(node2.type), node2 = node2.parent;
+          while (node2);
           var JSCompiler_inline_result = info;
         } catch (x2) {
           JSCompiler_inline_result = "\nError generating stack: " + x2.message + "\n" + x2.stack;
@@ -10348,16 +10348,16 @@ function requireReactDomServer_node_production() {
     });
     return errorInfo;
   }
-  function logRecoverableError(request, error, errorInfo) {
+  function logRecoverableError(request, error2, errorInfo) {
     request = request.onError;
-    error = request(error, errorInfo);
-    if (null == error || "string" === typeof error) return error;
+    error2 = request(error2, errorInfo);
+    if (null == error2 || "string" === typeof error2) return error2;
   }
-  function fatalError(request, error) {
+  function fatalError(request, error2) {
     var onShellError = request.onShellError, onFatalError = request.onFatalError;
-    onShellError(error);
-    onFatalError(error);
-    null !== request.destination ? (request.status = 14, request.destination.destroy(error)) : (request.status = 13, request.fatalError = error);
+    onShellError(error2);
+    onFatalError(error2);
+    null !== request.destination ? (request.status = 14, request.destination.destroy(error2)) : (request.status = 13, request.fatalError = error2);
   }
   function finishSuspenseListRow(request, row) {
     unblockSuspenseListRow(request, row.next, row.hoistables);
@@ -10414,13 +10414,13 @@ function requireReactDomServer_node_production() {
       var resumeSlots = task.replay.slots;
       if (null !== resumeSlots && "object" === typeof resumeSlots)
         for (var n = 0; n < keyPath; n++) {
-          var i = "backwards" !== revealOrder && "unstable_legacy-backwards" !== revealOrder ? n : keyPath - 1 - n, node = rows[i];
+          var i = "backwards" !== revealOrder && "unstable_legacy-backwards" !== revealOrder ? n : keyPath - 1 - n, node2 = rows[i];
           task.row = previousSuspenseListRow = createSuspenseListRow(
             previousSuspenseListRow
           );
           task.treeContext = pushTreeContext(prevTreeContext, keyPath, i);
           var resumeSegmentID = resumeSlots[i];
-          "number" === typeof resumeSegmentID ? (resumeNode(request, task, resumeSegmentID, node, i), delete resumeSlots[i]) : renderNode(request, task, node, i);
+          "number" === typeof resumeSegmentID ? (resumeNode(request, task, resumeSegmentID, node2, i), delete resumeSlots[i]) : renderNode(request, task, node2, i);
           0 === --previousSuspenseListRow.pendingTasks && finishSuspenseListRow(request, previousSuspenseListRow);
         }
       else
@@ -10438,7 +10438,7 @@ function requireReactDomServer_node_production() {
       resumeSlots = revealOrder.children.length;
       n = revealOrder.chunks.length;
       for (i = keyPath - 1; 0 <= i; i--) {
-        node = rows[i];
+        node2 = rows[i];
         task.row = previousSuspenseListRow = createSuspenseListRow(
           previousSuspenseListRow
         );
@@ -10454,7 +10454,7 @@ function requireReactDomServer_node_production() {
         revealOrder.children.splice(resumeSlots, 0, resumeSegmentID);
         task.blockedSegment = resumeSegmentID;
         try {
-          renderNode(request, task, node, i), resumeSegmentID.lastPushedText && resumeSegmentID.textEmbedded && resumeSegmentID.chunks.push(textSeparator), resumeSegmentID.status = 1, finishedSegment(request, task.blockedBoundary, resumeSegmentID), 0 === --previousSuspenseListRow.pendingTasks && finishSuspenseListRow(request, previousSuspenseListRow);
+          renderNode(request, task, node2, i), resumeSegmentID.lastPushedText && resumeSegmentID.textEmbedded && resumeSegmentID.chunks.push(textSeparator), resumeSegmentID.status = 1, finishedSegment(request, task.blockedBoundary, resumeSegmentID), 0 === --previousSuspenseListRow.pendingTasks && finishSuspenseListRow(request, previousSuspenseListRow);
         } catch (thrownValue) {
           throw resumeSegmentID.status = 12 === request.status ? 3 : 4, thrownValue;
         }
@@ -10923,7 +10923,7 @@ function requireReactDomServer_node_production() {
       );
     }
   }
-  function resumeNode(request, task, segmentId, node, childIndex) {
+  function resumeNode(request, task, segmentId, node2, childIndex) {
     var prevReplay = task.replay, blockedBoundary = task.blockedBoundary, resumedSegment = createPendingSegment(
       request,
       0,
@@ -10935,30 +10935,30 @@ function requireReactDomServer_node_production() {
     resumedSegment.id = segmentId;
     resumedSegment.parentFlushed = true;
     try {
-      task.replay = null, task.blockedSegment = resumedSegment, renderNode(request, task, node, childIndex), resumedSegment.status = 1, finishedSegment(request, blockedBoundary, resumedSegment), null === blockedBoundary ? request.completedRootSegment = resumedSegment : (queueCompletedSegment(blockedBoundary, resumedSegment), blockedBoundary.parentFlushed && request.partialBoundaries.push(blockedBoundary));
+      task.replay = null, task.blockedSegment = resumedSegment, renderNode(request, task, node2, childIndex), resumedSegment.status = 1, finishedSegment(request, blockedBoundary, resumedSegment), null === blockedBoundary ? request.completedRootSegment = resumedSegment : (queueCompletedSegment(blockedBoundary, resumedSegment), blockedBoundary.parentFlushed && request.partialBoundaries.push(blockedBoundary));
     } finally {
       task.replay = prevReplay, task.blockedSegment = null;
     }
   }
-  function renderNodeDestructive(request, task, node, childIndex) {
-    null !== task.replay && "number" === typeof task.replay.slots ? resumeNode(request, task, task.replay.slots, node, childIndex) : (task.node = node, task.childIndex = childIndex, node = task.componentStack, pushComponentStack(task), retryNode(request, task), task.componentStack = node);
+  function renderNodeDestructive(request, task, node2, childIndex) {
+    null !== task.replay && "number" === typeof task.replay.slots ? resumeNode(request, task, task.replay.slots, node2, childIndex) : (task.node = node2, task.childIndex = childIndex, node2 = task.componentStack, pushComponentStack(task), retryNode(request, task), task.componentStack = node2);
   }
   function retryNode(request, task) {
-    var node = task.node, childIndex = task.childIndex;
-    if (null !== node) {
-      if ("object" === typeof node) {
-        switch (node.$$typeof) {
+    var node2 = task.node, childIndex = task.childIndex;
+    if (null !== node2) {
+      if ("object" === typeof node2) {
+        switch (node2.$$typeof) {
           case REACT_ELEMENT_TYPE:
-            var type = node.type, key = node.key, props = node.props;
-            node = props.ref;
-            var ref = void 0 !== node ? node : null, name2 = getComponentNameFromType(type), keyOrIndex = null == key ? -1 === childIndex ? 0 : childIndex : key;
+            var type = node2.type, key = node2.key, props = node2.props;
+            node2 = props.ref;
+            var ref = void 0 !== node2 ? node2 : null, name2 = getComponentNameFromType(type), keyOrIndex = null == key ? -1 === childIndex ? 0 : childIndex : key;
             key = [task.keyPath, name2, keyOrIndex];
             if (null !== task.replay)
               a: {
                 var replay = task.replay;
                 childIndex = replay.nodes;
-                for (node = 0; node < childIndex.length; node++) {
-                  var node$jscomp$0 = childIndex[node];
+                for (node2 = 0; node2 < childIndex.length; node2++) {
+                  var node$jscomp$0 = childIndex[node2];
                   if (keyOrIndex === node$jscomp$0[1]) {
                     if (4 === node$jscomp$0.length) {
                       if (null !== name2 && name2 !== node$jscomp$0[0])
@@ -10982,7 +10982,7 @@ function requireReactDomServer_node_production() {
                         task.replay.pendingTasks--;
                       } catch (x2) {
                         if ("object" === typeof x2 && null !== x2 && (x2 === SuspenseException || "function" === typeof x2.then))
-                          throw task.node === keyOrIndex ? task.replay = replay : childIndex.splice(node, 1), x2;
+                          throw task.node === keyOrIndex ? task.replay = replay : childIndex.splice(node2, 1), x2;
                         task.replay.pendingTasks--;
                         props = getThrownInfo(task.componentStack);
                         key = request;
@@ -11052,10 +11052,10 @@ function requireReactDomServer_node_production() {
                             request.completedBoundaries.push(props);
                             break b;
                           }
-                        } catch (error) {
+                        } catch (error2) {
                           props.status = 4, childNodes = getThrownInfo(task.componentStack), replay = logRecoverableError(
                             request,
-                            error,
+                            error2,
                             childNodes
                           ), props.errorDigest = replay, task.replay.pendingTasks--, request.clientRenderedBoundaries.push(props);
                         } finally {
@@ -11090,7 +11090,7 @@ function requireReactDomServer_node_production() {
                         request.pingedTasks.push(childNodes);
                       }
                     }
-                    childIndex.splice(node, 1);
+                    childIndex.splice(node2, 1);
                     break a;
                   }
                 }
@@ -11102,54 +11102,54 @@ function requireReactDomServer_node_production() {
               "Portals are not currently supported by the server renderer. Render them conditionally so that they only appear on the client render."
             );
           case REACT_LAZY_TYPE:
-            childNodes = node._init;
-            node = childNodes(node._payload);
+            childNodes = node2._init;
+            node2 = childNodes(node2._payload);
             if (12 === request.status) throw null;
-            renderNodeDestructive(request, task, node, childIndex);
+            renderNodeDestructive(request, task, node2, childIndex);
             return;
         }
-        if (isArrayImpl(node)) {
-          renderChildrenArray(request, task, node, childIndex);
+        if (isArrayImpl(node2)) {
+          renderChildrenArray(request, task, node2, childIndex);
           return;
         }
-        if (childNodes = getIteratorFn(node)) {
-          if (childNodes = childNodes.call(node)) {
-            node = childNodes.next();
-            if (!node.done) {
+        if (childNodes = getIteratorFn(node2)) {
+          if (childNodes = childNodes.call(node2)) {
+            node2 = childNodes.next();
+            if (!node2.done) {
               props = [];
               do
-                props.push(node.value), node = childNodes.next();
-              while (!node.done);
+                props.push(node2.value), node2 = childNodes.next();
+              while (!node2.done);
               renderChildrenArray(request, task, props, childIndex);
             }
             return;
           }
         }
-        if ("function" === typeof node.then)
-          return task.thenableState = null, renderNodeDestructive(request, task, unwrapThenable(node), childIndex);
-        if (node.$$typeof === REACT_CONTEXT_TYPE)
+        if ("function" === typeof node2.then)
+          return task.thenableState = null, renderNodeDestructive(request, task, unwrapThenable(node2), childIndex);
+        if (node2.$$typeof === REACT_CONTEXT_TYPE)
           return renderNodeDestructive(
             request,
             task,
-            node._currentValue,
+            node2._currentValue,
             childIndex
           );
-        childIndex = Object.prototype.toString.call(node);
+        childIndex = Object.prototype.toString.call(node2);
         throw Error(
-          "Objects are not valid as a React child (found: " + ("[object Object]" === childIndex ? "object with keys {" + Object.keys(node).join(", ") + "}" : childIndex) + "). If you meant to render a collection of children, use an array instead."
+          "Objects are not valid as a React child (found: " + ("[object Object]" === childIndex ? "object with keys {" + Object.keys(node2).join(", ") + "}" : childIndex) + "). If you meant to render a collection of children, use an array instead."
         );
       }
-      if ("string" === typeof node)
+      if ("string" === typeof node2)
         childIndex = task.blockedSegment, null !== childIndex && (childIndex.lastPushedText = pushTextInstance(
           childIndex.chunks,
-          node,
+          node2,
           request.renderState,
           childIndex.lastPushedText
         ));
-      else if ("number" === typeof node || "bigint" === typeof node)
+      else if ("number" === typeof node2 || "bigint" === typeof node2)
         childIndex = task.blockedSegment, null !== childIndex && (childIndex.lastPushedText = pushTextInstance(
           childIndex.chunks,
-          "" + node,
+          "" + node2,
           request.renderState,
           childIndex.lastPushedText
         ));
@@ -11159,11 +11159,11 @@ function requireReactDomServer_node_production() {
     var prevKeyPath = task.keyPath;
     if (-1 !== childIndex && (task.keyPath = [task.keyPath, "Fragment", childIndex], null !== task.replay)) {
       for (var replay = task.replay, replayNodes = replay.nodes, j = 0; j < replayNodes.length; j++) {
-        var node = replayNodes[j];
-        if (node[1] === childIndex) {
-          childIndex = node[2];
-          node = node[3];
-          task.replay = { nodes: childIndex, slots: node, pendingTasks: 1 };
+        var node2 = replayNodes[j];
+        if (node2[1] === childIndex) {
+          childIndex = node2[2];
+          node2 = node2[3];
+          task.replay = { nodes: childIndex, slots: node2, pendingTasks: 1 };
           try {
             renderChildrenArray(request, task, children, -1);
             if (1 === task.replay.pendingTasks && 0 < task.replay.nodes.length)
@@ -11176,14 +11176,14 @@ function requireReactDomServer_node_production() {
               throw x2;
             task.replay.pendingTasks--;
             children = getThrownInfo(task.componentStack);
-            var boundary = task.blockedBoundary, error = x2;
-            children = logRecoverableError(request, error, children);
+            var boundary = task.blockedBoundary, error2 = x2;
+            children = logRecoverableError(request, error2, children);
             abortRemainingReplayNodes(
               request,
               boundary,
               childIndex,
-              node,
-              error,
+              node2,
+              error2,
               children
             );
           }
@@ -11199,7 +11199,7 @@ function requireReactDomServer_node_production() {
     replayNodes = children.length;
     if (null !== task.replay && (j = task.replay.slots, null !== j && "object" === typeof j)) {
       for (childIndex = 0; childIndex < replayNodes; childIndex++)
-        node = children[childIndex], task.treeContext = pushTreeContext(replay, replayNodes, childIndex), boundary = j[childIndex], "number" === typeof boundary ? (resumeNode(request, task, boundary, node, childIndex), delete j[childIndex]) : renderNode(request, task, node, childIndex);
+        node2 = children[childIndex], task.treeContext = pushTreeContext(replay, replayNodes, childIndex), boundary = j[childIndex], "number" === typeof boundary ? (resumeNode(request, task, boundary, node2, childIndex), delete j[childIndex]) : renderNode(request, task, node2, childIndex);
       task.treeContext = replay;
       task.keyPath = prevKeyPath;
       return;
@@ -11325,18 +11325,18 @@ function requireReactDomServer_node_production() {
       task.componentStack
     );
   }
-  function renderNode(request, task, node, childIndex) {
+  function renderNode(request, task, node2, childIndex) {
     var previousFormatContext = task.formatContext, previousContext = task.context, previousKeyPath = task.keyPath, previousTreeContext = task.treeContext, previousComponentStack = task.componentStack, segment = task.blockedSegment;
     if (null === segment) {
       segment = task.replay;
       try {
-        return renderNodeDestructive(request, task, node, childIndex);
+        return renderNodeDestructive(request, task, node2, childIndex);
       } catch (thrownValue) {
-        if (resetHooksState(), node = thrownValue === SuspenseException ? getSuspendedThenable() : thrownValue, 12 !== request.status && "object" === typeof node && null !== node) {
-          if ("function" === typeof node.then) {
+        if (resetHooksState(), node2 = thrownValue === SuspenseException ? getSuspendedThenable() : thrownValue, 12 !== request.status && "object" === typeof node2 && null !== node2) {
+          if ("function" === typeof node2.then) {
             childIndex = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
             request = spawnNewSuspendedReplayTask(request, task, childIndex).ping;
-            node.then(request, request);
+            node2.then(request, request);
             task.formatContext = previousFormatContext;
             task.context = previousContext;
             task.keyPath = previousKeyPath;
@@ -11346,10 +11346,10 @@ function requireReactDomServer_node_production() {
             switchContext(previousContext);
             return;
           }
-          if ("Maximum call stack size exceeded" === node.message) {
-            node = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
-            node = spawnNewSuspendedReplayTask(request, task, node);
-            request.pingedTasks.push(node);
+          if ("Maximum call stack size exceeded" === node2.message) {
+            node2 = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
+            node2 = spawnNewSuspendedReplayTask(request, task, node2);
+            request.pingedTasks.push(node2);
             task.formatContext = previousFormatContext;
             task.context = previousContext;
             task.keyPath = previousKeyPath;
@@ -11364,13 +11364,13 @@ function requireReactDomServer_node_production() {
     } else {
       var childrenLength = segment.children.length, chunkLength = segment.chunks.length;
       try {
-        return renderNodeDestructive(request, task, node, childIndex);
+        return renderNodeDestructive(request, task, node2, childIndex);
       } catch (thrownValue$63) {
-        if (resetHooksState(), segment.children.length = childrenLength, segment.chunks.length = chunkLength, node = thrownValue$63 === SuspenseException ? getSuspendedThenable() : thrownValue$63, 12 !== request.status && "object" === typeof node && null !== node) {
-          if ("function" === typeof node.then) {
-            segment = node;
-            node = thrownValue$63 === SuspenseException ? getThenableStateAfterSuspending() : null;
-            request = spawnNewSuspendedRenderTask(request, task, node).ping;
+        if (resetHooksState(), segment.children.length = childrenLength, segment.chunks.length = chunkLength, node2 = thrownValue$63 === SuspenseException ? getSuspendedThenable() : thrownValue$63, 12 !== request.status && "object" === typeof node2 && null !== node2) {
+          if ("function" === typeof node2.then) {
+            segment = node2;
+            node2 = thrownValue$63 === SuspenseException ? getThenableStateAfterSuspending() : null;
+            request = spawnNewSuspendedRenderTask(request, task, node2).ping;
             segment.then(request, request);
             task.formatContext = previousFormatContext;
             task.context = previousContext;
@@ -11380,7 +11380,7 @@ function requireReactDomServer_node_production() {
             switchContext(previousContext);
             return;
           }
-          if ("Maximum call stack size exceeded" === node.message) {
+          if ("Maximum call stack size exceeded" === node2.message) {
             segment = thrownValue$63 === SuspenseException ? getThenableStateAfterSuspending() : null;
             segment = spawnNewSuspendedRenderTask(request, task, segment);
             request.pingedTasks.push(segment);
@@ -11400,26 +11400,26 @@ function requireReactDomServer_node_production() {
     task.keyPath = previousKeyPath;
     task.treeContext = previousTreeContext;
     switchContext(previousContext);
-    throw node;
+    throw node2;
   }
   function abortTaskSoft(task) {
     var boundary = task.blockedBoundary, segment = task.blockedSegment;
     null !== segment && (segment.status = 3, finishedTask(this, boundary, task.row, segment));
   }
-  function abortRemainingReplayNodes(request$jscomp$0, boundary, nodes, slots, error, errorDigest$jscomp$0) {
+  function abortRemainingReplayNodes(request$jscomp$0, boundary, nodes, slots, error2, errorDigest$jscomp$0) {
     for (var i = 0; i < nodes.length; i++) {
-      var node = nodes[i];
-      if (4 === node.length)
+      var node2 = nodes[i];
+      if (4 === node2.length)
         abortRemainingReplayNodes(
           request$jscomp$0,
           boundary,
-          node[2],
-          node[3],
-          error,
+          node2[2],
+          node2[3],
+          error2,
           errorDigest$jscomp$0
         );
       else {
-        node = node[5];
+        node2 = node2[5];
         var request = request$jscomp$0, errorDigest = errorDigest$jscomp$0, resumedBoundary = createSuspenseBoundary(
           request,
           null,
@@ -11428,7 +11428,7 @@ function requireReactDomServer_node_production() {
           null
         );
         resumedBoundary.parentFlushed = true;
-        resumedBoundary.rootSegmentID = node;
+        resumedBoundary.rootSegmentID = node2;
         resumedBoundary.status = 4;
         resumedBoundary.errorDigest = errorDigest;
         resumedBoundary.parentFlushed && request.clientRenderedBoundaries.push(resumedBoundary);
@@ -11444,7 +11444,7 @@ function requireReactDomServer_node_production() {
       if ("object" === typeof slots) for (var index in slots) delete slots[index];
     }
   }
-  function abortTask(task, request, error) {
+  function abortTask(task, request, error2) {
     var boundary = task.blockedBoundary, segment = task.blockedSegment;
     if (null !== segment) {
       if (6 === segment.status) return;
@@ -11455,16 +11455,16 @@ function requireReactDomServer_node_production() {
       if (13 !== request.status && 14 !== request.status) {
         boundary = task.replay;
         if (null === boundary) {
-          null !== request.trackedPostpones && null !== segment ? (boundary = request.trackedPostpones, logRecoverableError(request, error, errorInfo), trackPostpone(request, boundary, task, segment), finishedTask(request, null, task.row, segment)) : (logRecoverableError(request, error, errorInfo), fatalError(request, error));
+          null !== request.trackedPostpones && null !== segment ? (boundary = request.trackedPostpones, logRecoverableError(request, error2, errorInfo), trackPostpone(request, boundary, task, segment), finishedTask(request, null, task.row, segment)) : (logRecoverableError(request, error2, errorInfo), fatalError(request, error2));
           return;
         }
         boundary.pendingTasks--;
-        0 === boundary.pendingTasks && 0 < boundary.nodes.length && (segment = logRecoverableError(request, error, errorInfo), abortRemainingReplayNodes(
+        0 === boundary.pendingTasks && 0 < boundary.nodes.length && (segment = logRecoverableError(request, error2, errorInfo), abortRemainingReplayNodes(
           request,
           null,
           boundary.nodes,
           boundary.slots,
-          error,
+          error2,
           segment
         ));
         request.pendingRootTasks--;
@@ -11474,11 +11474,11 @@ function requireReactDomServer_node_production() {
       var trackedPostpones$64 = request.trackedPostpones;
       if (4 !== boundary.status) {
         if (null !== trackedPostpones$64 && null !== segment)
-          return logRecoverableError(request, error, errorInfo), trackPostpone(request, trackedPostpones$64, task, segment), boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
-            return abortTask(fallbackTask, request, error);
+          return logRecoverableError(request, error2, errorInfo), trackPostpone(request, trackedPostpones$64, task, segment), boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
+            return abortTask(fallbackTask, request, error2);
           }), boundary.fallbackAbortableTasks.clear(), finishedTask(request, boundary, task.row, segment);
         boundary.status = 4;
-        segment = logRecoverableError(request, error, errorInfo);
+        segment = logRecoverableError(request, error2, errorInfo);
         boundary.status = 4;
         boundary.errorDigest = segment;
         untrackBoundary(request, boundary);
@@ -11488,7 +11488,7 @@ function requireReactDomServer_node_production() {
       segment = boundary.row;
       null !== segment && 0 === --segment.pendingTasks && finishSuspenseListRow(request, segment);
       boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
-        return abortTask(fallbackTask, request, error);
+        return abortTask(fallbackTask, request, error2);
       });
       boundary.fallbackAbortableTasks.clear();
     }
@@ -11528,8 +11528,8 @@ function requireReactDomServer_node_production() {
           linkHeader ? onHeaders({ Link: linkHeader }) : onHeaders({});
         }
       }
-    } catch (error) {
-      logRecoverableError(request, error, {});
+    } catch (error2) {
+      logRecoverableError(request, error2, {});
     }
   }
   function completeShell(request) {
@@ -11734,8 +11734,8 @@ function requireReactDomServer_node_production() {
         }
         pingedTasks.splice(0, i);
         null !== request$jscomp$2.destination && flushCompletedQueues(request$jscomp$2, request$jscomp$2.destination);
-      } catch (error) {
-        logRecoverableError(request$jscomp$2, error, {}), fatalError(request$jscomp$2, error);
+      } catch (error2) {
+        logRecoverableError(request$jscomp$2, error2, {}), fatalError(request$jscomp$2, error2);
       } finally {
         currentResumableState = prevResumableState, ReactSharedInternals.H = prevDispatcher, ReactSharedInternals.A = prevAsyncDispatcher, prevDispatcher === HooksDispatcher && switchContext(prevContext), currentRequest = prevRequest;
       }
@@ -12188,8 +12188,8 @@ function requireReactDomServer_node_production() {
       request.destination = destination;
       try {
         flushCompletedQueues(request, destination);
-      } catch (error) {
-        logRecoverableError(request, error, {}), fatalError(request, error);
+      } catch (error2) {
+        logRecoverableError(request, error2, {}), fatalError(request, error2);
       }
     }
   }
@@ -12198,10 +12198,10 @@ function requireReactDomServer_node_production() {
     try {
       var abortableTasks = request.abortableTasks;
       if (0 < abortableTasks.size) {
-        var error = void 0 === reason ? Error("The render was aborted by the server without a reason.") : "object" === typeof reason && null !== reason && "function" === typeof reason.then ? Error("The render was aborted by the server with a promise.") : reason;
-        request.fatalError = error;
+        var error2 = void 0 === reason ? Error("The render was aborted by the server without a reason.") : "object" === typeof reason && null !== reason && "function" === typeof reason.then ? Error("The render was aborted by the server with a promise.") : reason;
+        request.fatalError = error2;
         abortableTasks.forEach(function(task) {
-          return abortTask(task, request, error);
+          return abortTask(task, request, error2);
         });
         abortableTasks.clear();
       }
@@ -12210,12 +12210,12 @@ function requireReactDomServer_node_production() {
       logRecoverableError(request, error$72, {}), fatalError(request, error$72);
     }
   }
-  function addToReplayParent(node, parentKeyPath, trackedPostpones) {
-    if (null === parentKeyPath) trackedPostpones.rootNodes.push(node);
+  function addToReplayParent(node2, parentKeyPath, trackedPostpones) {
+    if (null === parentKeyPath) trackedPostpones.rootNodes.push(node2);
     else {
       var workingMap = trackedPostpones.workingMap, parentNode = workingMap.get(parentKeyPath);
       void 0 === parentNode && (parentNode = [parentKeyPath[1], parentKeyPath[2], [], null], workingMap.set(parentKeyPath, parentNode), addToReplayParent(parentNode, parentKeyPath[0], trackedPostpones));
-      parentNode[2].push(node);
+      parentNode[2].push(node2);
     }
   }
   function getPostponedState(request) {
@@ -12315,8 +12315,8 @@ function requireReactDomServer_node_production() {
       end: function() {
         controller.close();
       },
-      destroy: function(error) {
-        "function" === typeof controller.error ? controller.error(error) : controller.close();
+      destroy: function(error2) {
+        "function" === typeof controller.error ? controller.error(error2) : controller.close();
       }
     };
   }
@@ -12351,8 +12351,8 @@ function requireReactDomServer_node_production() {
       end: function() {
         controller.close();
       },
-      destroy: function(error) {
-        "function" === typeof controller.error ? controller.error(error) : controller.close();
+      destroy: function(error2) {
+        "function" === typeof controller.error ? controller.error(error2) : controller.close();
       }
     };
   }
@@ -12364,8 +12364,8 @@ function requireReactDomServer_node_production() {
       end: function() {
         readable.push(null);
       },
-      destroy: function(error) {
-        readable.destroy(error);
+      destroy: function(error2) {
+        readable.destroy(error2);
       }
     };
   }
@@ -12573,10 +12573,10 @@ function requireReactDomServer_node_production() {
           stream2.allReady = allReady;
           resolve(stream2);
         },
-        function(error) {
+        function(error2) {
           allReady.catch(function() {
           });
-          reject(error);
+          reject(error2);
         },
         onFatalError,
         options ? options.onPostpone : void 0,
@@ -12636,10 +12636,10 @@ function requireReactDomServer_node_production() {
           stream2.allReady = allReady;
           resolve(stream2);
         },
-        function(error) {
+        function(error2) {
           allReady.catch(function() {
           });
-          reject(error);
+          reject(error2);
         },
         onFatalError,
         options ? options.onPostpone : void 0
@@ -12813,9 +12813,9 @@ function requireReactDomServerLegacy_node_development() {
       maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
       return "function" === typeof maybeIterable ? maybeIterable : null;
     }
-    function objectName(object) {
-      object = Object.prototype.toString.call(object);
-      return object.slice(8, object.length - 1);
+    function objectName(object2) {
+      object2 = Object.prototype.toString.call(object2);
+      return object2.slice(8, object2.length - 1);
     }
     function describeKeyForErrorMessage(key) {
       var encodedKey = JSON.stringify(key);
@@ -13240,8 +13240,8 @@ function requireReactDomServerLegacy_node_development() {
         type
       );
     }
-    function camelize(string) {
-      return string.replace(hyphenPattern, function(_2, character) {
+    function camelize(string2) {
+      return string2.replace(hyphenPattern, function(_2, character) {
         return character.toUpperCase();
       });
     }
@@ -15581,11 +15581,11 @@ function requireReactDomServerLegacy_node_development() {
                 fulfilledThenable.value = fulfilledValue;
               }
             },
-            function(error) {
+            function(error2) {
               if ("pending" === thenable.status) {
                 var rejectedThenable = thenable;
                 rejectedThenable.status = "rejected";
-                rejectedThenable.reason = error;
+                rejectedThenable.reason = error2;
               }
             }
           ));
@@ -15854,23 +15854,23 @@ function requireReactDomServerLegacy_node_development() {
         "disabledDepth fell below zero. This is a bug in React. Please file an issue."
       );
     }
-    function formatOwnerStack(error) {
+    function formatOwnerStack(error2) {
       var prevPrepareStackTrace = Error.prepareStackTrace;
       Error.prepareStackTrace = void 0;
-      error = error.stack;
+      error2 = error2.stack;
       Error.prepareStackTrace = prevPrepareStackTrace;
-      error.startsWith("Error: react-stack-top-frame\n") && (error = error.slice(29));
-      prevPrepareStackTrace = error.indexOf("\n");
-      -1 !== prevPrepareStackTrace && (error = error.slice(prevPrepareStackTrace + 1));
-      prevPrepareStackTrace = error.indexOf("react_stack_bottom_frame");
-      -1 !== prevPrepareStackTrace && (prevPrepareStackTrace = error.lastIndexOf(
+      error2.startsWith("Error: react-stack-top-frame\n") && (error2 = error2.slice(29));
+      prevPrepareStackTrace = error2.indexOf("\n");
+      -1 !== prevPrepareStackTrace && (error2 = error2.slice(prevPrepareStackTrace + 1));
+      prevPrepareStackTrace = error2.indexOf("react_stack_bottom_frame");
+      -1 !== prevPrepareStackTrace && (prevPrepareStackTrace = error2.lastIndexOf(
         "\n",
         prevPrepareStackTrace
       ));
       if (-1 !== prevPrepareStackTrace)
-        error = error.slice(0, prevPrepareStackTrace);
+        error2 = error2.slice(0, prevPrepareStackTrace);
       else return "";
-      return error;
+      return error2;
     }
     function describeBuiltInComponentFrame(name2) {
       if (void 0 === prefix)
@@ -16039,20 +16039,20 @@ function requireReactDomServerLegacy_node_development() {
     function isEligibleForOutlining(request, boundary) {
       return (500 < boundary.byteSize || false) && null === boundary.contentPreamble;
     }
-    function defaultErrorHandler(error) {
-      if ("object" === typeof error && null !== error && "string" === typeof error.environmentName) {
-        var JSCompiler_inline_result = error.environmentName;
-        error = [error].slice(0);
-        "string" === typeof error[0] ? error.splice(
+    function defaultErrorHandler(error2) {
+      if ("object" === typeof error2 && null !== error2 && "string" === typeof error2.environmentName) {
+        var JSCompiler_inline_result = error2.environmentName;
+        error2 = [error2].slice(0);
+        "string" === typeof error2[0] ? error2.splice(
           0,
           1,
-          "[%s] " + error[0],
+          "[%s] " + error2[0],
           " " + JSCompiler_inline_result + " "
-        ) : error.splice(0, 0, "[%s]", " " + JSCompiler_inline_result + " ");
-        error.unshift(console);
-        JSCompiler_inline_result = bind.apply(console.error, error);
+        ) : error2.splice(0, 0, "[%s]", " " + JSCompiler_inline_result + " ");
+        error2.unshift(console);
+        JSCompiler_inline_result = bind.apply(console.error, error2);
         JSCompiler_inline_result();
-      } else console.error(error);
+      } else console.error(error2);
       return null;
     }
     function RequestInstance(resumableState, renderState, rootFormatContext, progressiveChunkSize, onError2, onAllReady, onShellReady, onShellError, onFatalError, onPostpone, formState) {
@@ -16159,13 +16159,13 @@ function requireReactDomServerLegacy_node_development() {
       null !== row && (row.pendingTasks++, contentPreamble = row.boundaries, null !== contentPreamble && (request.allPendingTasks++, fallbackAbortableTasks.pendingTasks++, contentPreamble.push(fallbackAbortableTasks)), request = row.inheritedHoistables, null !== request && hoistHoistables(fallbackAbortableTasks.contentState, request));
       return fallbackAbortableTasks;
     }
-    function createRenderTask(request, thenableState2, node, childIndex, blockedBoundary, blockedSegment, blockedPreamble, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack, legacyContext, debugTask) {
+    function createRenderTask(request, thenableState2, node2, childIndex, blockedBoundary, blockedSegment, blockedPreamble, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack, legacyContext, debugTask) {
       request.allPendingTasks++;
       null === blockedBoundary ? request.pendingRootTasks++ : blockedBoundary.pendingTasks++;
       null !== row && row.pendingTasks++;
       var task = {
         replay: null,
-        node,
+        node: node2,
         childIndex,
         ping: function() {
           return pingTask(request, task);
@@ -16187,14 +16187,14 @@ function requireReactDomServerLegacy_node_development() {
       abortSet.add(task);
       return task;
     }
-    function createReplayTask(request, thenableState2, replay, node, childIndex, blockedBoundary, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack, legacyContext, debugTask) {
+    function createReplayTask(request, thenableState2, replay, node2, childIndex, blockedBoundary, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack, legacyContext, debugTask) {
       request.allPendingTasks++;
       null === blockedBoundary ? request.pendingRootTasks++ : blockedBoundary.pendingTasks++;
       null !== row && row.pendingTasks++;
       replay.pendingTasks++;
       var task = {
         replay,
-        node,
+        node: node2,
         childIndex,
         ping: function() {
           return pingTask(request, task);
@@ -16293,13 +16293,13 @@ function requireReactDomServerLegacy_node_development() {
         }
     }
     function pushComponentStack(task) {
-      var node = task.node;
-      if ("object" === typeof node && null !== node)
-        switch (node.$$typeof) {
+      var node2 = task.node;
+      if ("object" === typeof node2 && null !== node2)
+        switch (node2.$$typeof) {
           case REACT_ELEMENT_TYPE:
-            var type = node.type, owner = node._owner, stack = node._debugStack;
-            pushServerComponentStack(task, node._debugInfo);
-            task.debugTask = node._debugTask;
+            var type = node2.type, owner = node2._owner, stack = node2._debugStack;
+            pushServerComponentStack(task, node2._debugInfo);
+            task.debugTask = node2._debugTask;
             task.componentStack = {
               parent: task.componentStack,
               type,
@@ -16308,10 +16308,10 @@ function requireReactDomServerLegacy_node_development() {
             };
             break;
           case REACT_LAZY_TYPE:
-            pushServerComponentStack(task, node._debugInfo);
+            pushServerComponentStack(task, node2._debugInfo);
             break;
           default:
-            "function" === typeof node.then && pushServerComponentStack(task, node._debugInfo);
+            "function" === typeof node2.then && pushServerComponentStack(task, node2._debugInfo);
         }
     }
     function replaceSuspenseComponentStackWithSuspenseFallbackStack(componentStack) {
@@ -16329,10 +16329,10 @@ function requireReactDomServerLegacy_node_development() {
         enumerable: true,
         get: function() {
           try {
-            var info = "", node = node$jscomp$0;
+            var info = "", node2 = node$jscomp$0;
             do
-              info += describeComponentStackByType(node.type), node = node.parent;
-            while (node);
+              info += describeComponentStackByType(node2.type), node2 = node2.parent;
+            while (node2);
             var stack = info;
           } catch (x2) {
             stack = "\nError generating stack: " + x2.message + "\n" + x2.stack;
@@ -16345,29 +16345,29 @@ function requireReactDomServerLegacy_node_development() {
       });
       return errorInfo;
     }
-    function encodeErrorForBoundary(boundary, digest, error, thrownInfo, wasAborted) {
+    function encodeErrorForBoundary(boundary, digest, error2, thrownInfo, wasAborted) {
       boundary.errorDigest = digest;
-      error instanceof Error ? (digest = String(error.message), error = String(error.stack)) : (digest = "object" === typeof error && null !== error ? describeObjectForErrorMessage(error) : String(error), error = null);
+      error2 instanceof Error ? (digest = String(error2.message), error2 = String(error2.stack)) : (digest = "object" === typeof error2 && null !== error2 ? describeObjectForErrorMessage(error2) : String(error2), error2 = null);
       wasAborted = wasAborted ? "Switched to client rendering because the server rendering aborted due to:\n\n" : "Switched to client rendering because the server rendering errored:\n\n";
       boundary.errorMessage = wasAborted + digest;
-      boundary.errorStack = null !== error ? wasAborted + error : null;
+      boundary.errorStack = null !== error2 ? wasAborted + error2 : null;
       boundary.errorComponentStack = thrownInfo.componentStack;
     }
-    function logRecoverableError(request, error, errorInfo, debugTask) {
+    function logRecoverableError(request, error2, errorInfo, debugTask) {
       request = request.onError;
-      error = debugTask ? debugTask.run(request.bind(null, error, errorInfo)) : request(error, errorInfo);
-      if (null != error && "string" !== typeof error)
+      error2 = debugTask ? debugTask.run(request.bind(null, error2, errorInfo)) : request(error2, errorInfo);
+      if (null != error2 && "string" !== typeof error2)
         console.error(
           'onError returned something with a type other than "string". onError should return a string and may return null or undefined but must not return anything else. It received something of type "%s" instead',
-          typeof error
+          typeof error2
         );
-      else return error;
+      else return error2;
     }
-    function fatalError(request, error, errorInfo, debugTask) {
+    function fatalError(request, error2, errorInfo, debugTask) {
       errorInfo = request.onShellError;
       var onFatalError = request.onFatalError;
-      debugTask ? (debugTask.run(errorInfo.bind(null, error)), debugTask.run(onFatalError.bind(null, error))) : (errorInfo(error), onFatalError(error));
-      null !== request.destination ? (request.status = CLOSED, request.destination.destroy(error)) : (request.status = 13, request.fatalError = error);
+      debugTask ? (debugTask.run(errorInfo.bind(null, error2)), debugTask.run(onFatalError.bind(null, error2))) : (errorInfo(error2), onFatalError(error2));
+      null !== request.destination ? (request.status = CLOSED, request.destination.destroy(error2)) : (request.status = 13, request.fatalError = error2);
     }
     function finishSuspenseListRow(request, row) {
       unblockSuspenseListRow(request, row.next, row.hoistables);
@@ -16429,13 +16429,13 @@ function requireReactDomServerLegacy_node_development() {
         var resumeSlots = task.replay.slots;
         if (null !== resumeSlots && "object" === typeof resumeSlots)
           for (var n = 0; n < keyPath; n++) {
-            var i = "backwards" !== revealOrder && "unstable_legacy-backwards" !== revealOrder ? n : keyPath - 1 - n, node = rows[i];
+            var i = "backwards" !== revealOrder && "unstable_legacy-backwards" !== revealOrder ? n : keyPath - 1 - n, node2 = rows[i];
             task.row = previousSuspenseListRow = createSuspenseListRow(
               previousSuspenseListRow
             );
             task.treeContext = pushTreeContext(prevTreeContext, keyPath, i);
             var resumeSegmentID = resumeSlots[i];
-            "number" === typeof resumeSegmentID ? (resumeNode(request, task, resumeSegmentID, node, i), delete resumeSlots[i]) : renderNode(request, task, node, i);
+            "number" === typeof resumeSegmentID ? (resumeNode(request, task, resumeSegmentID, node2, i), delete resumeSlots[i]) : renderNode(request, task, node2, i);
             0 === --previousSuspenseListRow.pendingTasks && finishSuspenseListRow(request, previousSuspenseListRow);
           }
         else
@@ -16453,7 +16453,7 @@ function requireReactDomServerLegacy_node_development() {
         resumeSlots = revealOrder.children.length;
         n = revealOrder.chunks.length;
         for (i = keyPath - 1; 0 <= i; i--) {
-          node = rows[i];
+          node2 = rows[i];
           task.row = previousSuspenseListRow = createSuspenseListRow(
             previousSuspenseListRow
           );
@@ -16468,9 +16468,9 @@ function requireReactDomServerLegacy_node_development() {
           );
           revealOrder.children.splice(resumeSlots, 0, resumeSegmentID);
           task.blockedSegment = resumeSegmentID;
-          warnForMissingKey(request, task, node);
+          warnForMissingKey(request, task, node2);
           try {
-            renderNode(request, task, node, i), pushSegmentFinale(
+            renderNode(request, task, node2, i), pushSegmentFinale(
               resumeSegmentID.chunks,
               request.renderState,
               resumeSegmentID.lastPushedText,
@@ -16727,12 +16727,12 @@ function requireReactDomServerLegacy_node_development() {
                 instance.state = oldQueue[0];
               else {
                 for (var nextState = oldReplace ? oldQueue[0] : instance.state, dontMutate = true, i = oldReplace ? 1 : 0; i < oldQueue.length; i++) {
-                  var partial = oldQueue[i], partialState$jscomp$0 = "function" === typeof partial ? partial.call(
+                  var partial2 = oldQueue[i], partialState$jscomp$0 = "function" === typeof partial2 ? partial2.call(
                     instance,
                     nextState,
                     resolvedProps,
                     void 0
-                  ) : partial;
+                  ) : partial2;
                   null != partialState$jscomp$0 && (dontMutate ? (dontMutate = false, nextState = assign(
                     {},
                     nextState,
@@ -17134,20 +17134,20 @@ function requireReactDomServerLegacy_node_development() {
                   newBoundary.status = CLIENT_RENDERED;
                   if (12 === request.status) {
                     contentRootSegment.status = ABORTED;
-                    var error = request.fatalError;
+                    var error2 = request.fatalError;
                   } else
-                    contentRootSegment.status = ERRORED, error = thrownValue$2;
+                    contentRootSegment.status = ERRORED, error2 = thrownValue$2;
                   var thrownInfo = getThrownInfo(task.componentStack);
                   var errorDigest = logRecoverableError(
                     request,
-                    error,
+                    error2,
                     thrownInfo,
                     task.debugTask
                   );
                   encodeErrorForBoundary(
                     newBoundary,
                     errorDigest,
-                    error,
+                    error2,
                     thrownInfo,
                     false
                   );
@@ -17279,7 +17279,7 @@ function requireReactDomServerLegacy_node_development() {
         );
       }
     }
-    function resumeNode(request, task, segmentId, node, childIndex) {
+    function resumeNode(request, task, segmentId, node2, childIndex) {
       var prevReplay = task.replay, blockedBoundary = task.blockedBoundary, resumedSegment = createPendingSegment(
         request,
         0,
@@ -17291,7 +17291,7 @@ function requireReactDomServerLegacy_node_development() {
       resumedSegment.id = segmentId;
       resumedSegment.parentFlushed = true;
       try {
-        task.replay = null, task.blockedSegment = resumedSegment, renderNode(request, task, node, childIndex), resumedSegment.status = COMPLETED, null === blockedBoundary ? request.completedRootSegment = resumedSegment : (queueCompletedSegment(blockedBoundary, resumedSegment), blockedBoundary.parentFlushed && request.partialBoundaries.push(blockedBoundary));
+        task.replay = null, task.blockedSegment = resumedSegment, renderNode(request, task, node2, childIndex), resumedSegment.status = COMPLETED, null === blockedBoundary ? request.completedRootSegment = resumedSegment : (queueCompletedSegment(blockedBoundary, resumedSegment), blockedBoundary.parentFlushed && request.partialBoundaries.push(blockedBoundary));
       } finally {
         task.replay = prevReplay, task.blockedSegment = null;
       }
@@ -17299,15 +17299,15 @@ function requireReactDomServerLegacy_node_development() {
     function replayElement(request, task, keyPath, name2, keyOrIndex, childIndex, type, props, ref, replay) {
       childIndex = replay.nodes;
       for (var i = 0; i < childIndex.length; i++) {
-        var node = childIndex[i];
-        if (keyOrIndex === node[1]) {
-          if (4 === node.length) {
-            if (null !== name2 && name2 !== node[0])
+        var node2 = childIndex[i];
+        if (keyOrIndex === node2[1]) {
+          if (4 === node2.length) {
+            if (null !== name2 && name2 !== node2[0])
               throw Error(
-                "Expected the resume to render <" + node[0] + "> in this slot but instead it rendered <" + name2 + ">. The tree doesn't match so React will fallback to client rendering."
+                "Expected the resume to render <" + node2[0] + "> in this slot but instead it rendered <" + name2 + ">. The tree doesn't match so React will fallback to client rendering."
               );
-            var childNodes = node[2];
-            name2 = node[3];
+            var childNodes = node2[2];
+            name2 = node2[3];
             keyOrIndex = task.node;
             task.replay = { nodes: childNodes, slots: name2, pendingTasks: 1 };
             try {
@@ -17346,11 +17346,11 @@ function requireReactDomServerLegacy_node_development() {
               );
             a: {
               replay = void 0;
-              name2 = node[5];
-              type = node[2];
-              ref = node[3];
-              keyOrIndex = null === node[4] ? [] : node[4][2];
-              node = null === node[4] ? null : node[4][3];
+              name2 = node2[5];
+              type = node2[2];
+              ref = node2[3];
+              keyOrIndex = null === node2[4] ? [] : node2[4][2];
+              node2 = null === node2[4] ? null : node2[4][3];
               var prevKeyPath = task.keyPath, prevContext = task.formatContext, prevRow = task.row, previousReplaySet = task.replay, parentBoundary = task.blockedBoundary, parentHoistableState = task.hoistableState, content = props.children, fallback = props.fallback, fallbackAbortSet = /* @__PURE__ */ new Set();
               props = createSuspenseBoundary(
                 request,
@@ -17382,20 +17382,20 @@ function requireReactDomServerLegacy_node_development() {
                   request.completedBoundaries.push(props);
                   break a;
                 }
-              } catch (error) {
+              } catch (error2) {
                 props.status = CLIENT_RENDERED, childNodes = getThrownInfo(task.componentStack), replay = logRecoverableError(
                   request,
-                  error,
+                  error2,
                   childNodes,
                   task.debugTask
-                ), encodeErrorForBoundary(props, replay, error, childNodes, false), task.replay.pendingTasks--, request.clientRenderedBoundaries.push(props);
+                ), encodeErrorForBoundary(props, replay, error2, childNodes, false), task.replay.pendingTasks--, request.clientRenderedBoundaries.push(props);
               } finally {
                 task.blockedBoundary = parentBoundary, task.hoistableState = parentHoistableState, task.replay = previousReplaySet, task.keyPath = prevKeyPath, task.formatContext = prevContext, task.row = prevRow;
               }
               props = createReplayTask(
                 request,
                 null,
-                { nodes: keyOrIndex, slots: node, pendingTasks: 0 },
+                { nodes: keyOrIndex, slots: node2, pendingTasks: 0 },
                 fallback,
                 -1,
                 parentBoundary,
@@ -17435,18 +17435,18 @@ function requireReactDomServerLegacy_node_development() {
           "Using Maps as children is not supported. Use an array of keyed ReactElements instead."
         ), didWarnAboutMaps = true);
     }
-    function renderNodeDestructive(request, task, node, childIndex) {
-      null !== task.replay && "number" === typeof task.replay.slots ? resumeNode(request, task, task.replay.slots, node, childIndex) : (task.node = node, task.childIndex = childIndex, node = task.componentStack, childIndex = task.debugTask, pushComponentStack(task), retryNode(request, task), task.componentStack = node, task.debugTask = childIndex);
+    function renderNodeDestructive(request, task, node2, childIndex) {
+      null !== task.replay && "number" === typeof task.replay.slots ? resumeNode(request, task, task.replay.slots, node2, childIndex) : (task.node = node2, task.childIndex = childIndex, node2 = task.componentStack, childIndex = task.debugTask, pushComponentStack(task), retryNode(request, task), task.componentStack = node2, task.debugTask = childIndex);
     }
     function retryNode(request, task) {
-      var node = task.node, childIndex = task.childIndex;
-      if (null !== node) {
-        if ("object" === typeof node) {
-          switch (node.$$typeof) {
+      var node2 = task.node, childIndex = task.childIndex;
+      if (null !== node2) {
+        if ("object" === typeof node2) {
+          switch (node2.$$typeof) {
             case REACT_ELEMENT_TYPE:
-              var type = node.type, key = node.key;
-              node = node.props;
-              var refProp = node.ref;
+              var type = node2.type, key = node2.key;
+              node2 = node2.props;
+              var refProp = node2.ref;
               refProp = void 0 !== refProp ? refProp : null;
               var debugTask = task.debugTask, name2 = getComponentNameFromType(type);
               key = null == key ? -1 === childIndex ? 0 : childIndex : key;
@@ -17461,7 +17461,7 @@ function requireReactDomServerLegacy_node_development() {
                   key,
                   childIndex,
                   type,
-                  node,
+                  node2,
                   refProp,
                   task.replay
                 )
@@ -17473,7 +17473,7 @@ function requireReactDomServerLegacy_node_development() {
                 key,
                 childIndex,
                 type,
-                node,
+                node2,
                 refProp,
                 task.replay
               ) : debugTask ? debugTask.run(
@@ -17483,75 +17483,75 @@ function requireReactDomServerLegacy_node_development() {
                   task,
                   keyPath,
                   type,
-                  node,
+                  node2,
                   refProp
                 )
-              ) : renderElement(request, task, keyPath, type, node, refProp);
+              ) : renderElement(request, task, keyPath, type, node2, refProp);
               return;
             case REACT_PORTAL_TYPE:
               throw Error(
                 "Portals are not currently supported by the server renderer. Render them conditionally so that they only appear on the client render."
               );
             case REACT_LAZY_TYPE:
-              type = callLazyInitInDEV(node);
+              type = callLazyInitInDEV(node2);
               if (12 === request.status) throw null;
               renderNodeDestructive(request, task, type, childIndex);
               return;
           }
-          if (isArrayImpl(node)) {
-            renderChildrenArray(request, task, node, childIndex);
+          if (isArrayImpl(node2)) {
+            renderChildrenArray(request, task, node2, childIndex);
             return;
           }
-          if (key = getIteratorFn(node)) {
-            if (type = key.call(node)) {
-              validateIterable(task, node, childIndex, type, key);
-              node = type.next();
-              if (!node.done) {
+          if (key = getIteratorFn(node2)) {
+            if (type = key.call(node2)) {
+              validateIterable(task, node2, childIndex, type, key);
+              node2 = type.next();
+              if (!node2.done) {
                 key = [];
                 do
-                  key.push(node.value), node = type.next();
-                while (!node.done);
+                  key.push(node2.value), node2 = type.next();
+                while (!node2.done);
                 renderChildrenArray(request, task, key, childIndex);
               }
               return;
             }
           }
-          if ("function" === typeof node.then)
+          if ("function" === typeof node2.then)
             return task.thenableState = null, renderNodeDestructive(
               request,
               task,
-              unwrapThenable(node),
+              unwrapThenable(node2),
               childIndex
             );
-          if (node.$$typeof === REACT_CONTEXT_TYPE)
+          if (node2.$$typeof === REACT_CONTEXT_TYPE)
             return renderNodeDestructive(
               request,
               task,
-              node._currentValue2,
+              node2._currentValue2,
               childIndex
             );
-          request = Object.prototype.toString.call(node);
+          request = Object.prototype.toString.call(node2);
           throw Error(
-            "Objects are not valid as a React child (found: " + ("[object Object]" === request ? "object with keys {" + Object.keys(node).join(", ") + "}" : request) + "). If you meant to render a collection of children, use an array instead."
+            "Objects are not valid as a React child (found: " + ("[object Object]" === request ? "object with keys {" + Object.keys(node2).join(", ") + "}" : request) + "). If you meant to render a collection of children, use an array instead."
           );
         }
-        "string" === typeof node ? (task = task.blockedSegment, null !== task && (task.lastPushedText = pushTextInstance(
+        "string" === typeof node2 ? (task = task.blockedSegment, null !== task && (task.lastPushedText = pushTextInstance(
           task.chunks,
-          node,
+          node2,
           request.renderState,
           task.lastPushedText
-        ))) : "number" === typeof node || "bigint" === typeof node ? (task = task.blockedSegment, null !== task && (task.lastPushedText = pushTextInstance(
+        ))) : "number" === typeof node2 || "bigint" === typeof node2 ? (task = task.blockedSegment, null !== task && (task.lastPushedText = pushTextInstance(
           task.chunks,
-          "" + node,
+          "" + node2,
           request.renderState,
           task.lastPushedText
-        ))) : ("function" === typeof node && (request = node.displayName || node.name || "Component", console.error(
+        ))) : ("function" === typeof node2 && (request = node2.displayName || node2.name || "Component", console.error(
           "Functions are not valid as a React child. This may happen if you return %s instead of <%s /> from render. Or maybe you meant to call this function rather than return it.",
           request,
           request
-        )), "symbol" === typeof node && console.error(
+        )), "symbol" === typeof node2 && console.error(
           "Symbols are not valid as a React child.\n  %s",
-          String(node)
+          String(node2)
         ));
       }
     }
@@ -17600,11 +17600,11 @@ function requireReactDomServerLegacy_node_development() {
       pushServerComponentStack(task, task.node._debugInfo);
       if (-1 !== childIndex && (task.keyPath = [task.keyPath, "Fragment", childIndex], null !== task.replay)) {
         for (var replay = task.replay, replayNodes = replay.nodes, j = 0; j < replayNodes.length; j++) {
-          var node = replayNodes[j];
-          if (node[1] === childIndex) {
-            childIndex = node[2];
-            node = node[3];
-            task.replay = { nodes: childIndex, slots: node, pendingTasks: 1 };
+          var node2 = replayNodes[j];
+          if (node2[1] === childIndex) {
+            childIndex = node2[2];
+            node2 = node2[3];
+            task.replay = { nodes: childIndex, slots: node2, pendingTasks: 1 };
             try {
               renderChildrenArray(request, task, children, -1);
               if (1 === task.replay.pendingTasks && 0 < task.replay.nodes.length)
@@ -17618,10 +17618,10 @@ function requireReactDomServerLegacy_node_development() {
               task.replay.pendingTasks--;
               var thrownInfo = getThrownInfo(task.componentStack);
               children = task.blockedBoundary;
-              var error = x2, resumeSlots = node;
-              node = logRecoverableError(
+              var error2 = x2, resumeSlots = node2;
+              node2 = logRecoverableError(
                 request,
-                error,
+                error2,
                 thrownInfo,
                 task.debugTask
               );
@@ -17630,8 +17630,8 @@ function requireReactDomServerLegacy_node_development() {
                 children,
                 childIndex,
                 resumeSlots,
-                error,
-                node,
+                error2,
+                node2,
                 thrownInfo,
                 false
               );
@@ -17650,11 +17650,11 @@ function requireReactDomServerLegacy_node_development() {
       replayNodes = children.length;
       if (null !== task.replay && (j = task.replay.slots, null !== j && "object" === typeof j)) {
         for (childIndex = 0; childIndex < replayNodes; childIndex++)
-          node = children[childIndex], task.treeContext = pushTreeContext(
+          node2 = children[childIndex], task.treeContext = pushTreeContext(
             replay,
             replayNodes,
             childIndex
-          ), error = j[childIndex], "number" === typeof error ? (resumeNode(request, task, error, node, childIndex), delete j[childIndex]) : renderNode(request, task, node, childIndex);
+          ), error2 = j[childIndex], "number" === typeof error2 ? (resumeNode(request, task, error2, node2, childIndex), delete j[childIndex]) : renderNode(request, task, node2, childIndex);
         task.treeContext = replay;
         task.keyPath = prevKeyPath;
         task.componentStack = previousComponentStack;
@@ -17788,22 +17788,22 @@ function requireReactDomServerLegacy_node_development() {
         task.debugTask
       );
     }
-    function renderNode(request, task, node, childIndex) {
+    function renderNode(request, task, node2, childIndex) {
       var previousFormatContext = task.formatContext, previousContext = task.context, previousKeyPath = task.keyPath, previousTreeContext = task.treeContext, previousComponentStack = task.componentStack, previousDebugTask = task.debugTask, segment = task.blockedSegment;
       if (null === segment) {
         segment = task.replay;
         try {
-          return renderNodeDestructive(request, task, node, childIndex);
+          return renderNodeDestructive(request, task, node2, childIndex);
         } catch (thrownValue) {
-          if (resetHooksState(), node = thrownValue === SuspenseException ? getSuspendedThenable() : thrownValue, 12 !== request.status && "object" === typeof node && null !== node) {
-            if ("function" === typeof node.then) {
+          if (resetHooksState(), node2 = thrownValue === SuspenseException ? getSuspendedThenable() : thrownValue, 12 !== request.status && "object" === typeof node2 && null !== node2) {
+            if ("function" === typeof node2.then) {
               childIndex = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
               request = spawnNewSuspendedReplayTask(
                 request,
                 task,
                 childIndex
               ).ping;
-              node.then(request, request);
+              node2.then(request, request);
               task.formatContext = previousFormatContext;
               task.context = previousContext;
               task.keyPath = previousKeyPath;
@@ -17814,10 +17814,10 @@ function requireReactDomServerLegacy_node_development() {
               switchContext(previousContext);
               return;
             }
-            if ("Maximum call stack size exceeded" === node.message) {
-              node = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
-              node = spawnNewSuspendedReplayTask(request, task, node);
-              request.pingedTasks.push(node);
+            if ("Maximum call stack size exceeded" === node2.message) {
+              node2 = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
+              node2 = spawnNewSuspendedReplayTask(request, task, node2);
+              request.pingedTasks.push(node2);
               task.formatContext = previousFormatContext;
               task.context = previousContext;
               task.keyPath = previousKeyPath;
@@ -17833,13 +17833,13 @@ function requireReactDomServerLegacy_node_development() {
       } else {
         var childrenLength = segment.children.length, chunkLength = segment.chunks.length;
         try {
-          return renderNodeDestructive(request, task, node, childIndex);
+          return renderNodeDestructive(request, task, node2, childIndex);
         } catch (thrownValue$3) {
-          if (resetHooksState(), segment.children.length = childrenLength, segment.chunks.length = chunkLength, node = thrownValue$3 === SuspenseException ? getSuspendedThenable() : thrownValue$3, 12 !== request.status && "object" === typeof node && null !== node) {
-            if ("function" === typeof node.then) {
-              segment = node;
-              node = thrownValue$3 === SuspenseException ? getThenableStateAfterSuspending() : null;
-              request = spawnNewSuspendedRenderTask(request, task, node).ping;
+          if (resetHooksState(), segment.children.length = childrenLength, segment.chunks.length = chunkLength, node2 = thrownValue$3 === SuspenseException ? getSuspendedThenable() : thrownValue$3, 12 !== request.status && "object" === typeof node2 && null !== node2) {
+            if ("function" === typeof node2.then) {
+              segment = node2;
+              node2 = thrownValue$3 === SuspenseException ? getThenableStateAfterSuspending() : null;
+              request = spawnNewSuspendedRenderTask(request, task, node2).ping;
               segment.then(request, request);
               task.formatContext = previousFormatContext;
               task.context = previousContext;
@@ -17850,7 +17850,7 @@ function requireReactDomServerLegacy_node_development() {
               switchContext(previousContext);
               return;
             }
-            if ("Maximum call stack size exceeded" === node.message) {
+            if ("Maximum call stack size exceeded" === node2.message) {
               segment = thrownValue$3 === SuspenseException ? getThenableStateAfterSuspending() : null;
               segment = spawnNewSuspendedRenderTask(request, task, segment);
               request.pingedTasks.push(segment);
@@ -17871,30 +17871,30 @@ function requireReactDomServerLegacy_node_development() {
       task.keyPath = previousKeyPath;
       task.treeContext = previousTreeContext;
       switchContext(previousContext);
-      throw node;
+      throw node2;
     }
     function abortTaskSoft(task) {
       var boundary = task.blockedBoundary, segment = task.blockedSegment;
       null !== segment && (segment.status = ABORTED, finishedTask(this, boundary, task.row, segment));
     }
-    function abortRemainingReplayNodes(request$jscomp$0, boundary, nodes, slots, error$jscomp$0, errorDigest$jscomp$0, errorInfo$jscomp$0, aborted) {
+    function abortRemainingReplayNodes(request$jscomp$0, boundary, nodes, slots, error$jscomp$0, errorDigest$jscomp$0, errorInfo$jscomp$0, aborted2) {
       for (var i = 0; i < nodes.length; i++) {
-        var node = nodes[i];
-        if (4 === node.length)
+        var node2 = nodes[i];
+        if (4 === node2.length)
           abortRemainingReplayNodes(
             request$jscomp$0,
             boundary,
-            node[2],
-            node[3],
+            node2[2],
+            node2[3],
             error$jscomp$0,
             errorDigest$jscomp$0,
             errorInfo$jscomp$0,
-            aborted
+            aborted2
           );
         else {
           var request = request$jscomp$0;
-          node = node[5];
-          var error = error$jscomp$0, errorDigest = errorDigest$jscomp$0, errorInfo = errorInfo$jscomp$0, wasAborted = aborted, resumedBoundary = createSuspenseBoundary(
+          node2 = node2[5];
+          var error2 = error$jscomp$0, errorDigest = errorDigest$jscomp$0, errorInfo = errorInfo$jscomp$0, wasAborted = aborted2, resumedBoundary = createSuspenseBoundary(
             request,
             null,
             /* @__PURE__ */ new Set(),
@@ -17902,12 +17902,12 @@ function requireReactDomServerLegacy_node_development() {
             null
           );
           resumedBoundary.parentFlushed = true;
-          resumedBoundary.rootSegmentID = node;
+          resumedBoundary.rootSegmentID = node2;
           resumedBoundary.status = CLIENT_RENDERED;
           encodeErrorForBoundary(
             resumedBoundary,
             errorDigest,
-            error,
+            error2,
             errorInfo,
             wasAborted
           );
@@ -17925,34 +17925,34 @@ function requireReactDomServerLegacy_node_development() {
           errorDigest$jscomp$0,
           error$jscomp$0,
           errorInfo$jscomp$0,
-          aborted
+          aborted2
         ), boundary.parentFlushed && request$jscomp$0.clientRenderedBoundaries.push(boundary));
         if ("object" === typeof slots)
           for (var index in slots) delete slots[index];
       }
     }
-    function abortTask(task, request, error) {
+    function abortTask(task, request, error2) {
       var boundary = task.blockedBoundary, segment = task.blockedSegment;
       if (null !== segment) {
         if (6 === segment.status) return;
         segment.status = ABORTED;
       }
-      var errorInfo = getThrownInfo(task.componentStack), node = task.node;
-      null !== node && "object" === typeof node && pushHaltedAwaitOnComponentStack(task, node._debugInfo);
+      var errorInfo = getThrownInfo(task.componentStack), node2 = task.node;
+      null !== node2 && "object" === typeof node2 && pushHaltedAwaitOnComponentStack(task, node2._debugInfo);
       if (null === boundary) {
         if (13 !== request.status && request.status !== CLOSED) {
           boundary = task.replay;
           if (null === boundary) {
-            null !== request.trackedPostpones && null !== segment ? (boundary = request.trackedPostpones, logRecoverableError(request, error, errorInfo, task.debugTask), trackPostpone(request, boundary, task, segment), finishedTask(request, null, task.row, segment)) : (logRecoverableError(request, error, errorInfo, task.debugTask), fatalError(request, error, errorInfo, task.debugTask));
+            null !== request.trackedPostpones && null !== segment ? (boundary = request.trackedPostpones, logRecoverableError(request, error2, errorInfo, task.debugTask), trackPostpone(request, boundary, task, segment), finishedTask(request, null, task.row, segment)) : (logRecoverableError(request, error2, errorInfo, task.debugTask), fatalError(request, error2, errorInfo, task.debugTask));
             return;
           }
           boundary.pendingTasks--;
-          0 === boundary.pendingTasks && 0 < boundary.nodes.length && (segment = logRecoverableError(request, error, errorInfo, null), abortRemainingReplayNodes(
+          0 === boundary.pendingTasks && 0 < boundary.nodes.length && (segment = logRecoverableError(request, error2, errorInfo, null), abortRemainingReplayNodes(
             request,
             null,
             boundary.nodes,
             boundary.slots,
-            error,
+            error2,
             segment,
             errorInfo,
             true
@@ -17961,21 +17961,21 @@ function requireReactDomServerLegacy_node_development() {
           0 === request.pendingRootTasks && completeShell(request);
         }
       } else {
-        node = request.trackedPostpones;
+        node2 = request.trackedPostpones;
         if (boundary.status !== CLIENT_RENDERED) {
-          if (null !== node && null !== segment)
-            return logRecoverableError(request, error, errorInfo, task.debugTask), trackPostpone(request, node, task, segment), boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
-              return abortTask(fallbackTask, request, error);
+          if (null !== node2 && null !== segment)
+            return logRecoverableError(request, error2, errorInfo, task.debugTask), trackPostpone(request, node2, task, segment), boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
+              return abortTask(fallbackTask, request, error2);
             }), boundary.fallbackAbortableTasks.clear(), finishedTask(request, boundary, task.row, segment);
           boundary.status = CLIENT_RENDERED;
           segment = logRecoverableError(
             request,
-            error,
+            error2,
             errorInfo,
             task.debugTask
           );
           boundary.status = CLIENT_RENDERED;
-          encodeErrorForBoundary(boundary, segment, error, errorInfo, true);
+          encodeErrorForBoundary(boundary, segment, error2, errorInfo, true);
           untrackBoundary(request, boundary);
           boundary.parentFlushed && request.clientRenderedBoundaries.push(boundary);
         }
@@ -17983,7 +17983,7 @@ function requireReactDomServerLegacy_node_development() {
         errorInfo = boundary.row;
         null !== errorInfo && 0 === --errorInfo.pendingTasks && finishSuspenseListRow(request, errorInfo);
         boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
-          return abortTask(fallbackTask, request, error);
+          return abortTask(fallbackTask, request, error2);
         });
         boundary.fallbackAbortableTasks.clear();
       }
@@ -18028,8 +18028,8 @@ function requireReactDomServerLegacy_node_development() {
             linkHeader ? onHeaders({ Link: linkHeader }) : onHeaders({});
           }
         }
-      } catch (error) {
-        logRecoverableError(request, error, {}, null);
+      } catch (error2) {
+        logRecoverableError(request, error2, {}, null);
       }
     }
     function completeShell(request) {
@@ -18272,8 +18272,8 @@ function requireReactDomServerLegacy_node_development() {
             request$jscomp$2,
             request$jscomp$2.destination
           );
-        } catch (error) {
-          pingedTasks = {}, logRecoverableError(request$jscomp$2, error, pingedTasks, null), fatalError(request$jscomp$2, error, pingedTasks, null);
+        } catch (error2) {
+          pingedTasks = {}, logRecoverableError(request$jscomp$2, error2, pingedTasks, null), fatalError(request$jscomp$2, error2, pingedTasks, null);
         } finally {
           currentResumableState = prevResumableState, ReactSharedInternals.H = prevDispatcher, ReactSharedInternals.A = prevAsyncDispatcher, ReactSharedInternals.getCurrentStack = prevGetCurrentStackImpl, prevDispatcher === HooksDispatcher && switchContext(prevContext), currentRequest = prevRequest;
         }
@@ -18761,8 +18761,8 @@ function requireReactDomServerLegacy_node_development() {
         request.destination = destination;
         try {
           flushCompletedQueues(request, destination);
-        } catch (error) {
-          destination = {}, logRecoverableError(request, error, destination, null), fatalError(request, error, destination, null);
+        } catch (error2) {
+          destination = {}, logRecoverableError(request, error2, destination, null), fatalError(request, error2, destination, null);
         }
       }
     }
@@ -18771,14 +18771,14 @@ function requireReactDomServerLegacy_node_development() {
       try {
         var abortableTasks = request.abortableTasks;
         if (0 < abortableTasks.size) {
-          var error = void 0 === reason ? Error("The render was aborted by the server without a reason.") : "object" === typeof reason && null !== reason && "function" === typeof reason.then ? Error("The render was aborted by the server with a promise.") : reason;
-          request.fatalError = error;
+          var error2 = void 0 === reason ? Error("The render was aborted by the server without a reason.") : "object" === typeof reason && null !== reason && "function" === typeof reason.then ? Error("The render was aborted by the server with a promise.") : reason;
+          request.fatalError = error2;
           abortableTasks.forEach(function(task) {
             var prevTaskInDEV = currentTaskInDEV, prevGetCurrentStackImpl = ReactSharedInternals.getCurrentStack;
             currentTaskInDEV = task;
             ReactSharedInternals.getCurrentStack = getCurrentStackInDEV;
             try {
-              abortTask(task, request, error);
+              abortTask(task, request, error2);
             } finally {
               currentTaskInDEV = prevTaskInDEV, ReactSharedInternals.getCurrentStack = prevGetCurrentStackImpl;
             }
@@ -18790,12 +18790,12 @@ function requireReactDomServerLegacy_node_development() {
         reason = {}, logRecoverableError(request, error$4, reason, null), fatalError(request, error$4, reason, null);
       }
     }
-    function addToReplayParent(node, parentKeyPath, trackedPostpones) {
-      if (null === parentKeyPath) trackedPostpones.rootNodes.push(node);
+    function addToReplayParent(node2, parentKeyPath, trackedPostpones) {
+      if (null === parentKeyPath) trackedPostpones.rootNodes.push(node2);
       else {
         var workingMap = trackedPostpones.workingMap, parentNode = workingMap.get(parentKeyPath);
         void 0 === parentNode && (parentNode = [parentKeyPath[1], parentKeyPath[2], [], null], workingMap.set(parentKeyPath, parentNode), addToReplayParent(parentNode, parentKeyPath[0], trackedPostpones));
-        parentNode[2].push(node);
+        parentNode[2].push(node2);
       }
     }
     function onError() {
@@ -18827,9 +18827,9 @@ function requireReactDomServerLegacy_node_development() {
           null !== chunk && (result += chunk);
           return true;
         },
-        destroy: function(error) {
+        destroy: function(error2) {
           didFatal = true;
-          fatalError2 = error;
+          fatalError2 = error2;
         }
       });
       if (didFatal && fatalError2 !== abortReason) throw fatalError2;
@@ -19917,9 +19917,9 @@ function requireReactDomServer_node_development() {
       maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
       return "function" === typeof maybeIterable ? maybeIterable : null;
     }
-    function objectName(object) {
-      object = Object.prototype.toString.call(object);
-      return object.slice(8, object.length - 1);
+    function objectName(object2) {
+      object2 = Object.prototype.toString.call(object2);
+      return object2.slice(8, object2.length - 1);
     }
     function describeKeyForErrorMessage(key) {
       var encodedKey = JSON.stringify(key);
@@ -20369,8 +20369,8 @@ function requireReactDomServer_node_development() {
         type
       );
     }
-    function camelize(string) {
-      return string.replace(hyphenPattern, function(_2, character) {
+    function camelize(string2) {
+      return string2.replace(hyphenPattern, function(_2, character) {
         return character.toUpperCase();
       });
     }
@@ -22730,11 +22730,11 @@ function requireReactDomServer_node_development() {
                 fulfilledThenable.value = fulfilledValue;
               }
             },
-            function(error) {
+            function(error2) {
               if ("pending" === thenable.status) {
                 var rejectedThenable = thenable;
                 rejectedThenable.status = "rejected";
-                rejectedThenable.reason = error;
+                rejectedThenable.reason = error2;
               }
             }
           ));
@@ -23004,29 +23004,29 @@ function requireReactDomServer_node_development() {
         "disabledDepth fell below zero. This is a bug in React. Please file an issue."
       );
     }
-    function prepareStackTrace(error, structuredStackTrace) {
-      error = (error.name || "Error") + ": " + (error.message || "");
+    function prepareStackTrace(error2, structuredStackTrace) {
+      error2 = (error2.name || "Error") + ": " + (error2.message || "");
       for (var i = 0; i < structuredStackTrace.length; i++)
-        error += "\n    at " + structuredStackTrace[i].toString();
-      return error;
+        error2 += "\n    at " + structuredStackTrace[i].toString();
+      return error2;
     }
-    function formatOwnerStack(error) {
+    function formatOwnerStack(error2) {
       var prevPrepareStackTrace = Error.prepareStackTrace;
       Error.prepareStackTrace = prepareStackTrace;
-      error = error.stack;
+      error2 = error2.stack;
       Error.prepareStackTrace = prevPrepareStackTrace;
-      error.startsWith("Error: react-stack-top-frame\n") && (error = error.slice(29));
-      prevPrepareStackTrace = error.indexOf("\n");
-      -1 !== prevPrepareStackTrace && (error = error.slice(prevPrepareStackTrace + 1));
-      prevPrepareStackTrace = error.indexOf("react_stack_bottom_frame");
-      -1 !== prevPrepareStackTrace && (prevPrepareStackTrace = error.lastIndexOf(
+      error2.startsWith("Error: react-stack-top-frame\n") && (error2 = error2.slice(29));
+      prevPrepareStackTrace = error2.indexOf("\n");
+      -1 !== prevPrepareStackTrace && (error2 = error2.slice(prevPrepareStackTrace + 1));
+      prevPrepareStackTrace = error2.indexOf("react_stack_bottom_frame");
+      -1 !== prevPrepareStackTrace && (prevPrepareStackTrace = error2.lastIndexOf(
         "\n",
         prevPrepareStackTrace
       ));
       if (-1 !== prevPrepareStackTrace)
-        error = error.slice(0, prevPrepareStackTrace);
+        error2 = error2.slice(0, prevPrepareStackTrace);
       else return "";
-      return error;
+      return error2;
     }
     function describeBuiltInComponentFrame(name2) {
       if (void 0 === prefix)
@@ -23199,18 +23199,18 @@ function requireReactDomServer_node_development() {
     function isEligibleForOutlining(request, boundary) {
       return (500 < boundary.byteSize || hasSuspenseyContent(boundary.contentState)) && null === boundary.contentPreamble;
     }
-    function defaultErrorHandler(error) {
-      if ("object" === typeof error && null !== error && "string" === typeof error.environmentName) {
-        var JSCompiler_inline_result = error.environmentName;
-        error = [error].slice(0);
-        "string" === typeof error[0] ? error.splice(
+    function defaultErrorHandler(error2) {
+      if ("object" === typeof error2 && null !== error2 && "string" === typeof error2.environmentName) {
+        var JSCompiler_inline_result = error2.environmentName;
+        error2 = [error2].slice(0);
+        "string" === typeof error2[0] ? error2.splice(
           0,
           1,
-          "\x1B[0m\x1B[7m%c%s\x1B[0m%c " + error[0],
+          "\x1B[0m\x1B[7m%c%s\x1B[0m%c " + error2[0],
           "background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px",
           " " + JSCompiler_inline_result + " ",
           ""
-        ) : error.splice(
+        ) : error2.splice(
           0,
           0,
           "\x1B[0m\x1B[7m%c%s\x1B[0m%c",
@@ -23218,10 +23218,10 @@ function requireReactDomServer_node_development() {
           " " + JSCompiler_inline_result + " ",
           ""
         );
-        error.unshift(console);
-        JSCompiler_inline_result = bind.apply(console.error, error);
+        error2.unshift(console);
+        JSCompiler_inline_result = bind.apply(console.error, error2);
         JSCompiler_inline_result();
-      } else console.error(error);
+      } else console.error(error2);
       return null;
     }
     function RequestInstance(resumableState, renderState, rootFormatContext, progressiveChunkSize, onError, onAllReady, onShellReady, onShellError, onFatalError, onPostpone, formState) {
@@ -23446,13 +23446,13 @@ function requireReactDomServer_node_development() {
       null !== row && (row.pendingTasks++, contentPreamble = row.boundaries, null !== contentPreamble && (request.allPendingTasks++, fallbackAbortableTasks.pendingTasks++, contentPreamble.push(fallbackAbortableTasks)), request = row.inheritedHoistables, null !== request && hoistHoistables(fallbackAbortableTasks.contentState, request));
       return fallbackAbortableTasks;
     }
-    function createRenderTask(request, thenableState2, node, childIndex, blockedBoundary, blockedSegment, blockedPreamble, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack, legacyContext, debugTask) {
+    function createRenderTask(request, thenableState2, node2, childIndex, blockedBoundary, blockedSegment, blockedPreamble, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack, legacyContext, debugTask) {
       request.allPendingTasks++;
       null === blockedBoundary ? request.pendingRootTasks++ : blockedBoundary.pendingTasks++;
       null !== row && row.pendingTasks++;
       var task = {
         replay: null,
-        node,
+        node: node2,
         childIndex,
         ping: function() {
           return pingTask(request, task);
@@ -23474,14 +23474,14 @@ function requireReactDomServer_node_development() {
       abortSet.add(task);
       return task;
     }
-    function createReplayTask(request, thenableState2, replay, node, childIndex, blockedBoundary, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack, legacyContext, debugTask) {
+    function createReplayTask(request, thenableState2, replay, node2, childIndex, blockedBoundary, hoistableState, abortSet, keyPath, formatContext, context, treeContext, row, componentStack, legacyContext, debugTask) {
       request.allPendingTasks++;
       null === blockedBoundary ? request.pendingRootTasks++ : blockedBoundary.pendingTasks++;
       null !== row && row.pendingTasks++;
       replay.pendingTasks++;
       var task = {
         replay,
-        node,
+        node: node2,
         childIndex,
         ping: function() {
           return pingTask(request, task);
@@ -23580,13 +23580,13 @@ function requireReactDomServer_node_development() {
         }
     }
     function pushComponentStack(task) {
-      var node = task.node;
-      if ("object" === typeof node && null !== node)
-        switch (node.$$typeof) {
+      var node2 = task.node;
+      if ("object" === typeof node2 && null !== node2)
+        switch (node2.$$typeof) {
           case REACT_ELEMENT_TYPE:
-            var type = node.type, owner = node._owner, stack = node._debugStack;
-            pushServerComponentStack(task, node._debugInfo);
-            task.debugTask = node._debugTask;
+            var type = node2.type, owner = node2._owner, stack = node2._debugStack;
+            pushServerComponentStack(task, node2._debugInfo);
+            task.debugTask = node2._debugTask;
             task.componentStack = {
               parent: task.componentStack,
               type,
@@ -23595,10 +23595,10 @@ function requireReactDomServer_node_development() {
             };
             break;
           case REACT_LAZY_TYPE:
-            pushServerComponentStack(task, node._debugInfo);
+            pushServerComponentStack(task, node2._debugInfo);
             break;
           default:
-            "function" === typeof node.then && pushServerComponentStack(task, node._debugInfo);
+            "function" === typeof node2.then && pushServerComponentStack(task, node2._debugInfo);
         }
     }
     function replaceSuspenseComponentStackWithSuspenseFallbackStack(componentStack) {
@@ -23616,10 +23616,10 @@ function requireReactDomServer_node_development() {
         enumerable: true,
         get: function() {
           try {
-            var info = "", node = node$jscomp$0;
+            var info = "", node2 = node$jscomp$0;
             do
-              info += describeComponentStackByType(node.type), node = node.parent;
-            while (node);
+              info += describeComponentStackByType(node2.type), node2 = node2.parent;
+            while (node2);
             var stack = info;
           } catch (x2) {
             stack = "\nError generating stack: " + x2.message + "\n" + x2.stack;
@@ -23632,29 +23632,29 @@ function requireReactDomServer_node_development() {
       });
       return errorInfo;
     }
-    function encodeErrorForBoundary(boundary, digest, error, thrownInfo, wasAborted) {
+    function encodeErrorForBoundary(boundary, digest, error2, thrownInfo, wasAborted) {
       boundary.errorDigest = digest;
-      error instanceof Error ? (digest = String(error.message), error = String(error.stack)) : (digest = "object" === typeof error && null !== error ? describeObjectForErrorMessage(error) : String(error), error = null);
+      error2 instanceof Error ? (digest = String(error2.message), error2 = String(error2.stack)) : (digest = "object" === typeof error2 && null !== error2 ? describeObjectForErrorMessage(error2) : String(error2), error2 = null);
       wasAborted = wasAborted ? "Switched to client rendering because the server rendering aborted due to:\n\n" : "Switched to client rendering because the server rendering errored:\n\n";
       boundary.errorMessage = wasAborted + digest;
-      boundary.errorStack = null !== error ? wasAborted + error : null;
+      boundary.errorStack = null !== error2 ? wasAborted + error2 : null;
       boundary.errorComponentStack = thrownInfo.componentStack;
     }
-    function logRecoverableError(request, error, errorInfo, debugTask) {
+    function logRecoverableError(request, error2, errorInfo, debugTask) {
       request = request.onError;
-      error = debugTask ? debugTask.run(request.bind(null, error, errorInfo)) : request(error, errorInfo);
-      if (null != error && "string" !== typeof error)
+      error2 = debugTask ? debugTask.run(request.bind(null, error2, errorInfo)) : request(error2, errorInfo);
+      if (null != error2 && "string" !== typeof error2)
         console.error(
           'onError returned something with a type other than "string". onError should return a string and may return null or undefined but must not return anything else. It received something of type "%s" instead',
-          typeof error
+          typeof error2
         );
-      else return error;
+      else return error2;
     }
-    function fatalError(request, error, errorInfo, debugTask) {
+    function fatalError(request, error2, errorInfo, debugTask) {
       errorInfo = request.onShellError;
       var onFatalError = request.onFatalError;
-      debugTask ? (debugTask.run(errorInfo.bind(null, error)), debugTask.run(onFatalError.bind(null, error))) : (errorInfo(error), onFatalError(error));
-      null !== request.destination ? (request.status = CLOSED, request.destination.destroy(error)) : (request.status = 13, request.fatalError = error);
+      debugTask ? (debugTask.run(errorInfo.bind(null, error2)), debugTask.run(onFatalError.bind(null, error2))) : (errorInfo(error2), onFatalError(error2));
+      null !== request.destination ? (request.status = CLOSED, request.destination.destroy(error2)) : (request.status = 13, request.fatalError = error2);
     }
     function finishSuspenseListRow(request, row) {
       unblockSuspenseListRow(request, row.next, row.hoistables);
@@ -23716,13 +23716,13 @@ function requireReactDomServer_node_development() {
         var resumeSlots = task.replay.slots;
         if (null !== resumeSlots && "object" === typeof resumeSlots)
           for (var n = 0; n < keyPath; n++) {
-            var i = "backwards" !== revealOrder && "unstable_legacy-backwards" !== revealOrder ? n : keyPath - 1 - n, node = rows[i];
+            var i = "backwards" !== revealOrder && "unstable_legacy-backwards" !== revealOrder ? n : keyPath - 1 - n, node2 = rows[i];
             task.row = previousSuspenseListRow = createSuspenseListRow(
               previousSuspenseListRow
             );
             task.treeContext = pushTreeContext(prevTreeContext, keyPath, i);
             var resumeSegmentID = resumeSlots[i];
-            "number" === typeof resumeSegmentID ? (resumeNode(request, task, resumeSegmentID, node, i), delete resumeSlots[i]) : renderNode(request, task, node, i);
+            "number" === typeof resumeSegmentID ? (resumeNode(request, task, resumeSegmentID, node2, i), delete resumeSlots[i]) : renderNode(request, task, node2, i);
             0 === --previousSuspenseListRow.pendingTasks && finishSuspenseListRow(request, previousSuspenseListRow);
           }
         else
@@ -23740,7 +23740,7 @@ function requireReactDomServer_node_development() {
         resumeSlots = revealOrder.children.length;
         n = revealOrder.chunks.length;
         for (i = keyPath - 1; 0 <= i; i--) {
-          node = rows[i];
+          node2 = rows[i];
           task.row = previousSuspenseListRow = createSuspenseListRow(
             previousSuspenseListRow
           );
@@ -23755,9 +23755,9 @@ function requireReactDomServer_node_development() {
           );
           revealOrder.children.splice(resumeSlots, 0, resumeSegmentID);
           task.blockedSegment = resumeSegmentID;
-          warnForMissingKey(request, task, node);
+          warnForMissingKey(request, task, node2);
           try {
-            renderNode(request, task, node, i), resumeSegmentID.lastPushedText && resumeSegmentID.textEmbedded && resumeSegmentID.chunks.push(textSeparator), resumeSegmentID.status = COMPLETED, finishedSegment(request, task.blockedBoundary, resumeSegmentID), 0 === --previousSuspenseListRow.pendingTasks && finishSuspenseListRow(request, previousSuspenseListRow);
+            renderNode(request, task, node2, i), resumeSegmentID.lastPushedText && resumeSegmentID.textEmbedded && resumeSegmentID.chunks.push(textSeparator), resumeSegmentID.status = COMPLETED, finishedSegment(request, task.blockedBoundary, resumeSegmentID), 0 === --previousSuspenseListRow.pendingTasks && finishSuspenseListRow(request, previousSuspenseListRow);
           } catch (thrownValue) {
             throw resumeSegmentID.status = 12 === request.status ? ABORTED : ERRORED, thrownValue;
           }
@@ -24009,12 +24009,12 @@ function requireReactDomServer_node_development() {
                 instance.state = oldQueue[0];
               else {
                 for (var nextState = oldReplace ? oldQueue[0] : instance.state, dontMutate = true, i = oldReplace ? 1 : 0; i < oldQueue.length; i++) {
-                  var partial = oldQueue[i], partialState$jscomp$0 = "function" === typeof partial ? partial.call(
+                  var partial2 = oldQueue[i], partialState$jscomp$0 = "function" === typeof partial2 ? partial2.call(
                     instance,
                     nextState,
                     resolvedProps,
                     void 0
-                  ) : partial;
+                  ) : partial2;
                   null != partialState$jscomp$0 && (dontMutate ? (dontMutate = false, nextState = assign(
                     {},
                     nextState,
@@ -24407,20 +24407,20 @@ function requireReactDomServer_node_development() {
                   newBoundary.status = CLIENT_RENDERED;
                   if (12 === request.status) {
                     contentRootSegment.status = ABORTED;
-                    var error = request.fatalError;
+                    var error2 = request.fatalError;
                   } else
-                    contentRootSegment.status = ERRORED, error = thrownValue$2;
+                    contentRootSegment.status = ERRORED, error2 = thrownValue$2;
                   var thrownInfo = getThrownInfo(task.componentStack);
                   var errorDigest = logRecoverableError(
                     request,
-                    error,
+                    error2,
                     thrownInfo,
                     task.debugTask
                   );
                   encodeErrorForBoundary(
                     newBoundary,
                     errorDigest,
-                    error,
+                    error2,
                     thrownInfo,
                     false
                   );
@@ -24552,7 +24552,7 @@ function requireReactDomServer_node_development() {
         );
       }
     }
-    function resumeNode(request, task, segmentId, node, childIndex) {
+    function resumeNode(request, task, segmentId, node2, childIndex) {
       var prevReplay = task.replay, blockedBoundary = task.blockedBoundary, resumedSegment = createPendingSegment(
         request,
         0,
@@ -24564,7 +24564,7 @@ function requireReactDomServer_node_development() {
       resumedSegment.id = segmentId;
       resumedSegment.parentFlushed = true;
       try {
-        task.replay = null, task.blockedSegment = resumedSegment, renderNode(request, task, node, childIndex), resumedSegment.status = COMPLETED, finishedSegment(request, blockedBoundary, resumedSegment), null === blockedBoundary ? request.completedRootSegment = resumedSegment : (queueCompletedSegment(blockedBoundary, resumedSegment), blockedBoundary.parentFlushed && request.partialBoundaries.push(blockedBoundary));
+        task.replay = null, task.blockedSegment = resumedSegment, renderNode(request, task, node2, childIndex), resumedSegment.status = COMPLETED, finishedSegment(request, blockedBoundary, resumedSegment), null === blockedBoundary ? request.completedRootSegment = resumedSegment : (queueCompletedSegment(blockedBoundary, resumedSegment), blockedBoundary.parentFlushed && request.partialBoundaries.push(blockedBoundary));
       } finally {
         task.replay = prevReplay, task.blockedSegment = null;
       }
@@ -24572,15 +24572,15 @@ function requireReactDomServer_node_development() {
     function replayElement(request, task, keyPath, name2, keyOrIndex, childIndex, type, props, ref, replay) {
       childIndex = replay.nodes;
       for (var i = 0; i < childIndex.length; i++) {
-        var node = childIndex[i];
-        if (keyOrIndex === node[1]) {
-          if (4 === node.length) {
-            if (null !== name2 && name2 !== node[0])
+        var node2 = childIndex[i];
+        if (keyOrIndex === node2[1]) {
+          if (4 === node2.length) {
+            if (null !== name2 && name2 !== node2[0])
               throw Error(
-                "Expected the resume to render <" + node[0] + "> in this slot but instead it rendered <" + name2 + ">. The tree doesn't match so React will fallback to client rendering."
+                "Expected the resume to render <" + node2[0] + "> in this slot but instead it rendered <" + name2 + ">. The tree doesn't match so React will fallback to client rendering."
               );
-            var childNodes = node[2];
-            name2 = node[3];
+            var childNodes = node2[2];
+            name2 = node2[3];
             keyOrIndex = task.node;
             task.replay = { nodes: childNodes, slots: name2, pendingTasks: 1 };
             try {
@@ -24619,11 +24619,11 @@ function requireReactDomServer_node_development() {
               );
             a: {
               replay = void 0;
-              name2 = node[5];
-              type = node[2];
-              ref = node[3];
-              keyOrIndex = null === node[4] ? [] : node[4][2];
-              node = null === node[4] ? null : node[4][3];
+              name2 = node2[5];
+              type = node2[2];
+              ref = node2[3];
+              keyOrIndex = null === node2[4] ? [] : node2[4][2];
+              node2 = null === node2[4] ? null : node2[4][3];
               var prevKeyPath = task.keyPath, prevContext = task.formatContext, prevRow = task.row, previousReplaySet = task.replay, parentBoundary = task.blockedBoundary, parentHoistableState = task.hoistableState, content = props.children, fallback = props.fallback, fallbackAbortSet = /* @__PURE__ */ new Set();
               props = task.formatContext.insertionMode < HTML_MODE ? createSuspenseBoundary(
                 request,
@@ -24661,20 +24661,20 @@ function requireReactDomServer_node_development() {
                   request.completedBoundaries.push(props);
                   break a;
                 }
-              } catch (error) {
+              } catch (error2) {
                 props.status = CLIENT_RENDERED, childNodes = getThrownInfo(task.componentStack), replay = logRecoverableError(
                   request,
-                  error,
+                  error2,
                   childNodes,
                   task.debugTask
-                ), encodeErrorForBoundary(props, replay, error, childNodes, false), task.replay.pendingTasks--, request.clientRenderedBoundaries.push(props);
+                ), encodeErrorForBoundary(props, replay, error2, childNodes, false), task.replay.pendingTasks--, request.clientRenderedBoundaries.push(props);
               } finally {
                 task.blockedBoundary = parentBoundary, task.hoistableState = parentHoistableState, task.replay = previousReplaySet, task.keyPath = prevKeyPath, task.formatContext = prevContext, task.row = prevRow;
               }
               props = createReplayTask(
                 request,
                 null,
-                { nodes: keyOrIndex, slots: node, pendingTasks: 0 },
+                { nodes: keyOrIndex, slots: node2, pendingTasks: 0 },
                 fallback,
                 -1,
                 parentBoundary,
@@ -24714,18 +24714,18 @@ function requireReactDomServer_node_development() {
           "Using Maps as children is not supported. Use an array of keyed ReactElements instead."
         ), didWarnAboutMaps = true);
     }
-    function renderNodeDestructive(request, task, node, childIndex) {
-      null !== task.replay && "number" === typeof task.replay.slots ? resumeNode(request, task, task.replay.slots, node, childIndex) : (task.node = node, task.childIndex = childIndex, node = task.componentStack, childIndex = task.debugTask, pushComponentStack(task), retryNode(request, task), task.componentStack = node, task.debugTask = childIndex);
+    function renderNodeDestructive(request, task, node2, childIndex) {
+      null !== task.replay && "number" === typeof task.replay.slots ? resumeNode(request, task, task.replay.slots, node2, childIndex) : (task.node = node2, task.childIndex = childIndex, node2 = task.componentStack, childIndex = task.debugTask, pushComponentStack(task), retryNode(request, task), task.componentStack = node2, task.debugTask = childIndex);
     }
     function retryNode(request, task) {
-      var node = task.node, childIndex = task.childIndex;
-      if (null !== node) {
-        if ("object" === typeof node) {
-          switch (node.$$typeof) {
+      var node2 = task.node, childIndex = task.childIndex;
+      if (null !== node2) {
+        if ("object" === typeof node2) {
+          switch (node2.$$typeof) {
             case REACT_ELEMENT_TYPE:
-              var type = node.type, key = node.key;
-              node = node.props;
-              var refProp = node.ref;
+              var type = node2.type, key = node2.key;
+              node2 = node2.props;
+              var refProp = node2.ref;
               refProp = void 0 !== refProp ? refProp : null;
               var debugTask = task.debugTask, name2 = getComponentNameFromType(type);
               key = null == key ? -1 === childIndex ? 0 : childIndex : key;
@@ -24740,7 +24740,7 @@ function requireReactDomServer_node_development() {
                   key,
                   childIndex,
                   type,
-                  node,
+                  node2,
                   refProp,
                   task.replay
                 )
@@ -24752,7 +24752,7 @@ function requireReactDomServer_node_development() {
                 key,
                 childIndex,
                 type,
-                node,
+                node2,
                 refProp,
                 task.replay
               ) : debugTask ? debugTask.run(
@@ -24762,75 +24762,75 @@ function requireReactDomServer_node_development() {
                   task,
                   keyPath,
                   type,
-                  node,
+                  node2,
                   refProp
                 )
-              ) : renderElement(request, task, keyPath, type, node, refProp);
+              ) : renderElement(request, task, keyPath, type, node2, refProp);
               return;
             case REACT_PORTAL_TYPE:
               throw Error(
                 "Portals are not currently supported by the server renderer. Render them conditionally so that they only appear on the client render."
               );
             case REACT_LAZY_TYPE:
-              type = callLazyInitInDEV(node);
+              type = callLazyInitInDEV(node2);
               if (12 === request.status) throw null;
               renderNodeDestructive(request, task, type, childIndex);
               return;
           }
-          if (isArrayImpl(node)) {
-            renderChildrenArray(request, task, node, childIndex);
+          if (isArrayImpl(node2)) {
+            renderChildrenArray(request, task, node2, childIndex);
             return;
           }
-          if (key = getIteratorFn(node)) {
-            if (type = key.call(node)) {
-              validateIterable(task, node, childIndex, type, key);
-              node = type.next();
-              if (!node.done) {
+          if (key = getIteratorFn(node2)) {
+            if (type = key.call(node2)) {
+              validateIterable(task, node2, childIndex, type, key);
+              node2 = type.next();
+              if (!node2.done) {
                 key = [];
                 do
-                  key.push(node.value), node = type.next();
-                while (!node.done);
+                  key.push(node2.value), node2 = type.next();
+                while (!node2.done);
                 renderChildrenArray(request, task, key, childIndex);
               }
               return;
             }
           }
-          if ("function" === typeof node.then)
+          if ("function" === typeof node2.then)
             return task.thenableState = null, renderNodeDestructive(
               request,
               task,
-              unwrapThenable(node),
+              unwrapThenable(node2),
               childIndex
             );
-          if (node.$$typeof === REACT_CONTEXT_TYPE)
+          if (node2.$$typeof === REACT_CONTEXT_TYPE)
             return renderNodeDestructive(
               request,
               task,
-              node._currentValue,
+              node2._currentValue,
               childIndex
             );
-          request = Object.prototype.toString.call(node);
+          request = Object.prototype.toString.call(node2);
           throw Error(
-            "Objects are not valid as a React child (found: " + ("[object Object]" === request ? "object with keys {" + Object.keys(node).join(", ") + "}" : request) + "). If you meant to render a collection of children, use an array instead."
+            "Objects are not valid as a React child (found: " + ("[object Object]" === request ? "object with keys {" + Object.keys(node2).join(", ") + "}" : request) + "). If you meant to render a collection of children, use an array instead."
           );
         }
-        "string" === typeof node ? (task = task.blockedSegment, null !== task && (task.lastPushedText = pushTextInstance(
+        "string" === typeof node2 ? (task = task.blockedSegment, null !== task && (task.lastPushedText = pushTextInstance(
           task.chunks,
-          node,
+          node2,
           request.renderState,
           task.lastPushedText
-        ))) : "number" === typeof node || "bigint" === typeof node ? (task = task.blockedSegment, null !== task && (task.lastPushedText = pushTextInstance(
+        ))) : "number" === typeof node2 || "bigint" === typeof node2 ? (task = task.blockedSegment, null !== task && (task.lastPushedText = pushTextInstance(
           task.chunks,
-          "" + node,
+          "" + node2,
           request.renderState,
           task.lastPushedText
-        ))) : ("function" === typeof node && (request = node.displayName || node.name || "Component", console.error(
+        ))) : ("function" === typeof node2 && (request = node2.displayName || node2.name || "Component", console.error(
           "Functions are not valid as a React child. This may happen if you return %s instead of <%s /> from render. Or maybe you meant to call this function rather than return it.",
           request,
           request
-        )), "symbol" === typeof node && console.error(
+        )), "symbol" === typeof node2 && console.error(
           "Symbols are not valid as a React child.\n  %s",
-          String(node)
+          String(node2)
         ));
       }
     }
@@ -24879,11 +24879,11 @@ function requireReactDomServer_node_development() {
       pushServerComponentStack(task, task.node._debugInfo);
       if (-1 !== childIndex && (task.keyPath = [task.keyPath, "Fragment", childIndex], null !== task.replay)) {
         for (var replay = task.replay, replayNodes = replay.nodes, j = 0; j < replayNodes.length; j++) {
-          var node = replayNodes[j];
-          if (node[1] === childIndex) {
-            childIndex = node[2];
-            node = node[3];
-            task.replay = { nodes: childIndex, slots: node, pendingTasks: 1 };
+          var node2 = replayNodes[j];
+          if (node2[1] === childIndex) {
+            childIndex = node2[2];
+            node2 = node2[3];
+            task.replay = { nodes: childIndex, slots: node2, pendingTasks: 1 };
             try {
               renderChildrenArray(request, task, children, -1);
               if (1 === task.replay.pendingTasks && 0 < task.replay.nodes.length)
@@ -24897,10 +24897,10 @@ function requireReactDomServer_node_development() {
               task.replay.pendingTasks--;
               var thrownInfo = getThrownInfo(task.componentStack);
               children = task.blockedBoundary;
-              var error = x2, resumeSlots = node;
-              node = logRecoverableError(
+              var error2 = x2, resumeSlots = node2;
+              node2 = logRecoverableError(
                 request,
-                error,
+                error2,
                 thrownInfo,
                 task.debugTask
               );
@@ -24909,8 +24909,8 @@ function requireReactDomServer_node_development() {
                 children,
                 childIndex,
                 resumeSlots,
-                error,
-                node,
+                error2,
+                node2,
                 thrownInfo,
                 false
               );
@@ -24929,11 +24929,11 @@ function requireReactDomServer_node_development() {
       replayNodes = children.length;
       if (null !== task.replay && (j = task.replay.slots, null !== j && "object" === typeof j)) {
         for (childIndex = 0; childIndex < replayNodes; childIndex++)
-          node = children[childIndex], task.treeContext = pushTreeContext(
+          node2 = children[childIndex], task.treeContext = pushTreeContext(
             replay,
             replayNodes,
             childIndex
-          ), error = j[childIndex], "number" === typeof error ? (resumeNode(request, task, error, node, childIndex), delete j[childIndex]) : renderNode(request, task, node, childIndex);
+          ), error2 = j[childIndex], "number" === typeof error2 ? (resumeNode(request, task, error2, node2, childIndex), delete j[childIndex]) : renderNode(request, task, node2, childIndex);
         task.treeContext = replay;
         task.keyPath = prevKeyPath;
         task.componentStack = previousComponentStack;
@@ -25067,22 +25067,22 @@ function requireReactDomServer_node_development() {
         task.debugTask
       );
     }
-    function renderNode(request, task, node, childIndex) {
+    function renderNode(request, task, node2, childIndex) {
       var previousFormatContext = task.formatContext, previousContext = task.context, previousKeyPath = task.keyPath, previousTreeContext = task.treeContext, previousComponentStack = task.componentStack, previousDebugTask = task.debugTask, segment = task.blockedSegment;
       if (null === segment) {
         segment = task.replay;
         try {
-          return renderNodeDestructive(request, task, node, childIndex);
+          return renderNodeDestructive(request, task, node2, childIndex);
         } catch (thrownValue) {
-          if (resetHooksState(), node = thrownValue === SuspenseException ? getSuspendedThenable() : thrownValue, 12 !== request.status && "object" === typeof node && null !== node) {
-            if ("function" === typeof node.then) {
+          if (resetHooksState(), node2 = thrownValue === SuspenseException ? getSuspendedThenable() : thrownValue, 12 !== request.status && "object" === typeof node2 && null !== node2) {
+            if ("function" === typeof node2.then) {
               childIndex = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
               request = spawnNewSuspendedReplayTask(
                 request,
                 task,
                 childIndex
               ).ping;
-              node.then(request, request);
+              node2.then(request, request);
               task.formatContext = previousFormatContext;
               task.context = previousContext;
               task.keyPath = previousKeyPath;
@@ -25093,10 +25093,10 @@ function requireReactDomServer_node_development() {
               switchContext(previousContext);
               return;
             }
-            if ("Maximum call stack size exceeded" === node.message) {
-              node = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
-              node = spawnNewSuspendedReplayTask(request, task, node);
-              request.pingedTasks.push(node);
+            if ("Maximum call stack size exceeded" === node2.message) {
+              node2 = thrownValue === SuspenseException ? getThenableStateAfterSuspending() : null;
+              node2 = spawnNewSuspendedReplayTask(request, task, node2);
+              request.pingedTasks.push(node2);
               task.formatContext = previousFormatContext;
               task.context = previousContext;
               task.keyPath = previousKeyPath;
@@ -25112,13 +25112,13 @@ function requireReactDomServer_node_development() {
       } else {
         var childrenLength = segment.children.length, chunkLength = segment.chunks.length;
         try {
-          return renderNodeDestructive(request, task, node, childIndex);
+          return renderNodeDestructive(request, task, node2, childIndex);
         } catch (thrownValue$3) {
-          if (resetHooksState(), segment.children.length = childrenLength, segment.chunks.length = chunkLength, node = thrownValue$3 === SuspenseException ? getSuspendedThenable() : thrownValue$3, 12 !== request.status && "object" === typeof node && null !== node) {
-            if ("function" === typeof node.then) {
-              segment = node;
-              node = thrownValue$3 === SuspenseException ? getThenableStateAfterSuspending() : null;
-              request = spawnNewSuspendedRenderTask(request, task, node).ping;
+          if (resetHooksState(), segment.children.length = childrenLength, segment.chunks.length = chunkLength, node2 = thrownValue$3 === SuspenseException ? getSuspendedThenable() : thrownValue$3, 12 !== request.status && "object" === typeof node2 && null !== node2) {
+            if ("function" === typeof node2.then) {
+              segment = node2;
+              node2 = thrownValue$3 === SuspenseException ? getThenableStateAfterSuspending() : null;
+              request = spawnNewSuspendedRenderTask(request, task, node2).ping;
               segment.then(request, request);
               task.formatContext = previousFormatContext;
               task.context = previousContext;
@@ -25129,7 +25129,7 @@ function requireReactDomServer_node_development() {
               switchContext(previousContext);
               return;
             }
-            if ("Maximum call stack size exceeded" === node.message) {
+            if ("Maximum call stack size exceeded" === node2.message) {
               segment = thrownValue$3 === SuspenseException ? getThenableStateAfterSuspending() : null;
               segment = spawnNewSuspendedRenderTask(request, task, segment);
               request.pingedTasks.push(segment);
@@ -25150,30 +25150,30 @@ function requireReactDomServer_node_development() {
       task.keyPath = previousKeyPath;
       task.treeContext = previousTreeContext;
       switchContext(previousContext);
-      throw node;
+      throw node2;
     }
     function abortTaskSoft(task) {
       var boundary = task.blockedBoundary, segment = task.blockedSegment;
       null !== segment && (segment.status = ABORTED, finishedTask(this, boundary, task.row, segment));
     }
-    function abortRemainingReplayNodes(request$jscomp$0, boundary, nodes, slots, error$jscomp$0, errorDigest$jscomp$0, errorInfo$jscomp$0, aborted) {
+    function abortRemainingReplayNodes(request$jscomp$0, boundary, nodes, slots, error$jscomp$0, errorDigest$jscomp$0, errorInfo$jscomp$0, aborted2) {
       for (var i = 0; i < nodes.length; i++) {
-        var node = nodes[i];
-        if (4 === node.length)
+        var node2 = nodes[i];
+        if (4 === node2.length)
           abortRemainingReplayNodes(
             request$jscomp$0,
             boundary,
-            node[2],
-            node[3],
+            node2[2],
+            node2[3],
             error$jscomp$0,
             errorDigest$jscomp$0,
             errorInfo$jscomp$0,
-            aborted
+            aborted2
           );
         else {
           var request = request$jscomp$0;
-          node = node[5];
-          var error = error$jscomp$0, errorDigest = errorDigest$jscomp$0, errorInfo = errorInfo$jscomp$0, wasAborted = aborted, resumedBoundary = createSuspenseBoundary(
+          node2 = node2[5];
+          var error2 = error$jscomp$0, errorDigest = errorDigest$jscomp$0, errorInfo = errorInfo$jscomp$0, wasAborted = aborted2, resumedBoundary = createSuspenseBoundary(
             request,
             null,
             /* @__PURE__ */ new Set(),
@@ -25181,12 +25181,12 @@ function requireReactDomServer_node_development() {
             null
           );
           resumedBoundary.parentFlushed = true;
-          resumedBoundary.rootSegmentID = node;
+          resumedBoundary.rootSegmentID = node2;
           resumedBoundary.status = CLIENT_RENDERED;
           encodeErrorForBoundary(
             resumedBoundary,
             errorDigest,
-            error,
+            error2,
             errorInfo,
             wasAborted
           );
@@ -25204,34 +25204,34 @@ function requireReactDomServer_node_development() {
           errorDigest$jscomp$0,
           error$jscomp$0,
           errorInfo$jscomp$0,
-          aborted
+          aborted2
         ), boundary.parentFlushed && request$jscomp$0.clientRenderedBoundaries.push(boundary));
         if ("object" === typeof slots)
           for (var index in slots) delete slots[index];
       }
     }
-    function abortTask(task, request, error) {
+    function abortTask(task, request, error2) {
       var boundary = task.blockedBoundary, segment = task.blockedSegment;
       if (null !== segment) {
         if (6 === segment.status) return;
         segment.status = ABORTED;
       }
-      var errorInfo = getThrownInfo(task.componentStack), node = task.node;
-      null !== node && "object" === typeof node && pushHaltedAwaitOnComponentStack(task, node._debugInfo);
+      var errorInfo = getThrownInfo(task.componentStack), node2 = task.node;
+      null !== node2 && "object" === typeof node2 && pushHaltedAwaitOnComponentStack(task, node2._debugInfo);
       if (null === boundary) {
         if (13 !== request.status && request.status !== CLOSED) {
           boundary = task.replay;
           if (null === boundary) {
-            null !== request.trackedPostpones && null !== segment ? (boundary = request.trackedPostpones, logRecoverableError(request, error, errorInfo, task.debugTask), trackPostpone(request, boundary, task, segment), finishedTask(request, null, task.row, segment)) : (logRecoverableError(request, error, errorInfo, task.debugTask), fatalError(request, error, errorInfo, task.debugTask));
+            null !== request.trackedPostpones && null !== segment ? (boundary = request.trackedPostpones, logRecoverableError(request, error2, errorInfo, task.debugTask), trackPostpone(request, boundary, task, segment), finishedTask(request, null, task.row, segment)) : (logRecoverableError(request, error2, errorInfo, task.debugTask), fatalError(request, error2, errorInfo, task.debugTask));
             return;
           }
           boundary.pendingTasks--;
-          0 === boundary.pendingTasks && 0 < boundary.nodes.length && (segment = logRecoverableError(request, error, errorInfo, null), abortRemainingReplayNodes(
+          0 === boundary.pendingTasks && 0 < boundary.nodes.length && (segment = logRecoverableError(request, error2, errorInfo, null), abortRemainingReplayNodes(
             request,
             null,
             boundary.nodes,
             boundary.slots,
-            error,
+            error2,
             segment,
             errorInfo,
             true
@@ -25240,21 +25240,21 @@ function requireReactDomServer_node_development() {
           0 === request.pendingRootTasks && completeShell(request);
         }
       } else {
-        node = request.trackedPostpones;
+        node2 = request.trackedPostpones;
         if (boundary.status !== CLIENT_RENDERED) {
-          if (null !== node && null !== segment)
-            return logRecoverableError(request, error, errorInfo, task.debugTask), trackPostpone(request, node, task, segment), boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
-              return abortTask(fallbackTask, request, error);
+          if (null !== node2 && null !== segment)
+            return logRecoverableError(request, error2, errorInfo, task.debugTask), trackPostpone(request, node2, task, segment), boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
+              return abortTask(fallbackTask, request, error2);
             }), boundary.fallbackAbortableTasks.clear(), finishedTask(request, boundary, task.row, segment);
           boundary.status = CLIENT_RENDERED;
           segment = logRecoverableError(
             request,
-            error,
+            error2,
             errorInfo,
             task.debugTask
           );
           boundary.status = CLIENT_RENDERED;
-          encodeErrorForBoundary(boundary, segment, error, errorInfo, true);
+          encodeErrorForBoundary(boundary, segment, error2, errorInfo, true);
           untrackBoundary(request, boundary);
           boundary.parentFlushed && request.clientRenderedBoundaries.push(boundary);
         }
@@ -25262,7 +25262,7 @@ function requireReactDomServer_node_development() {
         errorInfo = boundary.row;
         null !== errorInfo && 0 === --errorInfo.pendingTasks && finishSuspenseListRow(request, errorInfo);
         boundary.fallbackAbortableTasks.forEach(function(fallbackTask) {
-          return abortTask(fallbackTask, request, error);
+          return abortTask(fallbackTask, request, error2);
         });
         boundary.fallbackAbortableTasks.clear();
       }
@@ -25307,8 +25307,8 @@ function requireReactDomServer_node_development() {
             linkHeader ? onHeaders({ Link: linkHeader }) : onHeaders({});
           }
         }
-      } catch (error) {
-        logRecoverableError(request, error, {}, null);
+      } catch (error2) {
+        logRecoverableError(request, error2, {}, null);
       }
     }
     function completeShell(request) {
@@ -25558,8 +25558,8 @@ function requireReactDomServer_node_development() {
             request$jscomp$2,
             request$jscomp$2.destination
           );
-        } catch (error) {
-          pingedTasks = {}, logRecoverableError(request$jscomp$2, error, pingedTasks, null), fatalError(request$jscomp$2, error, pingedTasks, null);
+        } catch (error2) {
+          pingedTasks = {}, logRecoverableError(request$jscomp$2, error2, pingedTasks, null), fatalError(request$jscomp$2, error2, pingedTasks, null);
         } finally {
           currentResumableState = prevResumableState, ReactSharedInternals.H = prevDispatcher, ReactSharedInternals.A = prevAsyncDispatcher, ReactSharedInternals.getCurrentStack = prevGetCurrentStackImpl, prevDispatcher === HooksDispatcher && switchContext(prevContext), currentRequest = prevRequest;
         }
@@ -26076,8 +26076,8 @@ function requireReactDomServer_node_development() {
         request.destination = destination;
         try {
           flushCompletedQueues(request, destination);
-        } catch (error) {
-          destination = {}, logRecoverableError(request, error, destination, null), fatalError(request, error, destination, null);
+        } catch (error2) {
+          destination = {}, logRecoverableError(request, error2, destination, null), fatalError(request, error2, destination, null);
         }
       }
     }
@@ -26086,14 +26086,14 @@ function requireReactDomServer_node_development() {
       try {
         var abortableTasks = request.abortableTasks;
         if (0 < abortableTasks.size) {
-          var error = void 0 === reason ? Error("The render was aborted by the server without a reason.") : "object" === typeof reason && null !== reason && "function" === typeof reason.then ? Error("The render was aborted by the server with a promise.") : reason;
-          request.fatalError = error;
+          var error2 = void 0 === reason ? Error("The render was aborted by the server without a reason.") : "object" === typeof reason && null !== reason && "function" === typeof reason.then ? Error("The render was aborted by the server with a promise.") : reason;
+          request.fatalError = error2;
           abortableTasks.forEach(function(task) {
             var prevTaskInDEV = currentTaskInDEV, prevGetCurrentStackImpl = ReactSharedInternals.getCurrentStack;
             currentTaskInDEV = task;
             ReactSharedInternals.getCurrentStack = getCurrentStackInDEV;
             try {
-              abortTask(task, request, error);
+              abortTask(task, request, error2);
             } finally {
               currentTaskInDEV = prevTaskInDEV, ReactSharedInternals.getCurrentStack = prevGetCurrentStackImpl;
             }
@@ -26105,12 +26105,12 @@ function requireReactDomServer_node_development() {
         reason = {}, logRecoverableError(request, error$4, reason, null), fatalError(request, error$4, reason, null);
       }
     }
-    function addToReplayParent(node, parentKeyPath, trackedPostpones) {
-      if (null === parentKeyPath) trackedPostpones.rootNodes.push(node);
+    function addToReplayParent(node2, parentKeyPath, trackedPostpones) {
+      if (null === parentKeyPath) trackedPostpones.rootNodes.push(node2);
       else {
         var workingMap = trackedPostpones.workingMap, parentNode = workingMap.get(parentKeyPath);
         void 0 === parentNode && (parentNode = [parentKeyPath[1], parentKeyPath[2], [], null], workingMap.set(parentKeyPath, parentNode), addToReplayParent(parentNode, parentKeyPath[0], trackedPostpones));
-        parentNode[2].push(node);
+        parentNode[2].push(node2);
       }
     }
     function getPostponedState(request) {
@@ -26209,8 +26209,8 @@ function requireReactDomServer_node_development() {
         end: function() {
           controller.close();
         },
-        destroy: function(error) {
-          "function" === typeof controller.error ? controller.error(error) : controller.close();
+        destroy: function(error2) {
+          "function" === typeof controller.error ? controller.error(error2) : controller.close();
         }
       };
     }
@@ -26244,8 +26244,8 @@ function requireReactDomServer_node_development() {
         end: function() {
           controller.close();
         },
-        destroy: function(error) {
-          "function" === typeof controller.error ? controller.error(error) : controller.close();
+        destroy: function(error2) {
+          "function" === typeof controller.error ? controller.error(error2) : controller.close();
         }
       };
     }
@@ -26257,12 +26257,12 @@ function requireReactDomServer_node_development() {
         end: function() {
           readable.push(null);
         },
-        destroy: function(error) {
-          readable.destroy(error);
+        destroy: function(error2) {
+          readable.destroy(error2);
         }
       };
     }
-    var util2 = require$$0, crypto2 = require$$1, async_hooks = require$$2, React = requireReact(), ReactDOM = requireReactDom(), stream = require$$5, REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_SCOPE_TYPE = Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, isArrayImpl = Array.isArray, jsxPropsParents = /* @__PURE__ */ new WeakMap(), jsxChildrenParents = /* @__PURE__ */ new WeakMap(), CLIENT_REFERENCE_TAG = Symbol.for("react.client.reference"), scheduleMicrotask = queueMicrotask, currentView = null, writtenBytes = 0, destinationHasCapacity$1 = true, textEncoder = new util2.TextEncoder(), assign = Object.assign, hasOwnProperty = Object.prototype.hasOwnProperty, VALID_ATTRIBUTE_NAME_REGEX = RegExp(
+    var util = require$$0, crypto2 = require$$1, async_hooks = require$$2, React = requireReact(), ReactDOM = requireReactDom(), stream = require$$5, REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_SCOPE_TYPE = Symbol.for("react.scope"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = Symbol.for("react.legacy_hidden"), REACT_MEMO_CACHE_SENTINEL = Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, isArrayImpl = Array.isArray, jsxPropsParents = /* @__PURE__ */ new WeakMap(), jsxChildrenParents = /* @__PURE__ */ new WeakMap(), CLIENT_REFERENCE_TAG = Symbol.for("react.client.reference"), scheduleMicrotask = queueMicrotask, currentView = null, writtenBytes = 0, destinationHasCapacity$1 = true, textEncoder = new util.TextEncoder(), assign = Object.assign, hasOwnProperty = Object.prototype.hasOwnProperty, VALID_ATTRIBUTE_NAME_REGEX = RegExp(
       "^[:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD][:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040]*$"
     ), illegalAttributeNameCache = {}, validatedAttributeNameCache = {}, unitlessNumbers = new Set(
       "animationIterationCount aspectRatio borderImageOutset borderImageSlice borderImageWidth boxFlex boxFlexGroup boxOrdinalGroup columnCount columns flex flexGrow flexPositive flexShrink flexNegative flexOrder gridArea gridRow gridRowEnd gridRowSpan gridRowStart gridColumn gridColumnEnd gridColumnSpan gridColumnStart fontWeight lineClamp lineHeight opacity order orphans scale tabSize widows zIndex zoom fillOpacity floodOpacity stopOpacity strokeDasharray strokeDashoffset strokeMiterlimit strokeOpacity strokeWidth MozAnimationIterationCount MozBoxFlex MozBoxFlexGroup MozLineClamp msAnimationIterationCount msFlex msZoom msFlexGrow msFlexNegative msFlexOrder msFlexPositive msFlexShrink msGridColumn msGridColumnSpan msGridRow msGridRowSpan WebkitAnimationIterationCount WebkitBoxFlex WebKitBoxFlexGroup WebkitBoxOrdinalGroup WebkitColumnCount WebkitColumns WebkitFlex WebkitFlexGrow WebkitFlexPositive WebkitFlexShrink WebkitLineClamp".split(
@@ -27553,10 +27553,10 @@ function requireReactDomServer_node_development() {
             stream2.allReady = allReady;
             resolve(stream2);
           },
-          function(error) {
+          function(error2) {
             allReady.catch(function() {
             });
-            reject(error);
+            reject(error2);
           },
           onFatalError,
           options ? options.onPostpone : void 0,
@@ -27616,10 +27616,10 @@ function requireReactDomServer_node_development() {
             stream2.allReady = allReady;
             resolve(stream2);
           },
-          function(error) {
+          function(error2) {
             allReady.catch(function() {
             });
-            reject(error);
+            reject(error2);
           },
           onFatalError,
           options ? options.onPostpone : void 0
@@ -27952,7 +27952,7 @@ function Router(_ref5) {
     children = null,
     location: locationProp,
     navigationType = Action.Pop,
-    navigator,
+    navigator: navigator2,
     static: staticProp = false,
     future
   } = _ref5;
@@ -27960,12 +27960,12 @@ function Router(_ref5) {
   let basename = basenameProp.replace(/^\/*/, "/");
   let navigationContext = reactExports.useMemo(() => ({
     basename,
-    navigator,
+    navigator: navigator2,
     static: staticProp,
     future: _extends({
       v7_relativeSplatPath: false
     }, future)
-  }), [basename, future, navigator, staticProp]);
+  }), [basename, future, navigator2, staticProp]);
   if (typeof locationProp === "string") {
     locationProp = parsePath(locationProp);
   }
@@ -28068,2691 +28068,2365 @@ function encodeLocation(to2) {
   };
 }
 const ABSOLUTE_URL_REGEX = /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i;
-var util;
-(function(util2) {
-  util2.assertEqual = (_2) => {
-  };
-  function assertIs(_arg) {
+function getEnumValues(entries) {
+  const numericValues = Object.values(entries).filter((v2) => typeof v2 === "number");
+  const values = Object.entries(entries).filter(([k, _2]) => numericValues.indexOf(+k) === -1).map(([_2, v2]) => v2);
+  return values;
+}
+function joinValues(array2, separator = "|") {
+  return array2.map((val) => stringifyPrimitive(val)).join(separator);
+}
+function jsonStringifyReplacer(_2, value) {
+  if (typeof value === "bigint")
+    return value.toString();
+  return value;
+}
+class Cached {
+  constructor(getter) {
+    this._getter = getter;
+    this._value = void 0;
   }
-  util2.assertIs = assertIs;
-  function assertNever(_x) {
-    throw new Error();
+  get value() {
+    const getter = this._getter;
+    if (getter !== void 0) {
+      this._value = getter();
+      this._getter = void 0;
+    }
+    return this._value;
   }
-  util2.assertNever = assertNever;
-  util2.arrayToEnum = (items) => {
-    const obj = {};
-    for (const item of items) {
-      obj[item] = item;
+}
+function cached(getter) {
+  return new Cached(getter);
+}
+function nullish(input) {
+  return input === null || input === void 0;
+}
+function cleanRegex(source) {
+  const start = source.startsWith("^") ? 1 : 0;
+  const end = source.endsWith("$") ? source.length - 1 : source.length;
+  return source.slice(start, end);
+}
+function floatSafeRemainder(val, step) {
+  const ratio = val / step;
+  const roundedRatio = Math.round(ratio);
+  const tolerance = 4 * Number.EPSILON * Math.max(Math.abs(ratio), 1);
+  if (Math.abs(ratio - roundedRatio) < tolerance)
+    return 0;
+  return ratio - roundedRatio;
+}
+function assignProp(target, prop, value) {
+  Object.defineProperty(target, prop, {
+    value,
+    writable: true,
+    enumerable: true,
+    configurable: true
+  });
+}
+function rawShape(def) {
+  const desc = Object.getOwnPropertyDescriptor(def, "shape");
+  return (desc == null ? void 0 : desc.get) ? desc.get.raw : desc == null ? void 0 : desc.value;
+}
+function sourceShape(schema) {
+  return rawShape(schema._zod.def) ?? schema._zod.def.shape;
+}
+function deferProp(target, key, getter) {
+  Object.defineProperty(target, key, {
+    get() {
+      const value = getter();
+      assignProp(this, key, value);
+      return value;
+    },
+    enumerable: true,
+    configurable: true
+  });
+}
+function putProp(target, key, value) {
+  if (key in target)
+    assignProp(target, key, value);
+  else
+    target[key] = value;
+}
+function mirrorShape(target, source, keys, wrap) {
+  const raw = sourceShape(source);
+  for (const key of keys) {
+    const desc = Object.getOwnPropertyDescriptor(raw, key);
+    if (!desc.enumerable)
+      continue;
+    if (desc.get) {
+      deferProp(target, key, () => {
+        const value = source._zod.def.shape[key];
+        return wrap ? wrap(value, key) : value;
+      });
+    } else
+      putProp(target, key, wrap ? wrap(desc.value, key) : desc.value);
+  }
+}
+function mirrorProps(target, source) {
+  for (const key of Reflect.ownKeys(source)) {
+    const desc = Object.getOwnPropertyDescriptor(source, key);
+    if (!desc.enumerable)
+      continue;
+    if (desc.get)
+      deferProp(target, key, () => source[key]);
+    else
+      putProp(target, key, desc.value);
+  }
+}
+function mergeDefs(...defs) {
+  const mergedDescriptors = {};
+  for (const def of defs) {
+    const descriptors = Object.getOwnPropertyDescriptors(def);
+    Object.assign(mergedDescriptors, descriptors);
+  }
+  return Object.defineProperties({}, mergedDescriptors);
+}
+function esc(str) {
+  return JSON.stringify(str);
+}
+function slugify(input) {
+  return input.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-+|-+$/g, "");
+}
+const captureStackTrace = "captureStackTrace" in Error ? Error.captureStackTrace : (..._args) => {
+};
+function isObject(data) {
+  return typeof data === "object" && data !== null && !Array.isArray(data);
+}
+const allowsEval = /* @__PURE__ */ cached(() => {
+  var _a2;
+  if (globalConfig.jitless) {
+    return false;
+  }
+  if (typeof navigator !== "undefined" && ((_a2 = navigator == null ? void 0 : navigator.userAgent) == null ? void 0 : _a2.includes("Cloudflare"))) {
+    return false;
+  }
+  try {
+    const F2 = Function;
+    new F2("");
+    return true;
+  } catch (_2) {
+    return false;
+  }
+});
+function isPlainObject(o) {
+  if (isObject(o) === false)
+    return false;
+  const ctor = o.constructor;
+  if (ctor === void 0)
+    return true;
+  if (typeof ctor !== "function")
+    return true;
+  const prot = ctor.prototype;
+  if (isObject(prot) === false)
+    return false;
+  if (Object.prototype.hasOwnProperty.call(prot, "isPrototypeOf") === false) {
+    return false;
+  }
+  return true;
+}
+function shallowClone(o) {
+  if (isPlainObject(o))
+    return { ...o };
+  if (Array.isArray(o))
+    return [...o];
+  if (o instanceof Map)
+    return new Map(o);
+  if (o instanceof Set)
+    return new Set(o);
+  return o;
+}
+const propertyKeyTypes = /* @__PURE__ */ new Set(["string", "number", "symbol"]);
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function clone(inst, def, params) {
+  const cl = new inst._zod.constr(def ?? inst._zod.def);
+  if (!def || (params == null ? void 0 : params.parent))
+    cl._zod.parent = inst;
+  return cl;
+}
+function normalizeParams(_params) {
+  const params = _params;
+  if (!params)
+    return {};
+  if (typeof params === "string")
+    return { error: () => params };
+  if ((params == null ? void 0 : params.message) !== void 0) {
+    if ((params == null ? void 0 : params.error) !== void 0)
+      throw new Error("Cannot specify both `message` and `error` params");
+    params.error = params.message;
+  }
+  delete params.message;
+  if (typeof params.error === "string")
+    return { ...params, error: () => params.error };
+  return params;
+}
+function stringifyPrimitive(value) {
+  if (typeof value === "bigint")
+    return value.toString() + "n";
+  if (typeof value === "string")
+    return `"${value}"`;
+  return `${value}`;
+}
+function optionalKeys(shape) {
+  return Object.keys(shape).filter((k) => {
+    return shape[k]._zod.optin !== void 0 && shape[k]._zod.optout === "optional";
+  });
+}
+const NUMBER_FORMAT_RANGES = /* @__PURE__ */ (() => ({
+  safeint: [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
+  int32: [-2147483648, 2147483647],
+  uint32: [0, 4294967295],
+  float32: [-34028234663852886e22, 34028234663852886e22],
+  float64: [-Number.MAX_VALUE, Number.MAX_VALUE]
+}))();
+const BIGINT_FORMAT_RANGES = {
+  int64: [/* @__PURE__ */ BigInt("-9223372036854775808"), /* @__PURE__ */ BigInt("9223372036854775807")],
+  uint64: [/* @__PURE__ */ BigInt(0), /* @__PURE__ */ BigInt("18446744073709551615")]
+};
+function pick(schema, mask) {
+  const currDef = schema._zod.def;
+  const checks = currDef.checks;
+  const hasChecks = checks && checks.length > 0;
+  if (hasChecks) {
+    throw new Error(".pick() cannot be used on object schemas containing refinements");
+  }
+  const newShape = {};
+  mirrorShape(newShape, schema, maskedKeys(schema, mask));
+  return clone(schema, mergeDefs(currDef, { shape: newShape, checks: [] }));
+}
+function maskedKeys(schema, mask) {
+  var _a2;
+  const raw = sourceShape(schema);
+  const keys = [];
+  for (const key of Reflect.ownKeys(mask)) {
+    if (!((_a2 = Object.getOwnPropertyDescriptor(raw, key)) == null ? void 0 : _a2.enumerable)) {
+      throw new Error(`Unrecognized key: "${String(key)}"`);
     }
-    return obj;
-  };
-  util2.getValidEnumValues = (obj) => {
-    const validKeys = util2.objectKeys(obj).filter((k) => typeof obj[obj[k]] !== "number");
-    const filtered = {};
-    for (const k of validKeys) {
-      filtered[k] = obj[k];
-    }
-    return util2.objectValues(filtered);
-  };
-  util2.objectValues = (obj) => {
-    return util2.objectKeys(obj).map(function(e) {
-      return obj[e];
-    });
-  };
-  util2.objectKeys = typeof Object.keys === "function" ? (obj) => Object.keys(obj) : (object) => {
-    const keys = [];
-    for (const key in object) {
-      if (Object.prototype.hasOwnProperty.call(object, key)) {
-        keys.push(key);
+    if (mask[key])
+      keys.push(key);
+  }
+  return keys;
+}
+function omit(schema, mask) {
+  const currDef = schema._zod.def;
+  const checks = currDef.checks;
+  const hasChecks = checks && checks.length > 0;
+  if (hasChecks) {
+    throw new Error(".omit() cannot be used on object schemas containing refinements");
+  }
+  const omitted = new Set(maskedKeys(schema, mask));
+  const newShape = {};
+  mirrorShape(newShape, schema, Reflect.ownKeys(sourceShape(schema)).filter((key) => !omitted.has(key)));
+  return clone(schema, mergeDefs(currDef, { shape: newShape, checks: [] }));
+}
+function extend(schema, shape) {
+  if (!isPlainObject(shape)) {
+    throw new Error("Invalid input to extend: expected a plain object");
+  }
+  const checks = schema._zod.def.checks;
+  const hasChecks = checks && checks.length > 0;
+  if (hasChecks) {
+    const existingShape = sourceShape(schema);
+    for (const key of Reflect.ownKeys(shape)) {
+      if (Object.getOwnPropertyDescriptor(existingShape, key) !== void 0) {
+        throw new Error("Cannot overwrite keys on object schemas containing refinements. Use `.safeExtend()` instead.");
       }
     }
-    return keys;
-  };
-  util2.find = (arr, checker) => {
-    for (const item of arr) {
-      if (checker(item))
-        return item;
-    }
-    return void 0;
-  };
-  util2.isInteger = typeof Number.isInteger === "function" ? (val) => Number.isInteger(val) : (val) => typeof val === "number" && Number.isFinite(val) && Math.floor(val) === val;
-  function joinValues(array, separator = " | ") {
-    return array.map((val) => typeof val === "string" ? `'${val}'` : val).join(separator);
   }
-  util2.joinValues = joinValues;
-  util2.jsonStringifyReplacer = (_2, value) => {
-    if (typeof value === "bigint") {
-      return value.toString();
+  return clone(schema, mergeDefs(schema._zod.def, { shape: extended(schema, shape) }));
+}
+function extended(schema, shape) {
+  const newShape = {};
+  mirrorShape(newShape, schema, Reflect.ownKeys(sourceShape(schema)));
+  mirrorProps(newShape, shape);
+  return newShape;
+}
+function safeExtend(schema, shape) {
+  if (!isPlainObject(shape)) {
+    throw new Error("Invalid input to safeExtend: expected a plain object");
+  }
+  return clone(schema, mergeDefs(schema._zod.def, { shape: extended(schema, shape) }));
+}
+function merge(a, b2) {
+  var _a2, _b;
+  if (!((_a2 = b2 == null ? void 0 : b2._zod) == null ? void 0 : _a2.def)) {
+    throw new Error("Invalid input to merge: expected an object schema. To merge a plain shape, use `.extend()`.");
+  }
+  if ((_b = a._zod.def.checks) == null ? void 0 : _b.length) {
+    throw new Error(".merge() cannot be used on object schemas containing refinements. Use .safeExtend() instead.");
+  }
+  const newShape = {};
+  mirrorShape(newShape, a, Reflect.ownKeys(sourceShape(a)));
+  mirrorShape(newShape, b2, Reflect.ownKeys(sourceShape(b2)));
+  const def = mergeDefs(a._zod.def, {
+    shape: newShape,
+    get catchall() {
+      return b2._zod.def.catchall;
+    },
+    checks: b2._zod.def.checks ?? []
+  });
+  return clone(a, def);
+}
+function partial(Class, schema, mask, name2 = "partial") {
+  const currDef = schema._zod.def;
+  const checks = currDef.checks;
+  const hasChecks = checks && checks.length > 0;
+  if (hasChecks) {
+    throw new Error(`.${name2}() cannot be used on object schemas containing refinements`);
+  }
+  const selected = mask ? new Set(maskedKeys(schema, mask)) : void 0;
+  const newShape = {};
+  mirrorShape(newShape, schema, Reflect.ownKeys(sourceShape(schema)), Class && ((value, key) => selected && !selected.has(key) ? value : new Class({ type: "optional", innerType: value })));
+  return clone(schema, mergeDefs(schema._zod.def, { shape: newShape, checks: [] }));
+}
+function required(Class, schema, mask) {
+  const selected = mask ? new Set(maskedKeys(schema, mask)) : void 0;
+  const newShape = {};
+  mirrorShape(newShape, schema, Reflect.ownKeys(sourceShape(schema)), (value, key) => (
+    // overwrite with non-optional
+    selected && !selected.has(key) ? value : new Class({ type: "nonoptional", innerType: value })
+  ));
+  return clone(schema, mergeDefs(schema._zod.def, { shape: newShape }));
+}
+function aborted(x2, startIndex = 0) {
+  var _a2;
+  if (x2.aborted === true)
+    return true;
+  for (let i = startIndex; i < x2.issues.length; i++) {
+    if (((_a2 = x2.issues[i]) == null ? void 0 : _a2.continue) !== true) {
+      return true;
     }
-    return value;
-  };
-})(util || (util = {}));
-var objectUtil;
-(function(objectUtil2) {
-  objectUtil2.mergeShapes = (first, second) => {
-    return {
-      ...first,
-      ...second
-      // second overwrites first
-    };
-  };
-})(objectUtil || (objectUtil = {}));
-const ZodParsedType = util.arrayToEnum([
-  "string",
-  "nan",
-  "number",
-  "integer",
-  "float",
-  "boolean",
-  "date",
-  "bigint",
-  "symbol",
-  "function",
-  "undefined",
-  "null",
-  "array",
-  "object",
-  "unknown",
-  "promise",
-  "void",
-  "never",
-  "map",
-  "set"
-]);
-const getParsedType = (data) => {
+  }
+  return false;
+}
+function explicitlyAborted(x2, startIndex = 0) {
+  var _a2;
+  if (x2.aborted === true)
+    return true;
+  for (let i = startIndex; i < x2.issues.length; i++) {
+    if (((_a2 = x2.issues[i]) == null ? void 0 : _a2.continue) === false) {
+      return true;
+    }
+  }
+  return false;
+}
+function prefixIssues(path, issues) {
+  return issues.map((iss) => {
+    var _a2;
+    (_a2 = iss).path ?? (_a2.path = []);
+    iss.path.unshift(path);
+    return iss;
+  });
+}
+function unwrapMessage(message) {
+  return typeof message === "string" ? message : message == null ? void 0 : message.message;
+}
+function attachSchema(issues, start, inst) {
+  var _a2;
+  for (let i = start; i < issues.length; i++) {
+    (_a2 = issues[i]).schema ?? (_a2.schema = inst);
+  }
+}
+function finalizeIssue(iss, ctx, config2) {
+  var _a3, _b, _c, _d, _e2, _f, _g, _h, _i, _j;
+  var _a2;
+  const traits = (_b = (_a3 = iss.inst) == null ? void 0 : _a3._zod) == null ? void 0 : _b.traits;
+  if (traits == null ? void 0 : traits.has("$ZodType")) {
+    if (traits.has("$ZodCheck"))
+      (_a2 = iss).schema ?? (_a2.schema = iss.inst);
+    else
+      iss.schema = iss.inst;
+  }
+  const schemaError = iss.schema !== iss.inst ? (_d = (_c = iss.schema) == null ? void 0 : _c._zod.def) == null ? void 0 : _d.error : void 0;
+  const message = iss.message ? iss.message : unwrapMessage((_g = (_f = (_e2 = iss.inst) == null ? void 0 : _e2._zod.def) == null ? void 0 : _f.error) == null ? void 0 : _g.call(_f, iss)) ?? unwrapMessage(schemaError == null ? void 0 : schemaError(iss)) ?? unwrapMessage((_h = ctx == null ? void 0 : ctx.error) == null ? void 0 : _h.call(ctx, iss)) ?? unwrapMessage((_i = config2.customError) == null ? void 0 : _i.call(config2, iss)) ?? unwrapMessage((_j = config2.localeError) == null ? void 0 : _j.call(config2, iss)) ?? "Invalid input";
+  const full = {};
+  for (const k of Object.keys(iss)) {
+    if (k === "inst" || k === "schema" || k === "continue" || k === "input" || k === "__proto__")
+      continue;
+    full[k] = iss[k];
+  }
+  full.path ?? (full.path = []);
+  full.message = message;
+  if (ctx == null ? void 0 : ctx.reportInput) {
+    full.input = iss.input;
+  }
+  return full;
+}
+const highSurrogate = /[\uD800-\uDBFF]/;
+function codePointLength(str) {
+  const units = str.length;
+  if (!highSurrogate.test(str))
+    return units;
+  let count = units;
+  for (let i = 0; i < units - 1; i++) {
+    if ((str.charCodeAt(i) & 64512) === 55296 && (str.charCodeAt(i + 1) & 64512) === 56320) {
+      count--;
+      i++;
+    }
+  }
+  return count;
+}
+function getLengthableOrigin(input) {
+  if (Array.isArray(input))
+    return "array";
+  if (typeof input === "string")
+    return "string";
+  return "unknown";
+}
+function parsedType(data) {
   const t = typeof data;
   switch (t) {
-    case "undefined":
-      return ZodParsedType.undefined;
-    case "string":
-      return ZodParsedType.string;
-    case "number":
-      return Number.isNaN(data) ? ZodParsedType.nan : ZodParsedType.number;
-    case "boolean":
-      return ZodParsedType.boolean;
-    case "function":
-      return ZodParsedType.function;
-    case "bigint":
-      return ZodParsedType.bigint;
-    case "symbol":
-      return ZodParsedType.symbol;
-    case "object":
-      if (Array.isArray(data)) {
-        return ZodParsedType.array;
-      }
+    case "number": {
+      return Number.isNaN(data) ? "nan" : "number";
+    }
+    case "object": {
       if (data === null) {
-        return ZodParsedType.null;
+        return "null";
       }
-      if (data.then && typeof data.then === "function" && data.catch && typeof data.catch === "function") {
-        return ZodParsedType.promise;
+      if (Array.isArray(data)) {
+        return "array";
       }
-      if (typeof Map !== "undefined" && data instanceof Map) {
-        return ZodParsedType.map;
+      const obj = data;
+      if (obj && Object.getPrototypeOf(obj) !== Object.prototype && "constructor" in obj && obj.constructor) {
+        return obj.constructor.name;
       }
-      if (typeof Set !== "undefined" && data instanceof Set) {
-        return ZodParsedType.set;
+    }
+  }
+  return t;
+}
+function issue(...args) {
+  const [iss, input, inst] = args;
+  if (typeof iss === "string") {
+    return {
+      message: iss,
+      code: "custom",
+      input,
+      inst
+    };
+  }
+  return { ...iss };
+}
+function members(proto, table) {
+  for (const key in table) {
+    const desc = Object.getOwnPropertyDescriptor(table, key);
+    if (desc.get)
+      Object.defineProperty(proto, key, { ...desc, enumerable: false });
+    else
+      defineBound(proto, key, desc.value);
+  }
+}
+function own(inst, key, value, enumerable = true) {
+  Object.defineProperty(inst, key, { configurable: true, writable: true, enumerable, value });
+  return value;
+}
+function hide(inst, key, value) {
+  return own(inst, key, value, false);
+}
+function derived(computes, table) {
+  for (const key in computes) {
+    const compute = computes[key];
+    Object.defineProperty(table, key, {
+      configurable: true,
+      enumerable: true,
+      get() {
+        return own(this, key, compute(this));
+      },
+      set(value) {
+        own(this, key, value);
       }
-      if (typeof Date !== "undefined" && data instanceof Date) {
-        return ZodParsedType.date;
-      }
-      return ZodParsedType.object;
-    default:
-      return ZodParsedType.unknown;
+    });
+  }
+  return table;
+}
+function defineBound(proto, key, fn) {
+  Object.defineProperty(proto, key, {
+    configurable: true,
+    get() {
+      return this == null ? fn : own(this, key, fn.bind(this));
+    },
+    set(value) {
+      own(this, key, value);
+    }
+  });
+}
+function claim(inst, sentinel) {
+  const proto = Object.getPrototypeOf(inst);
+  return sentinel in proto ? void 0 : proto;
+}
+let installing;
+let broke = false;
+const breaker = {
+  configurable: true,
+  get() {
+    broke = true;
+    return void 0;
   }
 };
-const ZodIssueCode = util.arrayToEnum([
-  "invalid_type",
-  "invalid_literal",
-  "custom",
-  "invalid_union",
-  "invalid_union_discriminator",
-  "invalid_enum_value",
-  "unrecognized_keys",
-  "invalid_arguments",
-  "invalid_return_type",
-  "invalid_date",
-  "invalid_string",
-  "too_small",
-  "too_big",
-  "invalid_intersection_types",
-  "not_multiple_of",
-  "not_finite"
-]);
-class ZodError extends Error {
-  get errors() {
-    return this.issues;
+function defineLazyInternal(inst, key, compute) {
+  const proto = Object.getPrototypeOf(inst._zod);
+  if (key in proto && installing !== inst._zod) {
+    installing = void 0;
+    return;
   }
-  constructor(issues) {
-    super();
-    this.issues = [];
-    this.addIssue = (sub) => {
-      this.issues = [...this.issues, sub];
-    };
-    this.addIssues = (subs = []) => {
-      this.issues = [...this.issues, ...subs];
-    };
-    const actualProto = new.target.prototype;
-    if (Object.setPrototypeOf) {
-      Object.setPrototypeOf(this, actualProto);
-    } else {
-      this.__proto__ = actualProto;
+  installing = inst._zod;
+  Object.defineProperty(proto, key, {
+    configurable: true,
+    get() {
+      Object.defineProperty(this, key, breaker);
+      const outer = broke;
+      broke = false;
+      try {
+        const value = compute(this);
+        if (broke)
+          delete this[key];
+        else
+          Object.defineProperty(this, key, { configurable: true, writable: true, value });
+        broke = broke || outer;
+        return value;
+      } catch (err) {
+        delete this[key];
+        broke = broke || outer;
+        throw err;
+      }
+    },
+    set(value) {
+      Object.defineProperty(this, key, { configurable: true, writable: true, value });
     }
-    this.name = "ZodError";
-    this.issues = issues;
+  });
+}
+function installLazyProp(inst, key, make, enumerable) {
+  const proto = claim(inst, key);
+  if (!proto)
+    return;
+  Object.defineProperty(proto, key, {
+    configurable: true,
+    get() {
+      const desc = { configurable: true, writable: true, enumerable, value: void 0 };
+      Object.defineProperty(this, key, desc);
+      desc.value = make(this);
+      Object.defineProperty(this, key, desc);
+      return desc.value;
+    },
+    set(value) {
+      Object.defineProperty(this, key, { configurable: true, writable: true, enumerable, value });
+    }
+  });
+}
+const CONSTANT_CATCH = "~constantCatch";
+function constantCatch(value) {
+  const fn = () => value;
+  fn[CONSTANT_CATCH] = true;
+  return fn;
+}
+var _a$1;
+const _zodDesc = { value: void 0, enumerable: false };
+let _E = "captureStackTrace" in Error ? Error : null;
+function newError(Definition) {
+  const E = _E;
+  if (E) {
+    const saved = E.stackTraceLimit;
+    if (typeof saved === "number") {
+      try {
+        E.stackTraceLimit = 0;
+      } catch {
+        _E = null;
+        return new Definition();
+      }
+      try {
+        return new Definition();
+      } finally {
+        E.stackTraceLimit = saved;
+      }
+    }
   }
-  format(_mapper) {
-    const mapper = _mapper || function(issue) {
-      return issue.message;
-    };
-    const fieldErrors = { _errors: [] };
-    const processError = (error) => {
-      for (const issue of error.issues) {
-        if (issue.code === "invalid_union") {
-          issue.unionErrors.map(processError);
-        } else if (issue.code === "invalid_return_type") {
-          processError(issue.returnTypeError);
-        } else if (issue.code === "invalid_arguments") {
-          processError(issue.argumentsError);
-        } else if (issue.path.length === 0) {
-          fieldErrors._errors.push(mapper(issue));
+  return new Definition();
+}
+function $constructor(name2, initializer2, proto, params) {
+  const zodProto = {};
+  function Internals(def) {
+    this.def = def;
+    this.constr = _2;
+    this.traits = /* @__PURE__ */ new Set();
+  }
+  Internals.prototype = zodProto;
+  const protoMembers = proto;
+  const initialized = protoMembers && /* @__PURE__ */ new WeakSet();
+  function init(inst, def) {
+    if (!inst._zod) {
+      _zodDesc.value = new Internals(def);
+      try {
+        Object.defineProperty(inst, "_zod", _zodDesc);
+      } finally {
+        _zodDesc.value = void 0;
+      }
+    } else if (inst._zod.traits.has(name2)) {
+      return;
+    }
+    inst._zod.traits.add(name2);
+    initializer2(inst, def);
+    if (initialized) {
+      const own2 = Object.getPrototypeOf(inst);
+      const ctorProto = inst._zod.constr.prototype;
+      let up = own2;
+      while (up && up !== ctorProto)
+        up = Object.getPrototypeOf(up);
+      const target = up ?? own2;
+      if (!initialized.has(target)) {
+        initialized.add(target);
+        members(target, protoMembers);
+      }
+    }
+    const proto2 = _2.prototype;
+    for (const k in proto2) {
+      if (!Object.prototype.hasOwnProperty.call(proto2, k))
+        continue;
+      if (!(k in inst)) {
+        inst[k] = proto2[k].bind(inst);
+      }
+    }
+  }
+  const Parent = (params == null ? void 0 : params.Parent) ?? Object;
+  class Definition extends Parent {
+  }
+  Object.defineProperty(Definition, "name", { value: name2 });
+  function _2(def) {
+    var _a2;
+    const inst = (params == null ? void 0 : params.Parent) ? newError(Definition) : this;
+    init(inst, def);
+    const deferred = inst._zod.deferred;
+    if (deferred) {
+      for (const fn of deferred) {
+        fn();
+      }
+      inst._zod.deferred = void 0;
+    }
+    const pp = (_a2 = globalThis.__zod_globalConfig) == null ? void 0 : _a2.postProcessor;
+    if (pp)
+      pp(inst);
+    return inst;
+  }
+  Object.defineProperty(_2, "init", { value: init });
+  Object.defineProperty(_2, Symbol.hasInstance, {
+    value: (inst) => {
+      var _a2, _b;
+      if ((params == null ? void 0 : params.Parent) && inst instanceof params.Parent)
+        return true;
+      return (_b = (_a2 = inst == null ? void 0 : inst._zod) == null ? void 0 : _a2.traits) == null ? void 0 : _b.has(name2);
+    }
+  });
+  Object.defineProperty(_2, "name", { value: name2 });
+  return _2;
+}
+class $ZodAsyncError extends Error {
+  constructor() {
+    super(`Encountered Promise during synchronous parse. Use .parseAsync() instead.`);
+  }
+}
+class $ZodEncodeError extends Error {
+  constructor(name2) {
+    super(`Encountered unidirectional transform during encode: ${name2}`);
+    this.name = "ZodEncodeError";
+  }
+}
+(_a$1 = globalThis).__zod_globalConfig ?? (_a$1.__zod_globalConfig = {});
+const globalConfig = globalThis.__zod_globalConfig;
+function config(newConfig) {
+  if (newConfig)
+    Object.assign(globalConfig, newConfig);
+  return globalConfig;
+}
+function _getMessage() {
+  const internals = this._zod;
+  internals.message ?? (internals.message = JSON.stringify(internals.def, jsonStringifyReplacer, 2));
+  return internals.message;
+}
+function _setMessage(value) {
+  this._zod.message = value;
+}
+const _messageDesc = {
+  get: _getMessage,
+  set: _setMessage,
+  enumerable: true,
+  configurable: true
+};
+const _issuesDesc = { value: void 0, enumerable: false };
+const _installedToString = /* @__PURE__ */ new WeakSet([Object.prototype, Error.prototype]);
+const initializer$1 = (inst, def) => {
+  inst.name = "$ZodError";
+  _issuesDesc.value = def;
+  Object.defineProperty(inst, "issues", _issuesDesc);
+  _issuesDesc.value = void 0;
+  Object.defineProperty(inst, "message", _messageDesc);
+  const proto = Object.getPrototypeOf(inst);
+  if (!_installedToString.has(proto)) {
+    _installedToString.add(proto);
+    Object.defineProperty(proto, "toString", {
+      configurable: true,
+      enumerable: false,
+      get() {
+        const value = () => this.message;
+        Object.defineProperty(this, "toString", { value, configurable: true, writable: true });
+        return value;
+      },
+      set(value) {
+        Object.defineProperty(this, "toString", { value, configurable: true, writable: true });
+      }
+    });
+  }
+};
+const $ZodError = $constructor("$ZodError", initializer$1);
+function node(obj, key, make) {
+  if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+    if (key === "__proto__") {
+      Object.defineProperty(obj, key, { value: make(), writable: true, enumerable: true, configurable: true });
+    } else {
+      obj[key] = make();
+    }
+  }
+  return obj[key];
+}
+function flattenError(error2, mapper = (issue2) => issue2.message) {
+  const fieldErrors = {};
+  const formErrors = [];
+  for (const sub of error2.issues) {
+    if (sub.path.length > 0) {
+      node(fieldErrors, sub.path[0], () => []).push(mapper(sub));
+    } else {
+      formErrors.push(mapper(sub));
+    }
+  }
+  return { formErrors, fieldErrors };
+}
+function formatError(error2, mapper = (issue2) => issue2.message) {
+  const fieldErrors = { _errors: [] };
+  const processError = (error3, path = []) => {
+    for (const issue2 of error3.issues) {
+      if (issue2.code === "invalid_union" && issue2.errors.length) {
+        issue2.errors.map((issues) => processError({ issues }, [...path, ...issue2.path]));
+      } else if (issue2.code === "invalid_key") {
+        processError({ issues: issue2.issues }, [...path, ...issue2.path]);
+      } else if (issue2.code === "invalid_element") {
+        processError({ issues: issue2.issues }, [...path, ...issue2.path]);
+      } else {
+        const fullpath = [...path, ...issue2.path];
+        if (fullpath.length === 0) {
+          fieldErrors._errors.push(mapper(issue2));
         } else {
           let curr = fieldErrors;
           let i = 0;
-          while (i < issue.path.length) {
-            const el = issue.path[i];
-            const terminal = i === issue.path.length - 1;
-            if (!terminal) {
-              curr[el] = curr[el] || { _errors: [] };
-            } else {
-              curr[el] = curr[el] || { _errors: [] };
-              curr[el]._errors.push(mapper(issue));
+          while (i < fullpath.length) {
+            const el = fullpath[i];
+            const terminal = i === fullpath.length - 1;
+            if (el === "_errors") {
+              if (terminal)
+                curr._errors.push(mapper(issue2));
+              i++;
+              continue;
             }
-            curr = curr[el];
+            if (!Object.prototype.hasOwnProperty.call(curr, el)) {
+              Object.defineProperty(curr, el, {
+                value: { _errors: [] },
+                enumerable: true,
+                writable: true,
+                configurable: true
+              });
+            }
+            const node2 = curr[el];
+            if (terminal) {
+              node2._errors.push(mapper(issue2));
+            }
+            curr = node2;
             i++;
           }
         }
       }
-    };
-    processError(this);
-    return fieldErrors;
-  }
-  static assert(value) {
-    if (!(value instanceof ZodError)) {
-      throw new Error(`Not a ZodError: ${value}`);
     }
-  }
-  toString() {
-    return this.message;
-  }
-  get message() {
-    return JSON.stringify(this.issues, util.jsonStringifyReplacer, 2);
-  }
-  get isEmpty() {
-    return this.issues.length === 0;
-  }
-  flatten(mapper = (issue) => issue.message) {
-    const fieldErrors = {};
-    const formErrors = [];
-    for (const sub of this.issues) {
-      if (sub.path.length > 0) {
-        const firstEl = sub.path[0];
-        fieldErrors[firstEl] = fieldErrors[firstEl] || [];
-        fieldErrors[firstEl].push(mapper(sub));
-      } else {
-        formErrors.push(mapper(sub));
-      }
-    }
-    return { formErrors, fieldErrors };
-  }
-  get formErrors() {
-    return this.flatten();
-  }
-}
-ZodError.create = (issues) => {
-  const error = new ZodError(issues);
-  return error;
-};
-const errorMap = (issue, _ctx) => {
-  let message;
-  switch (issue.code) {
-    case ZodIssueCode.invalid_type:
-      if (issue.received === ZodParsedType.undefined) {
-        message = "Required";
-      } else {
-        message = `Expected ${issue.expected}, received ${issue.received}`;
-      }
-      break;
-    case ZodIssueCode.invalid_literal:
-      message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util.jsonStringifyReplacer)}`;
-      break;
-    case ZodIssueCode.unrecognized_keys:
-      message = `Unrecognized key(s) in object: ${util.joinValues(issue.keys, ", ")}`;
-      break;
-    case ZodIssueCode.invalid_union:
-      message = `Invalid input`;
-      break;
-    case ZodIssueCode.invalid_union_discriminator:
-      message = `Invalid discriminator value. Expected ${util.joinValues(issue.options)}`;
-      break;
-    case ZodIssueCode.invalid_enum_value:
-      message = `Invalid enum value. Expected ${util.joinValues(issue.options)}, received '${issue.received}'`;
-      break;
-    case ZodIssueCode.invalid_arguments:
-      message = `Invalid function arguments`;
-      break;
-    case ZodIssueCode.invalid_return_type:
-      message = `Invalid function return type`;
-      break;
-    case ZodIssueCode.invalid_date:
-      message = `Invalid date`;
-      break;
-    case ZodIssueCode.invalid_string:
-      if (typeof issue.validation === "object") {
-        if ("includes" in issue.validation) {
-          message = `Invalid input: must include "${issue.validation.includes}"`;
-          if (typeof issue.validation.position === "number") {
-            message = `${message} at one or more positions greater than or equal to ${issue.validation.position}`;
-          }
-        } else if ("startsWith" in issue.validation) {
-          message = `Invalid input: must start with "${issue.validation.startsWith}"`;
-        } else if ("endsWith" in issue.validation) {
-          message = `Invalid input: must end with "${issue.validation.endsWith}"`;
-        } else {
-          util.assertNever(issue.validation);
-        }
-      } else if (issue.validation !== "regex") {
-        message = `Invalid ${issue.validation}`;
-      } else {
-        message = "Invalid";
-      }
-      break;
-    case ZodIssueCode.too_small:
-      if (issue.type === "array")
-        message = `Array must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `more than`} ${issue.minimum} element(s)`;
-      else if (issue.type === "string")
-        message = `String must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `over`} ${issue.minimum} character(s)`;
-      else if (issue.type === "number")
-        message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
-      else if (issue.type === "bigint")
-        message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
-      else if (issue.type === "date")
-        message = `Date must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${new Date(Number(issue.minimum))}`;
-      else
-        message = "Invalid input";
-      break;
-    case ZodIssueCode.too_big:
-      if (issue.type === "array")
-        message = `Array must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `less than`} ${issue.maximum} element(s)`;
-      else if (issue.type === "string")
-        message = `String must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `under`} ${issue.maximum} character(s)`;
-      else if (issue.type === "number")
-        message = `Number must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
-      else if (issue.type === "bigint")
-        message = `BigInt must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
-      else if (issue.type === "date")
-        message = `Date must be ${issue.exact ? `exactly` : issue.inclusive ? `smaller than or equal to` : `smaller than`} ${new Date(Number(issue.maximum))}`;
-      else
-        message = "Invalid input";
-      break;
-    case ZodIssueCode.custom:
-      message = `Invalid input`;
-      break;
-    case ZodIssueCode.invalid_intersection_types:
-      message = `Intersection results could not be merged`;
-      break;
-    case ZodIssueCode.not_multiple_of:
-      message = `Number must be a multiple of ${issue.multipleOf}`;
-      break;
-    case ZodIssueCode.not_finite:
-      message = "Number must be finite";
-      break;
-    default:
-      message = _ctx.defaultError;
-      util.assertNever(issue);
-  }
-  return { message };
-};
-let overrideErrorMap = errorMap;
-function getErrorMap() {
-  return overrideErrorMap;
-}
-const makeIssue = (params) => {
-  const { data, path, errorMaps, issueData } = params;
-  const fullPath = [...path, ...issueData.path || []];
-  const fullIssue = {
-    ...issueData,
-    path: fullPath
   };
-  if (issueData.message !== void 0) {
-    return {
-      ...issueData,
-      path: fullPath,
-      message: issueData.message
-    };
+  processError(error2);
+  return fieldErrors;
+}
+function finalizeParams(callee, params) {
+  return { callee: (params == null ? void 0 : params.callee) ?? callee, Err: params == null ? void 0 : params.Err };
+}
+const _parse = (_Err) => {
+  const fn = (schema, value, _ctx, _params) => {
+    const ctx = _ctx ? { ..._ctx, async: false } : { async: false };
+    const result = schema._zod.run({ value, issues: [] }, ctx);
+    if (result instanceof Promise) {
+      throw new $ZodAsyncError();
+    }
+    if (result.issues.length) {
+      const e = new ((_params == null ? void 0 : _params.Err) ?? _Err)(result.issues.map((iss) => finalizeIssue(iss, ctx, config())));
+      captureStackTrace(e, (_params == null ? void 0 : _params.callee) ?? fn);
+      throw e;
+    }
+    return result.value;
+  };
+  return fn;
+};
+const _parseAsync = (_Err) => {
+  const fn = async (schema, value, _ctx, params) => {
+    const ctx = _ctx ? { ..._ctx, async: true } : { async: true };
+    let result = schema._zod.run({ value, issues: [] }, ctx);
+    if (result instanceof Promise)
+      result = await result;
+    if (result.issues.length) {
+      const e = new ((params == null ? void 0 : params.Err) ?? _Err)(result.issues.map((iss) => finalizeIssue(iss, ctx, config())));
+      captureStackTrace(e, (params == null ? void 0 : params.callee) ?? fn);
+      throw e;
+    }
+    return result.value;
+  };
+  return fn;
+};
+const _safeParse = (_Err) => (schema, value, _ctx) => {
+  const ctx = _ctx ? { ..._ctx, async: false } : { async: false };
+  const result = schema._zod.run({ value, issues: [] }, ctx);
+  if (result instanceof Promise) {
+    throw new $ZodAsyncError();
   }
-  let errorMessage = "";
-  const maps = errorMaps.filter((m) => !!m).slice().reverse();
-  for (const map of maps) {
-    errorMessage = map(fullIssue, { data, defaultError: errorMessage }).message;
-  }
+  return result.issues.length ? failure(_Err, result.issues, ctx) : { success: true, data: result.value };
+};
+function failure(Err, issues, ctx) {
+  let error2;
   return {
-    ...issueData,
-    path: fullPath,
-    message: errorMessage
-  };
-};
-function addIssueToContext(ctx, issueData) {
-  const overrideMap = getErrorMap();
-  const issue = makeIssue({
-    issueData,
-    data: ctx.data,
-    path: ctx.path,
-    errorMaps: [
-      ctx.common.contextualErrorMap,
-      // contextual error map is first priority
-      ctx.schemaErrorMap,
-      // then schema-bound map if available
-      overrideMap,
-      // then global override map
-      overrideMap === errorMap ? void 0 : errorMap
-      // then global default map
-    ].filter((x2) => !!x2)
-  });
-  ctx.common.issues.push(issue);
-}
-class ParseStatus {
-  constructor() {
-    this.value = "valid";
-  }
-  dirty() {
-    if (this.value === "valid")
-      this.value = "dirty";
-  }
-  abort() {
-    if (this.value !== "aborted")
-      this.value = "aborted";
-  }
-  static mergeArray(status, results) {
-    const arrayValue = [];
-    for (const s of results) {
-      if (s.status === "aborted")
-        return INVALID;
-      if (s.status === "dirty")
-        status.dirty();
-      arrayValue.push(s.value);
-    }
-    return { status: status.value, value: arrayValue };
-  }
-  static async mergeObjectAsync(status, pairs) {
-    const syncPairs = [];
-    for (const pair of pairs) {
-      const key = await pair.key;
-      const value = await pair.value;
-      syncPairs.push({
-        key,
-        value
-      });
-    }
-    return ParseStatus.mergeObjectSync(status, syncPairs);
-  }
-  static mergeObjectSync(status, pairs) {
-    const finalObject = {};
-    for (const pair of pairs) {
-      const { key, value } = pair;
-      if (key.status === "aborted")
-        return INVALID;
-      if (value.status === "aborted")
-        return INVALID;
-      if (key.status === "dirty")
-        status.dirty();
-      if (value.status === "dirty")
-        status.dirty();
-      if (key.value !== "__proto__" && (typeof value.value !== "undefined" || pair.alwaysSet)) {
-        finalObject[key.value] = value.value;
+    success: false,
+    get error() {
+      if (!error2) {
+        error2 = new Err(issues.map((iss) => finalizeIssue(iss, ctx, config())));
+        issues = void 0;
+        ctx = void 0;
       }
+      return error2;
+    },
+    set error(e) {
+      error2 = e;
+      issues = void 0;
+      ctx = void 0;
     }
-    return { status: status.value, value: finalObject };
-  }
+  };
 }
-const INVALID = Object.freeze({
-  status: "aborted"
+const _safeParseAsync = (_Err) => async (schema, value, _ctx) => {
+  const ctx = _ctx ? { ..._ctx, async: true } : { async: true };
+  let result = schema._zod.run({ value, issues: [] }, ctx);
+  if (result instanceof Promise)
+    result = await result;
+  return result.issues.length ? failure(_Err, result.issues, ctx) : { success: true, data: result.value };
+};
+const COMPILE_INVALID = /* @__PURE__ */ Symbol.for("zod.compile.invalid");
+const COMPILE_FALLBACK = /* @__PURE__ */ Symbol.for("zod.compile.fallback");
+const validate = ((schema, value, _ctx) => {
+  const validator = schema._zod.bag.validator;
+  if (validator !== void 0) {
+    if (validator(value) !== COMPILE_INVALID)
+      return true;
+    if (validator.definite === true && _ctx === void 0)
+      return false;
+  }
+  return validateFallback(schema, value, _ctx);
 });
-const DIRTY = (value) => ({ status: "dirty", value });
-const OK = (value) => ({ status: "valid", value });
-const isAborted = (x2) => x2.status === "aborted";
-const isDirty = (x2) => x2.status === "dirty";
-const isValid = (x2) => x2.status === "valid";
-const isAsync = (x2) => typeof Promise !== "undefined" && x2 instanceof Promise;
-var errorUtil;
-(function(errorUtil2) {
-  errorUtil2.errToObj = (message) => typeof message === "string" ? { message } : message || {};
-  errorUtil2.toString = (message) => typeof message === "string" ? message : message == null ? void 0 : message.message;
-})(errorUtil || (errorUtil = {}));
-class ParseInputLazyPath {
-  constructor(parent, value, path, key) {
-    this._cachedPath = [];
-    this.parent = parent;
-    this.data = value;
-    this._path = path;
-    this._key = key;
-  }
-  get path() {
-    if (!this._cachedPath.length) {
-      if (Array.isArray(this._key)) {
-        this._cachedPath.push(...this._path, ...this._key);
-      } else {
-        this._cachedPath.push(...this._path, this._key);
-      }
-    }
-    return this._cachedPath;
-  }
-}
-const handleResult = (ctx, result) => {
-  if (isValid(result)) {
-    return { success: true, data: result.value };
+function validateFallback(schema, value, _ctx) {
+  const ctx = _ctx ? { ..._ctx, async: false, abortEarly: true } : { async: false, abortEarly: true };
+  const fallbackRun = schema._zod.bag.fallbackRun;
+  let result;
+  if (fallbackRun) {
+    ctx[COMPILE_FALLBACK] = true;
+    result = fallbackRun({ value, issues: [] }, ctx);
   } else {
-    if (!ctx.common.issues.length) {
-      throw new Error("Validation failed but no issues detected.");
-    }
-    return {
-      success: false,
-      get error() {
-        if (this._error)
-          return this._error;
-        const error = new ZodError(ctx.common.issues);
-        this._error = error;
-        return this._error;
-      }
-    };
+    result = schema._zod.run({ value, issues: [] }, ctx);
   }
-};
-function processCreateParams(params) {
-  if (!params)
-    return {};
-  const { errorMap: errorMap2, invalid_type_error, required_error, description } = params;
-  if (errorMap2 && (invalid_type_error || required_error)) {
-    throw new Error(`Can't use "invalid_type_error" or "required_error" in conjunction with custom error map.`);
+  if (result instanceof Promise) {
+    throw new $ZodAsyncError();
   }
-  if (errorMap2)
-    return { errorMap: errorMap2, description };
-  const customMap = (iss, ctx) => {
-    const { message } = params;
-    if (iss.code === "invalid_enum_value") {
-      return { message: message ?? ctx.defaultError };
-    }
-    if (typeof ctx.data === "undefined") {
-      return { message: message ?? required_error ?? ctx.defaultError };
-    }
-    if (iss.code !== "invalid_type")
-      return { message: ctx.defaultError };
-    return { message: message ?? invalid_type_error ?? ctx.defaultError };
-  };
-  return { errorMap: customMap, description };
+  return result.issues.length === 0;
 }
-class ZodType {
-  get description() {
-    return this._def.description;
-  }
-  _getType(input) {
-    return getParsedType(input.data);
-  }
-  _getOrReturnCtx(input, ctx) {
-    return ctx || {
-      common: input.parent.common,
-      data: input.data,
-      parsedType: getParsedType(input.data),
-      schemaErrorMap: this._def.errorMap,
-      path: input.path,
-      parent: input.parent
-    };
-  }
-  _processInputParams(input) {
-    return {
-      status: new ParseStatus(),
-      ctx: {
-        common: input.parent.common,
-        data: input.data,
-        parsedType: getParsedType(input.data),
-        schemaErrorMap: this._def.errorMap,
-        path: input.path,
-        parent: input.parent
-      }
-    };
-  }
-  _parseSync(input) {
-    const result = this._parse(input);
-    if (isAsync(result)) {
-      throw new Error("Synchronous parse encountered promise.");
+const validateAsync$1 = async (schema, value, _ctx) => {
+  const ctx = _ctx ? { ..._ctx, async: true, abortEarly: true } : { async: true, abortEarly: true };
+  let result = schema._zod.run({ value, issues: [] }, ctx);
+  if (result instanceof Promise)
+    result = await result;
+  return result.issues.length === 0;
+};
+const _encode = (_Err) => {
+  const parse2 = _parse(_Err);
+  const fn = (schema, value, _ctx, _params) => {
+    const ctx = _ctx ? { ..._ctx, direction: "backward" } : { direction: "backward" };
+    return parse2(schema, value, ctx, finalizeParams(fn, _params));
+  };
+  return fn;
+};
+const _decode = (_Err) => {
+  const parse2 = _parse(_Err);
+  const fn = (schema, value, _ctx, _params) => {
+    return parse2(schema, value, _ctx, finalizeParams(fn, _params));
+  };
+  return fn;
+};
+const _encodeAsync = (_Err) => {
+  const parseAsync2 = _parseAsync(_Err);
+  const fn = async (schema, value, _ctx, _params) => {
+    const ctx = _ctx ? { ..._ctx, direction: "backward" } : { direction: "backward" };
+    return await parseAsync2(schema, value, ctx, finalizeParams(fn, _params));
+  };
+  return fn;
+};
+const _decodeAsync = (_Err) => {
+  const parseAsync2 = _parseAsync(_Err);
+  const fn = async (schema, value, _ctx, _params) => {
+    return await parseAsync2(schema, value, _ctx, finalizeParams(fn, _params));
+  };
+  return fn;
+};
+const _safeEncode = (_Err) => (schema, value, _ctx) => {
+  const ctx = _ctx ? { ..._ctx, direction: "backward" } : { direction: "backward" };
+  return _safeParse(_Err)(schema, value, ctx);
+};
+const _safeDecode = (_Err) => (schema, value, _ctx) => {
+  return _safeParse(_Err)(schema, value, _ctx);
+};
+const _safeEncodeAsync = (_Err) => async (schema, value, _ctx) => {
+  const ctx = _ctx ? { ..._ctx, direction: "backward" } : { direction: "backward" };
+  return _safeParseAsync(_Err)(schema, value, ctx);
+};
+const _safeDecodeAsync = (_Err) => async (schema, value, _ctx) => {
+  return _safeParseAsync(_Err)(schema, value, _ctx);
+};
+const cuid = /^[cC][0-9a-z]{6,}$/;
+const cuid2 = /^[0-9a-z]+$/;
+const ulid = /^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$/;
+const xid = /^[0-9a-vA-V]{20}$/;
+const ksuid = /^[A-Za-z0-9]{27}$/;
+const nanoid = /^[a-zA-Z0-9_-]{21}$/;
+function nanoidOfLength(length) {
+  return new RegExp(`^[a-zA-Z0-9_-]{${length}}$`);
+}
+const duration = /^P(?:(\d+W)|(?!.*W)(?=\d|T\d)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+([.,]\d+)?S)?)?)$/;
+const guid = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$/;
+const uuid = (version2) => {
+  if (!version2)
+    return /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/;
+  return new RegExp(`^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-${version2}[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$`);
+};
+const email$1 = /^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/;
+const _emoji$1 = `^(?=[\\s\\S]*[\\p{Extended_Pictographic}\\p{Regional_Indicator}\\u20E3])[\\p{Extended_Pictographic}\\p{Emoji_Component}]+$`;
+function emoji() {
+  return new RegExp(_emoji$1, "u");
+}
+const ipv4 = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/;
+const ipv6 = /^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:))$/;
+const cidrv4 = /^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\/([0-9]|[1-2][0-9]|3[0-2])$/;
+const cidrv6 = /^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:))\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$/;
+const base64 = /^$|^(?:[0-9a-zA-Z+/]{4})*(?:(?:[0-9a-zA-Z+/]{2}==)|(?:[0-9a-zA-Z+/]{3}=))?$/;
+const base64url = /^(?:[A-Za-z0-9_-]{4})*(?:[A-Za-z0-9_-]{2,3})?$/;
+const httpProtocol = /^https?$/;
+const e164 = /^\+[1-9]\d{6,14}$/;
+const dateSource = `(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))`;
+function anchor(source) {
+  return new RegExp(`^${source}$`);
+}
+const date = /* @__PURE__ */ anchor(dateSource);
+function timeSource(args) {
+  const hhmm = `(?:[01]\\d|2[0-3]):[0-5]\\d`;
+  const regex = typeof args.precision === "number" ? args.precision === -1 ? `${hhmm}` : args.precision === 0 ? `${hhmm}:[0-5]\\d` : `${hhmm}:[0-5]\\d\\.\\d{${args.precision}}` : args.seconds ? `${hhmm}:[0-5]\\d(?:\\.\\d+)?` : `${hhmm}(?::[0-5]\\d(?:\\.\\d+)?)?`;
+  return regex;
+}
+function time(args) {
+  return new RegExp(`^${timeSource(args)}$`);
+}
+function datetime(args) {
+  const opts = ["Z"];
+  if (args.offset)
+    opts.push(`([+-](?:[01]\\d|2[0-3]):[0-5]\\d)`);
+  const qualified = `${timeSource({ precision: args.precision, seconds: true })}(?:${opts.join("|")})`;
+  const timeRegex = args.local ? `${qualified}|${timeSource({ precision: args.precision })}` : qualified;
+  return new RegExp(`^${dateSource}T(?:${timeRegex})$`);
+}
+const anyString = /^[\s\S]{0,}$/;
+const integer = /^-?\d+$/;
+const number$1 = /^-?\d+(?:\.\d+)?$/;
+const boolean$1 = /^(?:true|false)$/i;
+const lowercase = /^[^A-Z]*$/;
+const uppercase = /^[^a-z]*$/;
+const $ZodCheck = /* @__PURE__ */ $constructor("$ZodCheck", (inst, def) => {
+  var _a2;
+  inst._zod ?? (inst._zod = {});
+  inst._zod.def = def;
+  (_a2 = inst._zod).onattach ?? (_a2.onattach = []);
+});
+const _whenHasLength = (payload) => {
+  const val = payload.value;
+  return !nullish(val) && val.length !== void 0;
+};
+const numericOriginMap = {
+  number: "number",
+  bigint: "bigint",
+  object: "date"
+};
+const $ZodCheckLessThan = /* @__PURE__ */ $constructor("$ZodCheckLessThan", (inst, def) => {
+  $ZodCheck.init(inst, def);
+  const origin = numericOriginMap[typeof def.value];
+  inst._zod.check = (payload) => {
+    if (def.inclusive ? payload.value <= def.value : payload.value < def.value) {
+      return;
     }
-    return result;
-  }
-  _parseAsync(input) {
-    const result = this._parse(input);
-    return Promise.resolve(result);
-  }
-  parse(data, params) {
-    const result = this.safeParse(data, params);
-    if (result.success)
-      return result.data;
-    throw result.error;
-  }
-  safeParse(data, params) {
-    const ctx = {
-      common: {
-        issues: [],
-        async: (params == null ? void 0 : params.async) ?? false,
-        contextualErrorMap: params == null ? void 0 : params.errorMap
-      },
-      path: (params == null ? void 0 : params.path) || [],
-      schemaErrorMap: this._def.errorMap,
-      parent: null,
-      data,
-      parsedType: getParsedType(data)
-    };
-    const result = this._parseSync({ data, path: ctx.path, parent: ctx });
-    return handleResult(ctx, result);
-  }
-  "~validate"(data) {
-    var _a, _b;
-    const ctx = {
-      common: {
-        issues: [],
-        async: !!this["~standard"].async
-      },
-      path: [],
-      schemaErrorMap: this._def.errorMap,
-      parent: null,
-      data,
-      parsedType: getParsedType(data)
-    };
-    if (!this["~standard"].async) {
-      try {
-        const result = this._parseSync({ data, path: [], parent: ctx });
-        return isValid(result) ? {
-          value: result.value
-        } : {
-          issues: ctx.common.issues
-        };
-      } catch (err) {
-        if ((_b = (_a = err == null ? void 0 : err.message) == null ? void 0 : _a.toLowerCase()) == null ? void 0 : _b.includes("encountered")) {
-          this["~standard"].async = true;
-        }
-        ctx.common = {
-          issues: [],
-          async: true
-        };
-      }
-    }
-    return this._parseAsync({ data, path: [], parent: ctx }).then((result) => isValid(result) ? {
-      value: result.value
-    } : {
-      issues: ctx.common.issues
+    payload.issues.push({
+      origin: numericOriginMap[typeof payload.value] ?? origin,
+      code: "too_big",
+      maximum: typeof def.value === "object" ? def.value.getTime() : def.value,
+      input: payload.value,
+      inclusive: def.inclusive,
+      inst,
+      continue: !def.abort
     });
-  }
-  async parseAsync(data, params) {
-    const result = await this.safeParseAsync(data, params);
-    if (result.success)
-      return result.data;
-    throw result.error;
-  }
-  async safeParseAsync(data, params) {
-    const ctx = {
-      common: {
-        issues: [],
-        contextualErrorMap: params == null ? void 0 : params.errorMap,
-        async: true
-      },
-      path: (params == null ? void 0 : params.path) || [],
-      schemaErrorMap: this._def.errorMap,
-      parent: null,
-      data,
-      parsedType: getParsedType(data)
-    };
-    const maybeAsyncResult = this._parse({ data, path: ctx.path, parent: ctx });
-    const result = await (isAsync(maybeAsyncResult) ? maybeAsyncResult : Promise.resolve(maybeAsyncResult));
-    return handleResult(ctx, result);
-  }
-  refine(check, message) {
-    const getIssueProperties = (val) => {
-      if (typeof message === "string" || typeof message === "undefined") {
-        return { message };
-      } else if (typeof message === "function") {
-        return message(val);
-      } else {
-        return message;
+  };
+});
+const $ZodCheckGreaterThan = /* @__PURE__ */ $constructor("$ZodCheckGreaterThan", (inst, def) => {
+  $ZodCheck.init(inst, def);
+  const origin = numericOriginMap[typeof def.value];
+  inst._zod.check = (payload) => {
+    if (def.inclusive ? payload.value >= def.value : payload.value > def.value) {
+      return;
+    }
+    payload.issues.push({
+      origin: numericOriginMap[typeof payload.value] ?? origin,
+      code: "too_small",
+      minimum: typeof def.value === "object" ? def.value.getTime() : def.value,
+      input: payload.value,
+      inclusive: def.inclusive,
+      inst,
+      continue: !def.abort
+    });
+  };
+});
+const $ZodCheckMultipleOf = /* @__PURE__ */ $constructor("$ZodCheckMultipleOf", (inst, def) => {
+  $ZodCheck.init(inst, def);
+  inst._zod.check = (payload) => {
+    if (typeof payload.value !== typeof def.value)
+      throw new Error("Cannot mix number and bigint in multiple_of check.");
+    const isMultiple = typeof payload.value === "bigint" ? (
+      // `value % 0n` throws, and nothing is a multiple of zero — the number branch already fails this way via NaN
+      def.value !== BigInt(0) && payload.value % def.value === BigInt(0)
+    ) : floatSafeRemainder(payload.value, def.value) === 0;
+    if (isMultiple)
+      return;
+    payload.issues.push({
+      origin: typeof payload.value,
+      code: "not_multiple_of",
+      divisor: def.value,
+      input: payload.value,
+      inst,
+      continue: !def.abort
+    });
+  };
+});
+const $ZodCheckNumberFormat = /* @__PURE__ */ $constructor("$ZodCheckNumberFormat", (inst, def) => {
+  var _a2;
+  $ZodCheck.init(inst, def);
+  def.format = def.format || "float64";
+  const isInt = (_a2 = def.format) == null ? void 0 : _a2.includes("int");
+  const origin = isInt ? "int" : "number";
+  const [minimum, maximum] = NUMBER_FORMAT_RANGES[def.format];
+  inst._zod.check = (payload) => {
+    const input = payload.value;
+    if (isInt) {
+      if (!Number.isInteger(input)) {
+        payload.issues.push({
+          expected: origin,
+          format: def.format,
+          code: "invalid_type",
+          continue: false,
+          input,
+          inst
+        });
+        return;
       }
-    };
-    return this._refinement((val, ctx) => {
-      const result = check(val);
-      const setError = () => ctx.addIssue({
-        code: ZodIssueCode.custom,
-        ...getIssueProperties(val)
+      if (!Number.isSafeInteger(input)) {
+        if (input > 0) {
+          payload.issues.push({
+            input,
+            code: "too_big",
+            maximum: Number.MAX_SAFE_INTEGER,
+            note: "Integers must be within the safe integer range.",
+            inst,
+            origin,
+            inclusive: true,
+            continue: !def.abort
+          });
+        } else {
+          payload.issues.push({
+            input,
+            code: "too_small",
+            minimum: Number.MIN_SAFE_INTEGER,
+            note: "Integers must be within the safe integer range.",
+            inst,
+            origin,
+            inclusive: true,
+            continue: !def.abort
+          });
+        }
+        return;
+      }
+    }
+    if (input < minimum) {
+      payload.issues.push({
+        origin: "number",
+        input,
+        code: "too_small",
+        minimum,
+        inclusive: true,
+        inst,
+        continue: !def.abort
       });
-      if (typeof Promise !== "undefined" && result instanceof Promise) {
-        return result.then((data) => {
-          if (!data) {
-            setError();
-            return false;
-          } else {
-            return true;
-          }
+    }
+    if (input > maximum) {
+      payload.issues.push({
+        origin: "number",
+        input,
+        code: "too_big",
+        maximum,
+        inclusive: true,
+        inst,
+        continue: !def.abort
+      });
+    }
+  };
+});
+const $ZodCheckMaxLength = /* @__PURE__ */ $constructor("$ZodCheckMaxLength", (inst, def) => {
+  var _a2;
+  $ZodCheck.init(inst, def);
+  (_a2 = inst._zod.def).when ?? (_a2.when = _whenHasLength);
+  inst._zod.check = (payload) => {
+    const input = payload.value;
+    const units = input.length;
+    const length = typeof input === "string" && units > def.maximum ? codePointLength(input) : units;
+    if (length <= def.maximum)
+      return;
+    const origin = getLengthableOrigin(input);
+    payload.issues.push({
+      origin,
+      code: "too_big",
+      maximum: def.maximum,
+      inclusive: true,
+      input,
+      inst,
+      continue: !def.abort
+    });
+  };
+});
+const $ZodCheckMinLength = /* @__PURE__ */ $constructor("$ZodCheckMinLength", (inst, def) => {
+  var _a2;
+  $ZodCheck.init(inst, def);
+  (_a2 = inst._zod.def).when ?? (_a2.when = _whenHasLength);
+  inst._zod.check = (payload) => {
+    const input = payload.value;
+    const units = input.length;
+    const length = typeof input === "string" && units >= def.minimum && units < def.minimum * 2 ? codePointLength(input) : units;
+    if (length >= def.minimum)
+      return;
+    const origin = getLengthableOrigin(input);
+    payload.issues.push({
+      origin,
+      code: "too_small",
+      minimum: def.minimum,
+      inclusive: true,
+      input,
+      inst,
+      continue: !def.abort
+    });
+  };
+});
+const $ZodCheckLengthEquals = /* @__PURE__ */ $constructor("$ZodCheckLengthEquals", (inst, def) => {
+  var _a2;
+  $ZodCheck.init(inst, def);
+  (_a2 = inst._zod.def).when ?? (_a2.when = _whenHasLength);
+  inst._zod.check = (payload) => {
+    const input = payload.value;
+    const units = input.length;
+    const length = typeof input === "string" && units >= def.length && units <= def.length * 2 ? codePointLength(input) : units;
+    if (length === def.length)
+      return;
+    const origin = getLengthableOrigin(input);
+    const tooBig = length > def.length;
+    payload.issues.push({
+      origin,
+      ...tooBig ? { code: "too_big", maximum: def.length } : { code: "too_small", minimum: def.length },
+      inclusive: true,
+      exact: true,
+      input: payload.value,
+      inst,
+      continue: !def.abort
+    });
+  };
+});
+const $ZodCheckStringFormat = /* @__PURE__ */ $constructor("$ZodCheckStringFormat", (inst, def) => {
+  var _a2, _b;
+  $ZodCheck.init(inst, def);
+  if (def.pattern)
+    (_a2 = inst._zod).check ?? (_a2.check = (payload) => {
+      def.pattern.lastIndex = 0;
+      if (def.pattern.test(payload.value))
+        return;
+      payload.issues.push({
+        origin: "string",
+        code: "invalid_format",
+        format: def.format,
+        input: payload.value,
+        ...def.pattern ? { pattern: def.pattern.toString() } : {},
+        inst,
+        continue: !def.abort
+      });
+    });
+  else
+    (_b = inst._zod).check ?? (_b.check = () => {
+    });
+});
+const $ZodCheckRegex = /* @__PURE__ */ $constructor("$ZodCheckRegex", (inst, def) => {
+  $ZodCheckStringFormat.init(inst, def);
+  inst._zod.check = (payload) => {
+    def.pattern.lastIndex = 0;
+    if (def.pattern.test(payload.value))
+      return;
+    payload.issues.push({
+      origin: "string",
+      code: "invalid_format",
+      format: "regex",
+      input: payload.value,
+      pattern: def.pattern.toString(),
+      inst,
+      continue: !def.abort
+    });
+  };
+});
+const $ZodCheckLowerCase = /* @__PURE__ */ $constructor("$ZodCheckLowerCase", (inst, def) => {
+  def.pattern ?? (def.pattern = lowercase);
+  $ZodCheckStringFormat.init(inst, def);
+});
+const $ZodCheckUpperCase = /* @__PURE__ */ $constructor("$ZodCheckUpperCase", (inst, def) => {
+  def.pattern ?? (def.pattern = uppercase);
+  $ZodCheckStringFormat.init(inst, def);
+});
+const $ZodCheckIncludes = /* @__PURE__ */ $constructor("$ZodCheckIncludes", (inst, def) => {
+  $ZodCheck.init(inst, def);
+  const escapedRegex = escapeRegex(def.includes);
+  const pattern = new RegExp(typeof def.position === "number" ? `^.{${def.position},}${escapedRegex}` : escapedRegex);
+  def.pattern = pattern;
+  inst._zod.check = (payload) => {
+    if (payload.value.includes(def.includes, def.position))
+      return;
+    payload.issues.push({
+      origin: "string",
+      code: "invalid_format",
+      format: "includes",
+      includes: def.includes,
+      input: payload.value,
+      inst,
+      continue: !def.abort
+    });
+  };
+});
+const $ZodCheckStartsWith = /* @__PURE__ */ $constructor("$ZodCheckStartsWith", (inst, def) => {
+  $ZodCheck.init(inst, def);
+  const pattern = new RegExp(`^${escapeRegex(def.prefix)}.*`);
+  def.pattern ?? (def.pattern = pattern);
+  inst._zod.check = (payload) => {
+    if (payload.value.startsWith(def.prefix))
+      return;
+    payload.issues.push({
+      origin: "string",
+      code: "invalid_format",
+      format: "starts_with",
+      prefix: def.prefix,
+      input: payload.value,
+      inst,
+      continue: !def.abort
+    });
+  };
+});
+const $ZodCheckEndsWith = /* @__PURE__ */ $constructor("$ZodCheckEndsWith", (inst, def) => {
+  $ZodCheck.init(inst, def);
+  const pattern = new RegExp(`.*${escapeRegex(def.suffix)}$`);
+  def.pattern ?? (def.pattern = pattern);
+  inst._zod.check = (payload) => {
+    if (payload.value.endsWith(def.suffix))
+      return;
+    payload.issues.push({
+      origin: "string",
+      code: "invalid_format",
+      format: "ends_with",
+      suffix: def.suffix,
+      input: payload.value,
+      inst,
+      continue: !def.abort
+    });
+  };
+});
+const $ZodCheckOverwrite = /* @__PURE__ */ $constructor("$ZodCheckOverwrite", (inst, def) => {
+  $ZodCheck.init(inst, def);
+  inst._zod.check = (payload) => {
+    payload.value = def.tx(payload.value);
+  };
+});
+class Doc {
+  constructor(args = [], closed = {}) {
+    this.content = [];
+    this.indent = 0;
+    this.args = args;
+    this.closed = closed;
+  }
+  // the compiler catches a child's throw and keeps writing into this doc, so the indent has to unwind with it
+  indented(fn) {
+    this.indent += 1;
+    try {
+      fn(this);
+    } finally {
+      this.indent -= 1;
+    }
+  }
+  write(arg) {
+    if (typeof arg === "function") {
+      arg(this, { execution: "sync" });
+      arg(this, { execution: "async" });
+      return;
+    }
+    const content = arg;
+    const lines = content.split("\n").filter((x2) => x2);
+    const minIndent = Math.min(...lines.map((x2) => x2.length - x2.trimStart().length));
+    const dedented = lines.map((x2) => x2.slice(minIndent)).map((x2) => " ".repeat(this.indent * 2) + x2);
+    for (const line of dedented) {
+      this.content.push(line);
+    }
+  }
+  compile() {
+    const F2 = Function;
+    const content = (this == null ? void 0 : this.content) ?? [``];
+    const factory = new F2(...Object.keys(this.closed), `return function (${this.args.join(", ")}) {
+${content.join("\n")}
+};`);
+    return factory(...Object.values(this.closed));
+  }
+}
+const version = {
+  major: 4,
+  minor: 6,
+  patch: 5
+};
+const $ZodType = /* @__PURE__ */ $constructor("$ZodType", (inst, def) => {
+  var _a3;
+  var _a2;
+  inst ?? (inst = {});
+  inst._zod.def = def;
+  inst._zod.bag = inst._zod.bag || {};
+  inst._zod.version = version;
+  const defChecks = inst._zod.def.checks;
+  const checks = inst._zod.traits.has("$ZodCheck") ? [inst, ...defChecks ?? []] : (defChecks == null ? void 0 : defChecks.length) ? [...defChecks] : [];
+  for (const ch of checks) {
+    for (const fn of ch._zod.onattach) {
+      fn(inst);
+    }
+  }
+  if (checks.length === 0) {
+    (_a2 = inst._zod).deferred ?? (_a2.deferred = []);
+    (_a3 = inst._zod.deferred) == null ? void 0 : _a3.push(() => {
+      inst._zod.run = inst._zod.parse;
+    });
+  } else {
+    const runChecks = (payload, checks2, ctx) => {
+      if (payload.memo)
+        return payload;
+      let isAborted = aborted(payload);
+      let asyncResult;
+      for (const ch of checks2) {
+        if (ch._zod.def.when) {
+          if (explicitlyAborted(payload))
+            continue;
+          const shouldRun = ch._zod.def.when(payload);
+          if (!shouldRun)
+            continue;
+        } else if (isAborted) {
+          continue;
+        }
+        const currLen = payload.issues.length;
+        const _2 = ch._zod.check(payload);
+        if (_2 instanceof Promise && (ctx == null ? void 0 : ctx.async) === false) {
+          throw new $ZodAsyncError();
+        }
+        if (asyncResult || _2 instanceof Promise) {
+          asyncResult = (asyncResult ?? Promise.resolve()).then(async () => {
+            await _2;
+            const nextLen = payload.issues.length;
+            if (nextLen === currLen)
+              return;
+            attachSchema(payload.issues, currLen, inst);
+            if (!isAborted)
+              isAborted = aborted(payload, currLen);
+          });
+        } else {
+          const nextLen = payload.issues.length;
+          if (nextLen === currLen)
+            continue;
+          attachSchema(payload.issues, currLen, inst);
+          if (!isAborted)
+            isAborted = aborted(payload, currLen);
+        }
+      }
+      if (asyncResult) {
+        return asyncResult.then(() => {
+          return payload;
         });
       }
-      if (!result) {
-        setError();
-        return false;
-      } else {
-        return true;
+      return payload;
+    };
+    const handleCanaryResult = (canary, payload, ctx) => {
+      if (aborted(canary)) {
+        canary.aborted = true;
+        return canary;
       }
-    });
-  }
-  refinement(check, refinementData) {
-    return this._refinement((val, ctx) => {
-      if (!check(val)) {
-        ctx.addIssue(typeof refinementData === "function" ? refinementData(val, ctx) : refinementData);
-        return false;
-      } else {
-        return true;
+      const checkResult = runChecks(payload, checks, ctx);
+      if (checkResult instanceof Promise) {
+        if (ctx.async === false)
+          throw new $ZodAsyncError();
+        return checkResult.then((checkResult2) => inst._zod.parse(checkResult2, ctx));
       }
-    });
-  }
-  _refinement(refinement) {
-    return new ZodEffects({
-      schema: this,
-      typeName: ZodFirstPartyTypeKind.ZodEffects,
-      effect: { type: "refinement", refinement }
-    });
-  }
-  superRefine(refinement) {
-    return this._refinement(refinement);
-  }
-  constructor(def) {
-    this.spa = this.safeParseAsync;
-    this._def = def;
-    this.parse = this.parse.bind(this);
-    this.safeParse = this.safeParse.bind(this);
-    this.parseAsync = this.parseAsync.bind(this);
-    this.safeParseAsync = this.safeParseAsync.bind(this);
-    this.spa = this.spa.bind(this);
-    this.refine = this.refine.bind(this);
-    this.refinement = this.refinement.bind(this);
-    this.superRefine = this.superRefine.bind(this);
-    this.optional = this.optional.bind(this);
-    this.nullable = this.nullable.bind(this);
-    this.nullish = this.nullish.bind(this);
-    this.array = this.array.bind(this);
-    this.promise = this.promise.bind(this);
-    this.or = this.or.bind(this);
-    this.and = this.and.bind(this);
-    this.transform = this.transform.bind(this);
-    this.brand = this.brand.bind(this);
-    this.default = this.default.bind(this);
-    this.catch = this.catch.bind(this);
-    this.describe = this.describe.bind(this);
-    this.pipe = this.pipe.bind(this);
-    this.readonly = this.readonly.bind(this);
-    this.isNullable = this.isNullable.bind(this);
-    this.isOptional = this.isOptional.bind(this);
-    this["~standard"] = {
-      version: 1,
-      vendor: "zod",
-      validate: (data) => this["~validate"](data)
+      return inst._zod.parse(checkResult, ctx);
+    };
+    inst._zod.run = (payload, ctx) => {
+      if (ctx.skipChecks) {
+        return inst._zod.parse(payload, ctx);
+      }
+      if (ctx.direction === "backward") {
+        const canary = inst._zod.parse({ value: payload.value, issues: [] }, { ...ctx, skipChecks: true });
+        if (canary instanceof Promise) {
+          return canary.then((canary2) => {
+            return handleCanaryResult(canary2, payload, ctx);
+          });
+        }
+        return handleCanaryResult(canary, payload, ctx);
+      }
+      const result = inst._zod.parse(payload, ctx);
+      if (result instanceof Promise) {
+        if (ctx.async === false)
+          throw new $ZodAsyncError();
+        return result.then((result2) => runChecks(result2, checks, ctx));
+      }
+      return runChecks(result, checks, ctx);
     };
   }
-  optional() {
-    return ZodOptional.create(this, this._def);
+}, {
+  // Wrappers extend this by installing a richer factory over it; reading it eagerly would defeat the laziness.
+  get "~standard"() {
+    return hide(this, "~standard", standardProps(this));
+  },
+  set "~standard"(value) {
+    own(this, "~standard", value);
   }
-  nullable() {
-    return ZodNullable.create(this, this._def);
-  }
-  nullish() {
-    return this.nullable().optional();
-  }
-  array() {
-    return ZodArray.create(this);
-  }
-  promise() {
-    return ZodPromise.create(this, this._def);
-  }
-  or(option) {
-    return ZodUnion.create([this, option], this._def);
-  }
-  and(incoming) {
-    return ZodIntersection.create(this, incoming, this._def);
-  }
-  transform(transform) {
-    return new ZodEffects({
-      ...processCreateParams(this._def),
-      schema: this,
-      typeName: ZodFirstPartyTypeKind.ZodEffects,
-      effect: { type: "transform", transform }
-    });
-  }
-  default(def) {
-    const defaultValueFunc = typeof def === "function" ? def : () => def;
-    return new ZodDefault({
-      ...processCreateParams(this._def),
-      innerType: this,
-      defaultValue: defaultValueFunc,
-      typeName: ZodFirstPartyTypeKind.ZodDefault
-    });
-  }
-  brand() {
-    return new ZodBranded({
-      typeName: ZodFirstPartyTypeKind.ZodBranded,
-      type: this,
-      ...processCreateParams(this._def)
-    });
-  }
-  catch(def) {
-    const catchValueFunc = typeof def === "function" ? def : () => def;
-    return new ZodCatch({
-      ...processCreateParams(this._def),
-      innerType: this,
-      catchValue: catchValueFunc,
-      typeName: ZodFirstPartyTypeKind.ZodCatch
-    });
-  }
-  describe(description) {
-    const This = this.constructor;
-    return new This({
-      ...this._def,
-      description
-    });
-  }
-  pipe(target) {
-    return ZodPipeline.create(this, target);
-  }
-  readonly() {
-    return ZodReadonly.create(this);
-  }
-  isOptional() {
-    return this.safeParse(void 0).success;
-  }
-  isNullable() {
-    return this.safeParse(null).success;
-  }
+});
+const toStandardResult = (r2, ctx) => r2.issues.length ? { issues: r2.issues.map((iss) => finalizeIssue(iss, ctx, config())) } : { value: r2.value };
+async function validateAsync(inst, value) {
+  const ctx = { async: true };
+  return toStandardResult(await inst._zod.run({ value, issues: [] }, ctx), ctx);
 }
-const cuidRegex = /^c[^\s-]{8,}$/i;
-const cuid2Regex = /^[0-9a-z]+$/;
-const ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/i;
-const uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/i;
-const nanoidRegex = /^[a-z0-9_-]{21}$/i;
-const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/;
-const durationRegex = /^[-+]?P(?!$)(?:(?:[-+]?\d+Y)|(?:[-+]?\d+[.,]\d+Y$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:(?:[-+]?\d+W)|(?:[-+]?\d+[.,]\d+W$))?(?:(?:[-+]?\d+D)|(?:[-+]?\d+[.,]\d+D$))?(?:T(?=[\d+-])(?:(?:[-+]?\d+H)|(?:[-+]?\d+[.,]\d+H$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:[-+]?\d+(?:[.,]\d+)?S)?)??$/;
-const emailRegex = /^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-\.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i;
-const _emojiRegex = `^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$`;
-let emojiRegex;
-const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/;
-const ipv4CidrRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\/(3[0-2]|[12]?[0-9])$/;
-const ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
-const ipv6CidrRegex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$/;
-const base64Regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-const base64urlRegex = /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/;
-const dateRegexSource = `((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))`;
-const dateRegex = new RegExp(`^${dateRegexSource}$`);
-function timeRegexSource(args) {
-  let secondsRegexSource = `[0-5]\\d`;
-  if (args.precision) {
-    secondsRegexSource = `${secondsRegexSource}\\.\\d{${args.precision}}`;
-  } else if (args.precision == null) {
-    secondsRegexSource = `${secondsRegexSource}(\\.\\d+)?`;
-  }
-  const secondsQuantifier = args.precision ? "+" : "?";
-  return `([01]\\d|2[0-3]):[0-5]\\d(:${secondsRegexSource})${secondsQuantifier}`;
+function standardProps(inst) {
+  return {
+    validate: (value) => {
+      const ctx = { async: false };
+      try {
+        const r2 = inst._zod.run({ value, issues: [] }, ctx);
+        if (!(r2 instanceof Promise))
+          return toStandardResult(r2, ctx);
+      } catch (_2) {
+      }
+      return validateAsync(inst, value);
+    },
+    vendor: "zod",
+    version: 1
+  };
 }
-function timeRegex(args) {
-  return new RegExp(`^${timeRegexSource(args)}$`);
-}
-function datetimeRegex(args) {
-  let regex = `${dateRegexSource}T${timeRegexSource(args)}`;
-  const opts = [];
-  opts.push(args.local ? `Z?` : `Z`);
-  if (args.offset)
-    opts.push(`([+-]\\d{2}:?\\d{2})`);
-  regex = `${regex}(${opts.join("|")})`;
-  return new RegExp(`^${regex}$`);
-}
-function isValidIP(ip, version) {
-  if ((version === "v4" || !version) && ipv4Regex.test(ip)) {
+const $ZodString = /* @__PURE__ */ $constructor("$ZodString", (inst, def) => {
+  $ZodType.init(inst, def);
+  inst._zod.pattern = def.pattern ?? anyString;
+  inst._zod.parse = (payload, _2) => {
+    if (def.coerce)
+      try {
+        payload.value = String(payload.value);
+      } catch (_3) {
+      }
+    if (typeof payload.value === "string")
+      return payload;
+    payload.issues.push({
+      expected: "string",
+      code: "invalid_type",
+      input: payload.value,
+      inst
+    });
+    return payload;
+  };
+});
+const $ZodStringFormat = /* @__PURE__ */ $constructor("$ZodStringFormat", (inst, def) => {
+  $ZodCheckStringFormat.init(inst, def);
+  $ZodString.init(inst, def);
+});
+const $ZodGUID = /* @__PURE__ */ $constructor("$ZodGUID", (inst, def) => {
+  def.pattern ?? (def.pattern = guid);
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodUUID = /* @__PURE__ */ $constructor("$ZodUUID", (inst, def) => {
+  if (def.version) {
+    const versionMap = {
+      v1: 1,
+      v2: 2,
+      v3: 3,
+      v4: 4,
+      v5: 5,
+      v6: 6,
+      v7: 7,
+      v8: 8
+    };
+    const v2 = versionMap[def.version];
+    if (v2 === void 0)
+      throw new Error(`Invalid UUID version: "${def.version}"`);
+    def.pattern ?? (def.pattern = uuid(v2));
+  } else
+    def.pattern ?? (def.pattern = uuid());
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodEmail = /* @__PURE__ */ $constructor("$ZodEmail", (inst, def) => {
+  def.pattern ?? (def.pattern = email$1);
+  $ZodStringFormat.init(inst, def);
+});
+const URL_BAD_FORMAT = 1;
+const URL_UNPARSEABLE = 2;
+function canParseURL(input) {
+  try {
+    if (typeof URL !== "undefined" && typeof URL.canParse === "function")
+      return URL.canParse(input);
+    new URL(input);
     return true;
+  } catch {
+    return false;
   }
-  if ((version === "v6" || !version) && ipv6Regex.test(ip)) {
-    return true;
-  }
-  return false;
 }
-function isValidJWT(jwt, alg) {
-  if (!jwtRegex.test(jwt))
+function validateURL(trimmed, def) {
+  if (!("normalize" in def) && !("hostname" in def) && !("protocol" in def)) {
+    return canParseURL(trimmed) || URL_UNPARSEABLE;
+  }
+  return parseURLObject(trimmed, def);
+}
+function parseURLObject(trimmed, def) {
+  var _a2;
+  if (!def.normalize && ((_a2 = def.protocol) == null ? void 0 : _a2.source) === httpProtocol.source && !/^https?:\/\//i.test(trimmed)) {
+    return URL_BAD_FORMAT;
+  }
+  try {
+    if (typeof URL !== "undefined") {
+      const URLStatic = URL;
+      if (typeof URLStatic.parse === "function")
+        return URLStatic.parse(trimmed) ?? URL_UNPARSEABLE;
+    }
+    return new URL(trimmed);
+  } catch {
+    return URL_UNPARSEABLE;
+  }
+}
+const asciiTabOrNewline = /[\t\n\r]/g;
+function stripTabAndNewline(value) {
+  return value.replace(asciiTabOrNewline, "");
+}
+function urlHostnameOk(url, hostname) {
+  hostname.lastIndex = 0;
+  return hostname.test(url.hostname);
+}
+function urlProtocolOk(url, protocol) {
+  protocol.lastIndex = 0;
+  return protocol.test(url.protocol.endsWith(":") ? url.protocol.slice(0, -1) : url.protocol);
+}
+const $ZodURL = /* @__PURE__ */ $constructor("$ZodURL", (inst, def) => {
+  $ZodStringFormat.init(inst, def);
+  inst._zod.check = (payload) => {
+    try {
+      const trimmed = payload.value.trim();
+      const url = validateURL(trimmed, def);
+      if (url === URL_BAD_FORMAT) {
+        payload.issues.push({
+          code: "invalid_format",
+          format: "url",
+          note: "Invalid URL format",
+          input: payload.value,
+          inst,
+          continue: !def.abort
+        });
+        return;
+      }
+      if (url === URL_UNPARSEABLE) {
+        payload.issues.push({
+          code: "invalid_format",
+          format: "url",
+          input: payload.value,
+          inst,
+          continue: !def.abort
+        });
+        return;
+      }
+      if (url === true) {
+        payload.value = stripTabAndNewline(trimmed);
+        return;
+      }
+      if (def.hostname && !urlHostnameOk(url, def.hostname)) {
+        payload.issues.push({
+          code: "invalid_format",
+          format: "url",
+          note: "Invalid hostname",
+          pattern: def.hostname.source,
+          input: payload.value,
+          inst,
+          continue: !def.abort
+        });
+      }
+      if (def.protocol && !urlProtocolOk(url, def.protocol)) {
+        payload.issues.push({
+          code: "invalid_format",
+          format: "url",
+          note: "Invalid protocol",
+          pattern: def.protocol.source,
+          input: payload.value,
+          inst,
+          continue: !def.abort
+        });
+      }
+      payload.value = def.normalize ? url.href : stripTabAndNewline(trimmed);
+      return;
+    } catch (_2) {
+      payload.issues.push({
+        code: "invalid_format",
+        format: "url",
+        input: payload.value,
+        inst,
+        continue: !def.abort
+      });
+    }
+  };
+});
+const $ZodEmoji = /* @__PURE__ */ $constructor("$ZodEmoji", (inst, def) => {
+  def.pattern ?? (def.pattern = emoji());
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodNanoID = /* @__PURE__ */ $constructor("$ZodNanoID", (inst, def) => {
+  if (def.length !== void 0 && (!Number.isInteger(def.length) || def.length < 1))
+    throw new Error(`Invalid nanoid length: ${def.length}`);
+  def.pattern ?? (def.pattern = def.length === void 0 ? nanoid : nanoidOfLength(def.length));
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodCUID = /* @__PURE__ */ $constructor("$ZodCUID", (inst, def) => {
+  def.pattern ?? (def.pattern = cuid);
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodCUID2 = /* @__PURE__ */ $constructor("$ZodCUID2", (inst, def) => {
+  def.pattern ?? (def.pattern = cuid2);
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodULID = /* @__PURE__ */ $constructor("$ZodULID", (inst, def) => {
+  def.pattern ?? (def.pattern = ulid);
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodXID = /* @__PURE__ */ $constructor("$ZodXID", (inst, def) => {
+  def.pattern ?? (def.pattern = xid);
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodKSUID = /* @__PURE__ */ $constructor("$ZodKSUID", (inst, def) => {
+  def.pattern ?? (def.pattern = ksuid);
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodISODateTime = /* @__PURE__ */ $constructor("$ZodISODateTime", (inst, def) => {
+  def.pattern ?? (def.pattern = datetime(def));
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodISODate = /* @__PURE__ */ $constructor("$ZodISODate", (inst, def) => {
+  def.pattern ?? (def.pattern = date);
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodISOTime = /* @__PURE__ */ $constructor("$ZodISOTime", (inst, def) => {
+  def.pattern ?? (def.pattern = time(def));
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodISODuration = /* @__PURE__ */ $constructor("$ZodISODuration", (inst, def) => {
+  def.pattern ?? (def.pattern = duration);
+  $ZodStringFormat.init(inst, def);
+});
+const $ZodIPv4 = /* @__PURE__ */ $constructor("$ZodIPv4", (inst, def) => {
+  def.pattern ?? (def.pattern = ipv4);
+  $ZodStringFormat.init(inst, def);
+});
+const ipv6Alphabet = /^[0-9a-fA-F:.]+$/;
+function isValidIPv6(value) {
+  if (!ipv6Alphabet.test(value))
+    return false;
+  return canParseURL(`http://[${value}]`);
+}
+const $ZodIPv6 = /* @__PURE__ */ $constructor("$ZodIPv6", (inst, def) => {
+  def.pattern ?? (def.pattern = ipv6);
+  $ZodStringFormat.init(inst, def);
+  inst._zod.check = (payload) => {
+    if (!isValidIPv6(payload.value)) {
+      payload.issues.push({
+        code: "invalid_format",
+        format: "ipv6",
+        input: payload.value,
+        inst,
+        continue: !def.abort
+      });
+    }
+  };
+});
+const $ZodCIDRv4 = /* @__PURE__ */ $constructor("$ZodCIDRv4", (inst, def) => {
+  def.pattern ?? (def.pattern = cidrv4);
+  $ZodStringFormat.init(inst, def);
+});
+function isValidCIDRv6(value) {
+  const parts = value.split("/");
+  if (parts.length !== 2)
+    return false;
+  const [address, prefix] = parts;
+  if (!prefix)
+    return false;
+  const prefixNum = Number(prefix);
+  if (`${prefixNum}` !== prefix)
+    return false;
+  if (prefixNum < 0 || prefixNum > 128)
+    return false;
+  return isValidIPv6(address);
+}
+const $ZodCIDRv6 = /* @__PURE__ */ $constructor("$ZodCIDRv6", (inst, def) => {
+  def.pattern ?? (def.pattern = cidrv6);
+  $ZodStringFormat.init(inst, def);
+  inst._zod.check = (payload) => {
+    if (!isValidCIDRv6(payload.value)) {
+      payload.issues.push({
+        code: "invalid_format",
+        format: "cidrv6",
+        input: payload.value,
+        inst,
+        continue: !def.abort
+      });
+    }
+  };
+});
+function isValidBase64(data) {
+  if (data === "")
+    return true;
+  if (/\s/.test(data))
+    return false;
+  if (data.length % 4 !== 0)
     return false;
   try {
-    const [header2] = jwt.split(".");
+    atob(data);
+    return true;
+  } catch {
+    return false;
+  }
+}
+const base64Charset = /^[0-9a-zA-Z+/]*={0,2}$/;
+const $ZodBase64 = /* @__PURE__ */ $constructor("$ZodBase64", (inst, def) => {
+  def.pattern ?? (def.pattern = base64Charset);
+  $ZodStringFormat.init(inst, def);
+  inst._zod.check = (payload) => {
+    if (isValidBase64(payload.value))
+      return;
+    payload.issues.push({
+      code: "invalid_format",
+      format: "base64",
+      input: payload.value,
+      inst,
+      continue: !def.abort
+    });
+  };
+});
+const base64urlCharset = /^[A-Za-z0-9_-]*$/;
+function isValidBase64URL(data) {
+  if (!base64urlCharset.test(data))
+    return false;
+  const base642 = data.replace(/[-_]/g, (c) => c === "-" ? "+" : "/");
+  const padded = base642.padEnd(Math.ceil(base642.length / 4) * 4, "=");
+  return isValidBase64(padded);
+}
+const $ZodBase64URL = /* @__PURE__ */ $constructor("$ZodBase64URL", (inst, def) => {
+  def.pattern ?? (def.pattern = base64urlCharset);
+  $ZodStringFormat.init(inst, def);
+  inst._zod.check = (payload) => {
+    if (isValidBase64URL(payload.value))
+      return;
+    payload.issues.push({
+      code: "invalid_format",
+      format: "base64url",
+      input: payload.value,
+      inst,
+      continue: !def.abort
+    });
+  };
+});
+const $ZodE164 = /* @__PURE__ */ $constructor("$ZodE164", (inst, def) => {
+  def.pattern ?? (def.pattern = e164);
+  $ZodStringFormat.init(inst, def);
+});
+function isValidJWT(token, algorithm = null) {
+  try {
+    const tokensParts = token.split(".");
+    if (tokensParts.length !== 3)
+      return false;
+    const [header2] = tokensParts;
     if (!header2)
       return false;
-    const base64 = header2.replace(/-/g, "+").replace(/_/g, "/").padEnd(header2.length + (4 - header2.length % 4) % 4, "=");
-    const decoded = JSON.parse(atob(base64));
-    if (typeof decoded !== "object" || decoded === null)
+    const parsedHeader = JSON.parse(atob(header2));
+    if ("typ" in parsedHeader && (parsedHeader == null ? void 0 : parsedHeader.typ) !== "JWT")
       return false;
-    if ("typ" in decoded && (decoded == null ? void 0 : decoded.typ) !== "JWT")
+    if (!parsedHeader.alg)
       return false;
-    if (!decoded.alg)
-      return false;
-    if (alg && decoded.alg !== alg)
+    if (algorithm && (!("alg" in parsedHeader) || parsedHeader.alg !== algorithm))
       return false;
     return true;
   } catch {
     return false;
   }
 }
-function isValidCidr(ip, version) {
-  if ((version === "v4" || !version) && ipv4CidrRegex.test(ip)) {
-    return true;
-  }
-  if ((version === "v6" || !version) && ipv6CidrRegex.test(ip)) {
-    return true;
-  }
-  return false;
-}
-class ZodString extends ZodType {
-  _parse(input) {
-    if (this._def.coerce) {
-      input.data = String(input.data);
-    }
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.string) {
-      const ctx2 = this._getOrReturnCtx(input);
-      addIssueToContext(ctx2, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.string,
-        received: ctx2.parsedType
-      });
-      return INVALID;
-    }
-    const status = new ParseStatus();
-    let ctx = void 0;
-    for (const check of this._def.checks) {
-      if (check.kind === "min") {
-        if (input.data.length < check.value) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_small,
-            minimum: check.value,
-            type: "string",
-            inclusive: true,
-            exact: false,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "max") {
-        if (input.data.length > check.value) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_big,
-            maximum: check.value,
-            type: "string",
-            inclusive: true,
-            exact: false,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "length") {
-        const tooBig = input.data.length > check.value;
-        const tooSmall = input.data.length < check.value;
-        if (tooBig || tooSmall) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          if (tooBig) {
-            addIssueToContext(ctx, {
-              code: ZodIssueCode.too_big,
-              maximum: check.value,
-              type: "string",
-              inclusive: true,
-              exact: true,
-              message: check.message
-            });
-          } else if (tooSmall) {
-            addIssueToContext(ctx, {
-              code: ZodIssueCode.too_small,
-              minimum: check.value,
-              type: "string",
-              inclusive: true,
-              exact: true,
-              message: check.message
-            });
-          }
-          status.dirty();
-        }
-      } else if (check.kind === "email") {
-        if (!emailRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "email",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "emoji") {
-        if (!emojiRegex) {
-          emojiRegex = new RegExp(_emojiRegex, "u");
-        }
-        if (!emojiRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "emoji",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "uuid") {
-        if (!uuidRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "uuid",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "nanoid") {
-        if (!nanoidRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "nanoid",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "cuid") {
-        if (!cuidRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "cuid",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "cuid2") {
-        if (!cuid2Regex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "cuid2",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "ulid") {
-        if (!ulidRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "ulid",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "url") {
-        try {
-          new URL(input.data);
-        } catch {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "url",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "regex") {
-        check.regex.lastIndex = 0;
-        const testResult = check.regex.test(input.data);
-        if (!testResult) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "regex",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "trim") {
-        input.data = input.data.trim();
-      } else if (check.kind === "includes") {
-        if (!input.data.includes(check.value, check.position)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: { includes: check.value, position: check.position },
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "toLowerCase") {
-        input.data = input.data.toLowerCase();
-      } else if (check.kind === "toUpperCase") {
-        input.data = input.data.toUpperCase();
-      } else if (check.kind === "startsWith") {
-        if (!input.data.startsWith(check.value)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: { startsWith: check.value },
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "endsWith") {
-        if (!input.data.endsWith(check.value)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: { endsWith: check.value },
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "datetime") {
-        const regex = datetimeRegex(check);
-        if (!regex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: "datetime",
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "date") {
-        const regex = dateRegex;
-        if (!regex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: "date",
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "time") {
-        const regex = timeRegex(check);
-        if (!regex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: "time",
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "duration") {
-        if (!durationRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "duration",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "ip") {
-        if (!isValidIP(input.data, check.version)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "ip",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "jwt") {
-        if (!isValidJWT(input.data, check.alg)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "jwt",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "cidr") {
-        if (!isValidCidr(input.data, check.version)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "cidr",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "base64") {
-        if (!base64Regex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "base64",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "base64url") {
-        if (!base64urlRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "base64url",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else {
-        util.assertNever(check);
-      }
-    }
-    return { status: status.value, value: input.data };
-  }
-  _regex(regex, validation, message) {
-    return this.refinement((data) => regex.test(data), {
-      validation,
-      code: ZodIssueCode.invalid_string,
-      ...errorUtil.errToObj(message)
+const $ZodJWT = /* @__PURE__ */ $constructor("$ZodJWT", (inst, def) => {
+  $ZodStringFormat.init(inst, def);
+  inst._zod.check = (payload) => {
+    if (isValidJWT(payload.value, def.alg))
+      return;
+    payload.issues.push({
+      code: "invalid_format",
+      format: "jwt",
+      input: payload.value,
+      inst,
+      continue: !def.abort
     });
-  }
-  _addCheck(check) {
-    return new ZodString({
-      ...this._def,
-      checks: [...this._def.checks, check]
-    });
-  }
-  email(message) {
-    return this._addCheck({ kind: "email", ...errorUtil.errToObj(message) });
-  }
-  url(message) {
-    return this._addCheck({ kind: "url", ...errorUtil.errToObj(message) });
-  }
-  emoji(message) {
-    return this._addCheck({ kind: "emoji", ...errorUtil.errToObj(message) });
-  }
-  uuid(message) {
-    return this._addCheck({ kind: "uuid", ...errorUtil.errToObj(message) });
-  }
-  nanoid(message) {
-    return this._addCheck({ kind: "nanoid", ...errorUtil.errToObj(message) });
-  }
-  cuid(message) {
-    return this._addCheck({ kind: "cuid", ...errorUtil.errToObj(message) });
-  }
-  cuid2(message) {
-    return this._addCheck({ kind: "cuid2", ...errorUtil.errToObj(message) });
-  }
-  ulid(message) {
-    return this._addCheck({ kind: "ulid", ...errorUtil.errToObj(message) });
-  }
-  base64(message) {
-    return this._addCheck({ kind: "base64", ...errorUtil.errToObj(message) });
-  }
-  base64url(message) {
-    return this._addCheck({
-      kind: "base64url",
-      ...errorUtil.errToObj(message)
-    });
-  }
-  jwt(options) {
-    return this._addCheck({ kind: "jwt", ...errorUtil.errToObj(options) });
-  }
-  ip(options) {
-    return this._addCheck({ kind: "ip", ...errorUtil.errToObj(options) });
-  }
-  cidr(options) {
-    return this._addCheck({ kind: "cidr", ...errorUtil.errToObj(options) });
-  }
-  datetime(options) {
-    if (typeof options === "string") {
-      return this._addCheck({
-        kind: "datetime",
-        precision: null,
-        offset: false,
-        local: false,
-        message: options
-      });
-    }
-    return this._addCheck({
-      kind: "datetime",
-      precision: typeof (options == null ? void 0 : options.precision) === "undefined" ? null : options == null ? void 0 : options.precision,
-      offset: (options == null ? void 0 : options.offset) ?? false,
-      local: (options == null ? void 0 : options.local) ?? false,
-      ...errorUtil.errToObj(options == null ? void 0 : options.message)
-    });
-  }
-  date(message) {
-    return this._addCheck({ kind: "date", message });
-  }
-  time(options) {
-    if (typeof options === "string") {
-      return this._addCheck({
-        kind: "time",
-        precision: null,
-        message: options
-      });
-    }
-    return this._addCheck({
-      kind: "time",
-      precision: typeof (options == null ? void 0 : options.precision) === "undefined" ? null : options == null ? void 0 : options.precision,
-      ...errorUtil.errToObj(options == null ? void 0 : options.message)
-    });
-  }
-  duration(message) {
-    return this._addCheck({ kind: "duration", ...errorUtil.errToObj(message) });
-  }
-  regex(regex, message) {
-    return this._addCheck({
-      kind: "regex",
-      regex,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  includes(value, options) {
-    return this._addCheck({
-      kind: "includes",
-      value,
-      position: options == null ? void 0 : options.position,
-      ...errorUtil.errToObj(options == null ? void 0 : options.message)
-    });
-  }
-  startsWith(value, message) {
-    return this._addCheck({
-      kind: "startsWith",
-      value,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  endsWith(value, message) {
-    return this._addCheck({
-      kind: "endsWith",
-      value,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  min(minLength, message) {
-    return this._addCheck({
-      kind: "min",
-      value: minLength,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  max(maxLength, message) {
-    return this._addCheck({
-      kind: "max",
-      value: maxLength,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  length(len, message) {
-    return this._addCheck({
-      kind: "length",
-      value: len,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  /**
-   * Equivalent to `.min(1)`
-   */
-  nonempty(message) {
-    return this.min(1, errorUtil.errToObj(message));
-  }
-  trim() {
-    return new ZodString({
-      ...this._def,
-      checks: [...this._def.checks, { kind: "trim" }]
-    });
-  }
-  toLowerCase() {
-    return new ZodString({
-      ...this._def,
-      checks: [...this._def.checks, { kind: "toLowerCase" }]
-    });
-  }
-  toUpperCase() {
-    return new ZodString({
-      ...this._def,
-      checks: [...this._def.checks, { kind: "toUpperCase" }]
-    });
-  }
-  get isDatetime() {
-    return !!this._def.checks.find((ch) => ch.kind === "datetime");
-  }
-  get isDate() {
-    return !!this._def.checks.find((ch) => ch.kind === "date");
-  }
-  get isTime() {
-    return !!this._def.checks.find((ch) => ch.kind === "time");
-  }
-  get isDuration() {
-    return !!this._def.checks.find((ch) => ch.kind === "duration");
-  }
-  get isEmail() {
-    return !!this._def.checks.find((ch) => ch.kind === "email");
-  }
-  get isURL() {
-    return !!this._def.checks.find((ch) => ch.kind === "url");
-  }
-  get isEmoji() {
-    return !!this._def.checks.find((ch) => ch.kind === "emoji");
-  }
-  get isUUID() {
-    return !!this._def.checks.find((ch) => ch.kind === "uuid");
-  }
-  get isNANOID() {
-    return !!this._def.checks.find((ch) => ch.kind === "nanoid");
-  }
-  get isCUID() {
-    return !!this._def.checks.find((ch) => ch.kind === "cuid");
-  }
-  get isCUID2() {
-    return !!this._def.checks.find((ch) => ch.kind === "cuid2");
-  }
-  get isULID() {
-    return !!this._def.checks.find((ch) => ch.kind === "ulid");
-  }
-  get isIP() {
-    return !!this._def.checks.find((ch) => ch.kind === "ip");
-  }
-  get isCIDR() {
-    return !!this._def.checks.find((ch) => ch.kind === "cidr");
-  }
-  get isBase64() {
-    return !!this._def.checks.find((ch) => ch.kind === "base64");
-  }
-  get isBase64url() {
-    return !!this._def.checks.find((ch) => ch.kind === "base64url");
-  }
-  get minLength() {
-    let min = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "min") {
-        if (min === null || ch.value > min)
-          min = ch.value;
-      }
-    }
-    return min;
-  }
-  get maxLength() {
-    let max = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "max") {
-        if (max === null || ch.value < max)
-          max = ch.value;
-      }
-    }
-    return max;
-  }
-}
-ZodString.create = (params) => {
-  return new ZodString({
-    checks: [],
-    typeName: ZodFirstPartyTypeKind.ZodString,
-    coerce: (params == null ? void 0 : params.coerce) ?? false,
-    ...processCreateParams(params)
-  });
-};
-function floatSafeRemainder(val, step) {
-  const valDecCount = (val.toString().split(".")[1] || "").length;
-  const stepDecCount = (step.toString().split(".")[1] || "").length;
-  const decCount = valDecCount > stepDecCount ? valDecCount : stepDecCount;
-  const valInt = Number.parseInt(val.toFixed(decCount).replace(".", ""));
-  const stepInt = Number.parseInt(step.toFixed(decCount).replace(".", ""));
-  return valInt % stepInt / 10 ** decCount;
-}
-class ZodNumber extends ZodType {
-  constructor() {
-    super(...arguments);
-    this.min = this.gte;
-    this.max = this.lte;
-    this.step = this.multipleOf;
-  }
-  _parse(input) {
-    if (this._def.coerce) {
-      input.data = Number(input.data);
-    }
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.number) {
-      const ctx2 = this._getOrReturnCtx(input);
-      addIssueToContext(ctx2, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.number,
-        received: ctx2.parsedType
-      });
-      return INVALID;
-    }
-    let ctx = void 0;
-    const status = new ParseStatus();
-    for (const check of this._def.checks) {
-      if (check.kind === "int") {
-        if (!util.isInteger(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_type,
-            expected: "integer",
-            received: "float",
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "min") {
-        const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
-        if (tooSmall) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_small,
-            minimum: check.value,
-            type: "number",
-            inclusive: check.inclusive,
-            exact: false,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "max") {
-        const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
-        if (tooBig) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_big,
-            maximum: check.value,
-            type: "number",
-            inclusive: check.inclusive,
-            exact: false,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "multipleOf") {
-        if (floatSafeRemainder(input.data, check.value) !== 0) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.not_multiple_of,
-            multipleOf: check.value,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "finite") {
-        if (!Number.isFinite(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.not_finite,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else {
-        util.assertNever(check);
-      }
-    }
-    return { status: status.value, value: input.data };
-  }
-  gte(value, message) {
-    return this.setLimit("min", value, true, errorUtil.toString(message));
-  }
-  gt(value, message) {
-    return this.setLimit("min", value, false, errorUtil.toString(message));
-  }
-  lte(value, message) {
-    return this.setLimit("max", value, true, errorUtil.toString(message));
-  }
-  lt(value, message) {
-    return this.setLimit("max", value, false, errorUtil.toString(message));
-  }
-  setLimit(kind, value, inclusive, message) {
-    return new ZodNumber({
-      ...this._def,
-      checks: [
-        ...this._def.checks,
-        {
-          kind,
-          value,
-          inclusive,
-          message: errorUtil.toString(message)
-        }
-      ]
-    });
-  }
-  _addCheck(check) {
-    return new ZodNumber({
-      ...this._def,
-      checks: [...this._def.checks, check]
-    });
-  }
-  int(message) {
-    return this._addCheck({
-      kind: "int",
-      message: errorUtil.toString(message)
-    });
-  }
-  positive(message) {
-    return this._addCheck({
-      kind: "min",
-      value: 0,
-      inclusive: false,
-      message: errorUtil.toString(message)
-    });
-  }
-  negative(message) {
-    return this._addCheck({
-      kind: "max",
-      value: 0,
-      inclusive: false,
-      message: errorUtil.toString(message)
-    });
-  }
-  nonpositive(message) {
-    return this._addCheck({
-      kind: "max",
-      value: 0,
-      inclusive: true,
-      message: errorUtil.toString(message)
-    });
-  }
-  nonnegative(message) {
-    return this._addCheck({
-      kind: "min",
-      value: 0,
-      inclusive: true,
-      message: errorUtil.toString(message)
-    });
-  }
-  multipleOf(value, message) {
-    return this._addCheck({
-      kind: "multipleOf",
-      value,
-      message: errorUtil.toString(message)
-    });
-  }
-  finite(message) {
-    return this._addCheck({
-      kind: "finite",
-      message: errorUtil.toString(message)
-    });
-  }
-  safe(message) {
-    return this._addCheck({
-      kind: "min",
-      inclusive: true,
-      value: Number.MIN_SAFE_INTEGER,
-      message: errorUtil.toString(message)
-    })._addCheck({
-      kind: "max",
-      inclusive: true,
-      value: Number.MAX_SAFE_INTEGER,
-      message: errorUtil.toString(message)
-    });
-  }
-  get minValue() {
-    let min = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "min") {
-        if (min === null || ch.value > min)
-          min = ch.value;
-      }
-    }
-    return min;
-  }
-  get maxValue() {
-    let max = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "max") {
-        if (max === null || ch.value < max)
-          max = ch.value;
-      }
-    }
-    return max;
-  }
-  get isInt() {
-    return !!this._def.checks.find((ch) => ch.kind === "int" || ch.kind === "multipleOf" && util.isInteger(ch.value));
-  }
-  get isFinite() {
-    let max = null;
-    let min = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "finite" || ch.kind === "int" || ch.kind === "multipleOf") {
-        return true;
-      } else if (ch.kind === "min") {
-        if (min === null || ch.value > min)
-          min = ch.value;
-      } else if (ch.kind === "max") {
-        if (max === null || ch.value < max)
-          max = ch.value;
-      }
-    }
-    return Number.isFinite(min) && Number.isFinite(max);
-  }
-}
-ZodNumber.create = (params) => {
-  return new ZodNumber({
-    checks: [],
-    typeName: ZodFirstPartyTypeKind.ZodNumber,
-    coerce: (params == null ? void 0 : params.coerce) || false,
-    ...processCreateParams(params)
-  });
-};
-class ZodBigInt extends ZodType {
-  constructor() {
-    super(...arguments);
-    this.min = this.gte;
-    this.max = this.lte;
-  }
-  _parse(input) {
-    if (this._def.coerce) {
+  };
+});
+const $ZodNumber = /* @__PURE__ */ $constructor("$ZodNumber", (inst, def) => {
+  $ZodType.init(inst, def);
+  inst._zod.pattern = number$1;
+  inst._zod.parse = (payload, _ctx) => {
+    if (def.coerce)
       try {
-        input.data = BigInt(input.data);
-      } catch {
-        return this._getInvalidInput(input);
+        payload.value = Number(payload.value);
+      } catch (_2) {
       }
+    const input = payload.value;
+    if (typeof input === "number" && !Number.isNaN(input) && Number.isFinite(input)) {
+      return payload;
     }
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.bigint) {
-      return this._getInvalidInput(input);
+    const received = typeof input === "number" ? Number.isNaN(input) ? "NaN" : !Number.isFinite(input) ? String(input) : void 0 : void 0;
+    payload.issues.push({
+      expected: "number",
+      code: "invalid_type",
+      input,
+      inst,
+      ...received ? { received } : {}
+    });
+    return payload;
+  };
+});
+const $ZodNumberFormat = /* @__PURE__ */ $constructor("$ZodNumberFormat", (inst, def) => {
+  $ZodCheckNumberFormat.init(inst, def);
+  $ZodNumber.init(inst, def);
+});
+const $ZodBoolean = /* @__PURE__ */ $constructor("$ZodBoolean", (inst, def) => {
+  $ZodType.init(inst, def);
+  inst._zod.pattern = boolean$1;
+  inst._zod.parse = (payload, _ctx) => {
+    if (def.coerce)
+      try {
+        payload.value = Boolean(payload.value);
+      } catch (_2) {
+      }
+    const input = payload.value;
+    if (typeof input === "boolean")
+      return payload;
+    payload.issues.push({
+      expected: "boolean",
+      code: "invalid_type",
+      input,
+      inst
+    });
+    return payload;
+  };
+});
+const $ZodUnknown = /* @__PURE__ */ $constructor("$ZodUnknown", (inst, def) => {
+  $ZodType.init(inst, def);
+  inst._zod.parse = (payload) => payload;
+});
+const $ZodNever = /* @__PURE__ */ $constructor("$ZodNever", (inst, def) => {
+  $ZodType.init(inst, def);
+  inst._zod.parse = (payload, _ctx) => {
+    payload.issues.push({
+      expected: "never",
+      code: "invalid_type",
+      input: payload.value,
+      inst
+    });
+    return payload;
+  };
+});
+function handleArrayResult(result, final, index) {
+  if (result.issues.length) {
+    final.issues.push(...prefixIssues(index, result.issues));
+  }
+  final.value[index] = result.value;
+}
+const $ZodArray = /* @__PURE__ */ $constructor("$ZodArray", (inst, def) => {
+  $ZodType.init(inst, def);
+  const memo2 = globalConfig.memoizer;
+  memo2 == null ? void 0 : memo2.attach(inst);
+  inst._zod.parse = (payload, ctx) => {
+    const input = payload.value;
+    if (!Array.isArray(input)) {
+      payload.issues.push({
+        expected: "array",
+        code: "invalid_type",
+        input,
+        inst
+      });
+      return payload;
     }
-    let ctx = void 0;
-    const status = new ParseStatus();
-    for (const check of this._def.checks) {
-      if (check.kind === "min") {
-        const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
-        if (tooSmall) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_small,
-            type: "bigint",
-            minimum: check.value,
-            inclusive: check.inclusive,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "max") {
-        const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
-        if (tooBig) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_big,
-            type: "bigint",
-            maximum: check.value,
-            inclusive: check.inclusive,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "multipleOf") {
-        if (input.data % check.value !== BigInt(0)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.not_multiple_of,
-            multipleOf: check.value,
-            message: check.message
-          });
-          status.dirty();
-        }
+    payload.value = memo2 ? memo2.alloc(inst, payload, Array(input.length), ctx) : Array(input.length);
+    const proms = [];
+    const abortEarly = ctx == null ? void 0 : ctx.abortEarly;
+    for (let i = 0; i < input.length; i++) {
+      const item = input[i];
+      const result = def.element._zod.run({
+        value: item,
+        issues: []
+      }, ctx);
+      if (result instanceof Promise) {
+        proms.push(result.then((result2) => handleArrayResult(result2, payload, i)));
       } else {
-        util.assertNever(check);
+        handleArrayResult(result, payload, i);
+        if (abortEarly && result.issues.length !== 0 && aborted(result))
+          break;
       }
     }
-    return { status: status.value, value: input.data };
-  }
-  _getInvalidInput(input) {
-    const ctx = this._getOrReturnCtx(input);
-    addIssueToContext(ctx, {
-      code: ZodIssueCode.invalid_type,
-      expected: ZodParsedType.bigint,
-      received: ctx.parsedType
-    });
-    return INVALID;
-  }
-  gte(value, message) {
-    return this.setLimit("min", value, true, errorUtil.toString(message));
-  }
-  gt(value, message) {
-    return this.setLimit("min", value, false, errorUtil.toString(message));
-  }
-  lte(value, message) {
-    return this.setLimit("max", value, true, errorUtil.toString(message));
-  }
-  lt(value, message) {
-    return this.setLimit("max", value, false, errorUtil.toString(message));
-  }
-  setLimit(kind, value, inclusive, message) {
-    return new ZodBigInt({
-      ...this._def,
-      checks: [
-        ...this._def.checks,
-        {
-          kind,
-          value,
-          inclusive,
-          message: errorUtil.toString(message)
-        }
-      ]
-    });
-  }
-  _addCheck(check) {
-    return new ZodBigInt({
-      ...this._def,
-      checks: [...this._def.checks, check]
-    });
-  }
-  positive(message) {
-    return this._addCheck({
-      kind: "min",
-      value: BigInt(0),
-      inclusive: false,
-      message: errorUtil.toString(message)
-    });
-  }
-  negative(message) {
-    return this._addCheck({
-      kind: "max",
-      value: BigInt(0),
-      inclusive: false,
-      message: errorUtil.toString(message)
-    });
-  }
-  nonpositive(message) {
-    return this._addCheck({
-      kind: "max",
-      value: BigInt(0),
-      inclusive: true,
-      message: errorUtil.toString(message)
-    });
-  }
-  nonnegative(message) {
-    return this._addCheck({
-      kind: "min",
-      value: BigInt(0),
-      inclusive: true,
-      message: errorUtil.toString(message)
-    });
-  }
-  multipleOf(value, message) {
-    return this._addCheck({
-      kind: "multipleOf",
-      value,
-      message: errorUtil.toString(message)
-    });
-  }
-  get minValue() {
-    let min = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "min") {
-        if (min === null || ch.value > min)
-          min = ch.value;
-      }
+    if (proms.length) {
+      return Promise.all(proms).then(() => payload);
     }
-    return min;
+    return payload;
+  };
+});
+function handlePropertyResult(result, final, key, input, optin, optout) {
+  const isPresent = key in input;
+  const isOptionalOut = optout === "optional";
+  if (!isPresent && isOptionalOut && optin === "optional") {
+    return;
   }
-  get maxValue() {
-    let max = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "max") {
-        if (max === null || ch.value < max)
-          max = ch.value;
-      }
+  if (result.issues.length) {
+    if (optin !== void 0 && isOptionalOut && !isPresent) {
+      return;
     }
-    return max;
+    final.issues.push(...prefixIssues(key, result.issues));
   }
-}
-ZodBigInt.create = (params) => {
-  return new ZodBigInt({
-    checks: [],
-    typeName: ZodFirstPartyTypeKind.ZodBigInt,
-    coerce: (params == null ? void 0 : params.coerce) ?? false,
-    ...processCreateParams(params)
-  });
-};
-class ZodBoolean extends ZodType {
-  _parse(input) {
-    if (this._def.coerce) {
-      input.data = Boolean(input.data);
-    }
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.boolean) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.boolean,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-}
-ZodBoolean.create = (params) => {
-  return new ZodBoolean({
-    typeName: ZodFirstPartyTypeKind.ZodBoolean,
-    coerce: (params == null ? void 0 : params.coerce) || false,
-    ...processCreateParams(params)
-  });
-};
-class ZodDate extends ZodType {
-  _parse(input) {
-    if (this._def.coerce) {
-      input.data = new Date(input.data);
-    }
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.date) {
-      const ctx2 = this._getOrReturnCtx(input);
-      addIssueToContext(ctx2, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.date,
-        received: ctx2.parsedType
-      });
-      return INVALID;
-    }
-    if (Number.isNaN(input.data.getTime())) {
-      const ctx2 = this._getOrReturnCtx(input);
-      addIssueToContext(ctx2, {
-        code: ZodIssueCode.invalid_date
-      });
-      return INVALID;
-    }
-    const status = new ParseStatus();
-    let ctx = void 0;
-    for (const check of this._def.checks) {
-      if (check.kind === "min") {
-        if (input.data.getTime() < check.value) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_small,
-            message: check.message,
-            inclusive: true,
-            exact: false,
-            minimum: check.value,
-            type: "date"
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "max") {
-        if (input.data.getTime() > check.value) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_big,
-            message: check.message,
-            inclusive: true,
-            exact: false,
-            maximum: check.value,
-            type: "date"
-          });
-          status.dirty();
-        }
-      } else {
-        util.assertNever(check);
-      }
-    }
-    return {
-      status: status.value,
-      value: new Date(input.data.getTime())
-    };
-  }
-  _addCheck(check) {
-    return new ZodDate({
-      ...this._def,
-      checks: [...this._def.checks, check]
-    });
-  }
-  min(minDate, message) {
-    return this._addCheck({
-      kind: "min",
-      value: minDate.getTime(),
-      message: errorUtil.toString(message)
-    });
-  }
-  max(maxDate, message) {
-    return this._addCheck({
-      kind: "max",
-      value: maxDate.getTime(),
-      message: errorUtil.toString(message)
-    });
-  }
-  get minDate() {
-    let min = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "min") {
-        if (min === null || ch.value > min)
-          min = ch.value;
-      }
-    }
-    return min != null ? new Date(min) : null;
-  }
-  get maxDate() {
-    let max = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "max") {
-        if (max === null || ch.value < max)
-          max = ch.value;
-      }
-    }
-    return max != null ? new Date(max) : null;
-  }
-}
-ZodDate.create = (params) => {
-  return new ZodDate({
-    checks: [],
-    coerce: (params == null ? void 0 : params.coerce) || false,
-    typeName: ZodFirstPartyTypeKind.ZodDate,
-    ...processCreateParams(params)
-  });
-};
-class ZodSymbol extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.symbol) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.symbol,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-}
-ZodSymbol.create = (params) => {
-  return new ZodSymbol({
-    typeName: ZodFirstPartyTypeKind.ZodSymbol,
-    ...processCreateParams(params)
-  });
-};
-class ZodUndefined extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.undefined) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.undefined,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-}
-ZodUndefined.create = (params) => {
-  return new ZodUndefined({
-    typeName: ZodFirstPartyTypeKind.ZodUndefined,
-    ...processCreateParams(params)
-  });
-};
-class ZodNull extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.null) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.null,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-}
-ZodNull.create = (params) => {
-  return new ZodNull({
-    typeName: ZodFirstPartyTypeKind.ZodNull,
-    ...processCreateParams(params)
-  });
-};
-class ZodAny extends ZodType {
-  constructor() {
-    super(...arguments);
-    this._any = true;
-  }
-  _parse(input) {
-    return OK(input.data);
-  }
-}
-ZodAny.create = (params) => {
-  return new ZodAny({
-    typeName: ZodFirstPartyTypeKind.ZodAny,
-    ...processCreateParams(params)
-  });
-};
-class ZodUnknown extends ZodType {
-  constructor() {
-    super(...arguments);
-    this._unknown = true;
-  }
-  _parse(input) {
-    return OK(input.data);
-  }
-}
-ZodUnknown.create = (params) => {
-  return new ZodUnknown({
-    typeName: ZodFirstPartyTypeKind.ZodUnknown,
-    ...processCreateParams(params)
-  });
-};
-class ZodNever extends ZodType {
-  _parse(input) {
-    const ctx = this._getOrReturnCtx(input);
-    addIssueToContext(ctx, {
-      code: ZodIssueCode.invalid_type,
-      expected: ZodParsedType.never,
-      received: ctx.parsedType
-    });
-    return INVALID;
-  }
-}
-ZodNever.create = (params) => {
-  return new ZodNever({
-    typeName: ZodFirstPartyTypeKind.ZodNever,
-    ...processCreateParams(params)
-  });
-};
-class ZodVoid extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.undefined) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.void,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-}
-ZodVoid.create = (params) => {
-  return new ZodVoid({
-    typeName: ZodFirstPartyTypeKind.ZodVoid,
-    ...processCreateParams(params)
-  });
-};
-class ZodArray extends ZodType {
-  _parse(input) {
-    const { ctx, status } = this._processInputParams(input);
-    const def = this._def;
-    if (ctx.parsedType !== ZodParsedType.array) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.array,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    if (def.exactLength !== null) {
-      const tooBig = ctx.data.length > def.exactLength.value;
-      const tooSmall = ctx.data.length < def.exactLength.value;
-      if (tooBig || tooSmall) {
-        addIssueToContext(ctx, {
-          code: tooBig ? ZodIssueCode.too_big : ZodIssueCode.too_small,
-          minimum: tooSmall ? def.exactLength.value : void 0,
-          maximum: tooBig ? def.exactLength.value : void 0,
-          type: "array",
-          inclusive: true,
-          exact: true,
-          message: def.exactLength.message
-        });
-        status.dirty();
-      }
-    }
-    if (def.minLength !== null) {
-      if (ctx.data.length < def.minLength.value) {
-        addIssueToContext(ctx, {
-          code: ZodIssueCode.too_small,
-          minimum: def.minLength.value,
-          type: "array",
-          inclusive: true,
-          exact: false,
-          message: def.minLength.message
-        });
-        status.dirty();
-      }
-    }
-    if (def.maxLength !== null) {
-      if (ctx.data.length > def.maxLength.value) {
-        addIssueToContext(ctx, {
-          code: ZodIssueCode.too_big,
-          maximum: def.maxLength.value,
-          type: "array",
-          inclusive: true,
-          exact: false,
-          message: def.maxLength.message
-        });
-        status.dirty();
-      }
-    }
-    if (ctx.common.async) {
-      return Promise.all([...ctx.data].map((item, i) => {
-        return def.type._parseAsync(new ParseInputLazyPath(ctx, item, ctx.path, i));
-      })).then((result2) => {
-        return ParseStatus.mergeArray(status, result2);
+  if (!isPresent && optin === void 0) {
+    if (!result.issues.length) {
+      final.issues.push({
+        code: "invalid_type",
+        expected: "nonoptional",
+        input: void 0,
+        path: [key]
       });
     }
-    const result = [...ctx.data].map((item, i) => {
-      return def.type._parseSync(new ParseInputLazyPath(ctx, item, ctx.path, i));
-    });
-    return ParseStatus.mergeArray(status, result);
+    return;
   }
-  get element() {
-    return this._def.type;
-  }
-  min(minLength, message) {
-    return new ZodArray({
-      ...this._def,
-      minLength: { value: minLength, message: errorUtil.toString(message) }
-    });
-  }
-  max(maxLength, message) {
-    return new ZodArray({
-      ...this._def,
-      maxLength: { value: maxLength, message: errorUtil.toString(message) }
-    });
-  }
-  length(len, message) {
-    return new ZodArray({
-      ...this._def,
-      exactLength: { value: len, message: errorUtil.toString(message) }
-    });
-  }
-  nonempty(message) {
-    return this.min(1, message);
-  }
-}
-ZodArray.create = (schema, params) => {
-  return new ZodArray({
-    type: schema,
-    minLength: null,
-    maxLength: null,
-    exactLength: null,
-    typeName: ZodFirstPartyTypeKind.ZodArray,
-    ...processCreateParams(params)
-  });
-};
-function deepPartialify(schema) {
-  if (schema instanceof ZodObject) {
-    const newShape = {};
-    for (const key in schema.shape) {
-      const fieldSchema = schema.shape[key];
-      newShape[key] = ZodOptional.create(deepPartialify(fieldSchema));
+  if (result.value === void 0) {
+    if (isPresent || optin === "defaulted" && !isOptionalOut) {
+      final.value[key] = void 0;
     }
-    return new ZodObject({
-      ...schema._def,
-      shape: () => newShape
-    });
-  } else if (schema instanceof ZodArray) {
-    return new ZodArray({
-      ...schema._def,
-      type: deepPartialify(schema.element)
-    });
-  } else if (schema instanceof ZodOptional) {
-    return ZodOptional.create(deepPartialify(schema.unwrap()));
-  } else if (schema instanceof ZodNullable) {
-    return ZodNullable.create(deepPartialify(schema.unwrap()));
-  } else if (schema instanceof ZodTuple) {
-    return ZodTuple.create(schema.items.map((item) => deepPartialify(item)));
   } else {
-    return schema;
+    final.value[key] = result.value;
   }
 }
-class ZodObject extends ZodType {
-  constructor() {
-    super(...arguments);
-    this._cached = null;
-    this.nonstrict = this.passthrough;
-    this.augment = this.extend;
-  }
-  _getCached() {
-    if (this._cached !== null)
-      return this._cached;
-    const shape = this._def.shape();
-    const keys = util.objectKeys(shape);
-    this._cached = { shape, keys };
-    return this._cached;
-  }
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.object) {
-      const ctx2 = this._getOrReturnCtx(input);
-      addIssueToContext(ctx2, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.object,
-        received: ctx2.parsedType
-      });
-      return INVALID;
-    }
-    const { status, ctx } = this._processInputParams(input);
-    const { shape, keys: shapeKeys } = this._getCached();
-    const extraKeys = [];
-    if (!(this._def.catchall instanceof ZodNever && this._def.unknownKeys === "strip")) {
-      for (const key in ctx.data) {
-        if (!shapeKeys.includes(key)) {
-          extraKeys.push(key);
-        }
-      }
-    }
-    const pairs = [];
-    for (const key of shapeKeys) {
-      const keyValidator = shape[key];
-      const value = ctx.data[key];
-      pairs.push({
-        key: { status: "valid", value: key },
-        value: keyValidator._parse(new ParseInputLazyPath(ctx, value, ctx.path, key)),
-        alwaysSet: key in ctx.data
-      });
-    }
-    if (this._def.catchall instanceof ZodNever) {
-      const unknownKeys = this._def.unknownKeys;
-      if (unknownKeys === "passthrough") {
-        for (const key of extraKeys) {
-          pairs.push({
-            key: { status: "valid", value: key },
-            value: { status: "valid", value: ctx.data[key] }
-          });
-        }
-      } else if (unknownKeys === "strict") {
-        if (extraKeys.length > 0) {
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.unrecognized_keys,
-            keys: extraKeys
-          });
-          status.dirty();
-        }
-      } else if (unknownKeys === "strip") ;
-      else {
-        throw new Error(`Internal ZodObject error: invalid unknownKeys value.`);
-      }
-    } else {
-      const catchall = this._def.catchall;
-      for (const key of extraKeys) {
-        const value = ctx.data[key];
-        pairs.push({
-          key: { status: "valid", value: key },
-          value: catchall._parse(
-            new ParseInputLazyPath(ctx, value, ctx.path, key)
-            //, ctx.child(key), value, getParsedType(value)
-          ),
-          alwaysSet: key in ctx.data
-        });
-      }
-    }
-    if (ctx.common.async) {
-      return Promise.resolve().then(async () => {
-        const syncPairs = [];
-        for (const pair of pairs) {
-          const key = await pair.key;
-          const value = await pair.value;
-          syncPairs.push({
-            key,
-            value,
-            alwaysSet: pair.alwaysSet
-          });
-        }
-        return syncPairs;
-      }).then((syncPairs) => {
-        return ParseStatus.mergeObjectSync(status, syncPairs);
-      });
-    } else {
-      return ParseStatus.mergeObjectSync(status, pairs);
+const NO_SYMBOL_KEYS = [];
+function normalizeDef(def) {
+  var _a2, _b, _c, _d;
+  const keys = Object.keys(def.shape);
+  const ownSymbols = Object.getOwnPropertySymbols(def.shape);
+  const symbolKeys = ownSymbols.length ? ownSymbols : NO_SYMBOL_KEYS;
+  const allKeys = symbolKeys.length ? [...keys, ...symbolKeys] : keys;
+  for (const k of allKeys) {
+    if (!((_d = (_c = (_b = (_a2 = def.shape) == null ? void 0 : _a2[k]) == null ? void 0 : _b._zod) == null ? void 0 : _c.traits) == null ? void 0 : _d.has("$ZodType"))) {
+      throw new Error(`Invalid element at key "${String(k)}": expected a Zod schema`);
     }
   }
-  get shape() {
-    return this._def.shape();
-  }
-  strict(message) {
-    errorUtil.errToObj;
-    return new ZodObject({
-      ...this._def,
-      unknownKeys: "strict",
-      ...message !== void 0 ? {
-        errorMap: (issue, ctx) => {
-          var _a, _b;
-          const defaultError = ((_b = (_a = this._def).errorMap) == null ? void 0 : _b.call(_a, issue, ctx).message) ?? ctx.defaultError;
-          if (issue.code === "unrecognized_keys")
-            return {
-              message: errorUtil.errToObj(message).message ?? defaultError
-            };
-          return {
-            message: defaultError
-          };
-        }
-      } : {}
-    });
-  }
-  strip() {
-    return new ZodObject({
-      ...this._def,
-      unknownKeys: "strip"
-    });
-  }
-  passthrough() {
-    return new ZodObject({
-      ...this._def,
-      unknownKeys: "passthrough"
-    });
-  }
-  // const AugmentFactory =
-  //   <Def extends ZodObjectDef>(def: Def) =>
-  //   <Augmentation extends ZodRawShape>(
-  //     augmentation: Augmentation
-  //   ): ZodObject<
-  //     extendShape<ReturnType<Def["shape"]>, Augmentation>,
-  //     Def["unknownKeys"],
-  //     Def["catchall"]
-  //   > => {
-  //     return new ZodObject({
-  //       ...def,
-  //       shape: () => ({
-  //         ...def.shape(),
-  //         ...augmentation,
-  //       }),
-  //     }) as any;
-  //   };
-  extend(augmentation) {
-    return new ZodObject({
-      ...this._def,
-      shape: () => ({
-        ...this._def.shape(),
-        ...augmentation
-      })
-    });
-  }
-  /**
-   * Prior to zod@1.0.12 there was a bug in the
-   * inferred type of merged objects. Please
-   * upgrade if you are experiencing issues.
-   */
-  merge(merging) {
-    const merged = new ZodObject({
-      unknownKeys: merging._def.unknownKeys,
-      catchall: merging._def.catchall,
-      shape: () => ({
-        ...this._def.shape(),
-        ...merging._def.shape()
-      }),
-      typeName: ZodFirstPartyTypeKind.ZodObject
-    });
-    return merged;
-  }
-  // merge<
-  //   Incoming extends AnyZodObject,
-  //   Augmentation extends Incoming["shape"],
-  //   NewOutput extends {
-  //     [k in keyof Augmentation | keyof Output]: k extends keyof Augmentation
-  //       ? Augmentation[k]["_output"]
-  //       : k extends keyof Output
-  //       ? Output[k]
-  //       : never;
-  //   },
-  //   NewInput extends {
-  //     [k in keyof Augmentation | keyof Input]: k extends keyof Augmentation
-  //       ? Augmentation[k]["_input"]
-  //       : k extends keyof Input
-  //       ? Input[k]
-  //       : never;
-  //   }
-  // >(
-  //   merging: Incoming
-  // ): ZodObject<
-  //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
-  //   Incoming["_def"]["unknownKeys"],
-  //   Incoming["_def"]["catchall"],
-  //   NewOutput,
-  //   NewInput
-  // > {
-  //   const merged: any = new ZodObject({
-  //     unknownKeys: merging._def.unknownKeys,
-  //     catchall: merging._def.catchall,
-  //     shape: () =>
-  //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
-  //     typeName: ZodFirstPartyTypeKind.ZodObject,
-  //   }) as any;
-  //   return merged;
-  // }
-  setKey(key, schema) {
-    return this.augment({ [key]: schema });
-  }
-  // merge<Incoming extends AnyZodObject>(
-  //   merging: Incoming
-  // ): //ZodObject<T & Incoming["_shape"], UnknownKeys, Catchall> = (merging) => {
-  // ZodObject<
-  //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
-  //   Incoming["_def"]["unknownKeys"],
-  //   Incoming["_def"]["catchall"]
-  // > {
-  //   // const mergedShape = objectUtil.mergeShapes(
-  //   //   this._def.shape(),
-  //   //   merging._def.shape()
-  //   // );
-  //   const merged: any = new ZodObject({
-  //     unknownKeys: merging._def.unknownKeys,
-  //     catchall: merging._def.catchall,
-  //     shape: () =>
-  //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
-  //     typeName: ZodFirstPartyTypeKind.ZodObject,
-  //   }) as any;
-  //   return merged;
-  // }
-  catchall(index) {
-    return new ZodObject({
-      ...this._def,
-      catchall: index
-    });
-  }
-  pick(mask) {
-    const shape = {};
-    for (const key of util.objectKeys(mask)) {
-      if (mask[key] && this.shape[key]) {
-        shape[key] = this.shape[key];
-      }
-    }
-    return new ZodObject({
-      ...this._def,
-      shape: () => shape
-    });
-  }
-  omit(mask) {
-    const shape = {};
-    for (const key of util.objectKeys(this.shape)) {
-      if (!mask[key]) {
-        shape[key] = this.shape[key];
-      }
-    }
-    return new ZodObject({
-      ...this._def,
-      shape: () => shape
-    });
-  }
-  /**
-   * @deprecated
-   */
-  deepPartial() {
-    return deepPartialify(this);
-  }
-  partial(mask) {
-    const newShape = {};
-    for (const key of util.objectKeys(this.shape)) {
-      const fieldSchema = this.shape[key];
-      if (mask && !mask[key]) {
-        newShape[key] = fieldSchema;
-      } else {
-        newShape[key] = fieldSchema.optional();
-      }
-    }
-    return new ZodObject({
-      ...this._def,
-      shape: () => newShape
-    });
-  }
-  required(mask) {
-    const newShape = {};
-    for (const key of util.objectKeys(this.shape)) {
-      if (mask && !mask[key]) {
-        newShape[key] = this.shape[key];
-      } else {
-        const fieldSchema = this.shape[key];
-        let newField = fieldSchema;
-        while (newField instanceof ZodOptional) {
-          newField = newField._def.innerType;
-        }
-        newShape[key] = newField;
-      }
-    }
-    return new ZodObject({
-      ...this._def,
-      shape: () => newShape
-    });
-  }
-  keyof() {
-    return createZodEnum(util.objectKeys(this.shape));
-  }
+  const okeys = optionalKeys(def.shape);
+  return {
+    ...def,
+    allKeys,
+    symbolKeys,
+    // string-only: handleCatchall matches it against `for...in`, which never yields a symbol
+    keySet: new Set(keys),
+    numKeys: keys.length,
+    optionalKeys: new Set(okeys)
+  };
 }
-ZodObject.create = (shape, params) => {
-  return new ZodObject({
-    shape: () => shape,
-    unknownKeys: "strip",
-    catchall: ZodNever.create(),
-    typeName: ZodFirstPartyTypeKind.ZodObject,
-    ...processCreateParams(params)
-  });
-};
-ZodObject.strictCreate = (shape, params) => {
-  return new ZodObject({
-    shape: () => shape,
-    unknownKeys: "strict",
-    catchall: ZodNever.create(),
-    typeName: ZodFirstPartyTypeKind.ZodObject,
-    ...processCreateParams(params)
-  });
-};
-ZodObject.lazycreate = (shape, params) => {
-  return new ZodObject({
-    shape,
-    unknownKeys: "strip",
-    catchall: ZodNever.create(),
-    typeName: ZodFirstPartyTypeKind.ZodObject,
-    ...processCreateParams(params)
-  });
-};
-class ZodUnion extends ZodType {
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    const options = this._def.options;
-    function handleResults(results) {
-      for (const result of results) {
-        if (result.result.status === "valid") {
-          return result.result;
-        }
-      }
-      for (const result of results) {
-        if (result.result.status === "dirty") {
-          ctx.common.issues.push(...result.ctx.common.issues);
-          return result.result;
-        }
-      }
-      const unionErrors = results.map((result) => new ZodError(result.ctx.common.issues));
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_union,
-        unionErrors
-      });
-      return INVALID;
+function handleCatchall(proms, input, payload, ctx, def, inst, abortEarly) {
+  const unrecognized = [];
+  const keySet = def.keySet;
+  const _catchall = def.catchall._zod;
+  const t = _catchall.def.type;
+  const optin = _catchall.optin;
+  const optout = _catchall.optout;
+  let seen = 0;
+  for (const key in input) {
+    if (abortEarly && payload.issues.length !== seen) {
+      if (aborted(payload, seen))
+        break;
+      seen = payload.issues.length;
     }
-    if (ctx.common.async) {
-      return Promise.all(options.map(async (option) => {
-        const childCtx = {
-          ...ctx,
-          common: {
-            ...ctx.common,
-            issues: []
-          },
-          parent: null
-        };
-        return {
-          result: await option._parseAsync({
-            data: ctx.data,
-            path: ctx.path,
-            parent: childCtx
-          }),
-          ctx: childCtx
-        };
-      })).then(handleResults);
+    if (keySet.has(key))
+      continue;
+    if (key === "__proto__") {
+      if (t === "never")
+        unrecognized.push(key);
+      continue;
+    }
+    if (t === "never") {
+      unrecognized.push(key);
+      continue;
+    }
+    const r2 = _catchall.run({ value: input[key], issues: [] }, ctx);
+    if (r2 instanceof Promise) {
+      proms.push(r2.then((r3) => handlePropertyResult(r3, payload, key, input, optin, optout)));
     } else {
-      let dirty = void 0;
-      const issues = [];
-      for (const option of options) {
-        const childCtx = {
-          ...ctx,
-          common: {
-            ...ctx.common,
-            issues: []
-          },
-          parent: null
-        };
-        const result = option._parseSync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: childCtx
-        });
-        if (result.status === "valid") {
+      handlePropertyResult(r2, payload, key, input, optin, optout);
+    }
+  }
+  if (unrecognized.length) {
+    payload.issues.push({
+      code: "unrecognized_keys",
+      keys: unrecognized,
+      input,
+      inst,
+      // Describes the shape of the input, not the validity of the parsed value, so it never aborts. The parse still fails; the schema's own checks just get to run first, and an enclosing intersection can reconcile the key against a sibling operand.
+      continue: true
+    });
+  }
+  if (!proms.length)
+    return payload;
+  return Promise.all(proms).then(() => {
+    return payload;
+  });
+}
+const $ZodObject = /* @__PURE__ */ $constructor("$ZodObject", (inst, def) => {
+  $ZodType.init(inst, def);
+  const desc = Object.getOwnPropertyDescriptor(def, "shape");
+  const sh = (desc == null ? void 0 : desc.get) ? desc.get.raw : def.shape ?? {};
+  if (sh) {
+    const get = () => {
+      const newSh = { ...sh };
+      Object.defineProperty(def, "shape", { value: newSh });
+      get.raw = newSh;
+      return newSh;
+    };
+    get.raw = sh;
+    Object.defineProperty(def, "shape", { get });
+  }
+  const _normalized = cached(() => normalizeDef(def));
+  defineLazyInternal(inst, "propValues", (zod) => {
+    const shape = zod.def.shape;
+    const propValues = {};
+    for (const key in shape) {
+      const field = shape[key]._zod;
+      if (field.values) {
+        if (!Object.prototype.hasOwnProperty.call(propValues, key)) {
+          assignProp(propValues, key, /* @__PURE__ */ new Set());
+        }
+        for (const v2 of field.values)
+          propValues[key].add(v2);
+        if (field.optin !== void 0)
+          propValues[key].add(void 0);
+      }
+    }
+    return propValues;
+  });
+  const isObject$1 = isObject;
+  const catchall = def.catchall;
+  let value;
+  const memo2 = globalConfig.memoizer;
+  memo2 == null ? void 0 : memo2.attach(inst);
+  inst._zod.parse = (payload, ctx) => {
+    value ?? (value = _normalized.value);
+    const input = payload.value;
+    if (!isObject$1(input)) {
+      payload.issues.push({
+        expected: "object",
+        code: "invalid_type",
+        input,
+        inst
+      });
+      return payload;
+    }
+    payload.value = memo2 ? memo2.alloc(inst, payload, {}, ctx) : {};
+    const proms = [];
+    const shape = value.shape;
+    const abortEarly = ctx == null ? void 0 : ctx.abortEarly;
+    let seen = payload.issues.length;
+    for (const key of value.allKeys) {
+      if (abortEarly && payload.issues.length !== seen) {
+        if (aborted(payload, seen))
+          break;
+        seen = payload.issues.length;
+      }
+      if (key === "__proto__")
+        continue;
+      const el = shape[key];
+      const optin = el._zod.optin;
+      const optout = el._zod.optout;
+      const r2 = el._zod.run({ value: input[key], issues: [] }, ctx);
+      if (r2 instanceof Promise) {
+        proms.push(r2.then((r3) => handlePropertyResult(r3, payload, key, input, optin, optout)));
+      } else {
+        handlePropertyResult(r2, payload, key, input, optin, optout);
+      }
+    }
+    if (!catchall) {
+      return proms.length ? Promise.all(proms).then(() => payload) : payload;
+    }
+    return handleCatchall(proms, input, payload, ctx, _normalized.value, inst, abortEarly === true);
+  };
+});
+const $ZodObjectJIT = /* @__PURE__ */ $constructor("$ZodObjectJIT", (inst, def) => {
+  $ZodObject.init(inst, def);
+  const superParse = inst._zod.parse;
+  const _normalized = cached(() => normalizeDef(def));
+  const memo2 = globalConfig.memoizer;
+  const generateFastpass = (shape) => {
+    var _a2, _b;
+    const normalized = _normalized.value;
+    const syms = normalized.symbolKeys;
+    const doc = new Doc(["payload", "ctx"], { shape, inst, memo: memo2, syms });
+    const parseStr = (k) => `shape[${k}]._zod.run({ value: input[${k}], issues: [] }, ctx)`;
+    const prefixStr = (id2, k) => `
+          let ${id2}_ab = false;
+          for (let i = 0; i < ${id2}.issues.length; i++) {
+            const iss = ${id2}.issues[i];
+            iss.path = iss.path ? [${k}, ...iss.path] : [${k}];
+            payload.issues.push(iss);
+            if (iss.continue !== true) ${id2}_ab = true;
+          }
+          if (${id2}_ab && ctx && ctx.abortEarly) {
+            payload.value = newResult;
+            return payload;
+          }`;
+    doc.write(`const input = payload.value;`);
+    const ids = /* @__PURE__ */ Object.create(null);
+    let counter = 0;
+    for (const key of normalized.allKeys) {
+      ids[key] = `key_${counter++}`;
+    }
+    doc.write(memo2 ? `const newResult = memo.alloc(inst, payload, {}, ctx);` : `const newResult = {};`);
+    for (const key of normalized.allKeys) {
+      if (key === "__proto__")
+        continue;
+      const id2 = ids[key];
+      const k = typeof key === "symbol" ? `syms[${syms.indexOf(key)}]` : esc(key);
+      const isPresent = `${k} in input`;
+      const schema = shape[key];
+      const optin = (_a2 = schema == null ? void 0 : schema._zod) == null ? void 0 : _a2.optin;
+      const isOptionalIn = optin !== void 0;
+      const isOptionalOut = ((_b = schema == null ? void 0 : schema._zod) == null ? void 0 : _b.optout) === "optional";
+      doc.write(`const ${id2} = ${parseStr(k)};`);
+      if (isOptionalIn && isOptionalOut) {
+        const assign = optin === "optional" ? `${id2}_present` : `${id2}.value !== undefined || ${id2}_present`;
+        doc.write(`
+        const ${id2}_present = ${isPresent};
+        if (!${id2}.issues.length || ${id2}_present) {
+          if (${id2}.issues.length) {${prefixStr(id2, k)}
+          }
+
+          if (${assign}) {
+            newResult[${k}] = ${id2}.value;
+          }
+        }
+
+      `);
+      } else if (!isOptionalIn) {
+        doc.write(`
+        const ${id2}_present = ${isPresent};
+        if (${id2}.issues.length) {${prefixStr(id2, k)}
+        }
+        if (!${id2}_present && !${id2}.issues.length) {
+          payload.issues.push({
+            code: "invalid_type",
+            expected: "nonoptional",
+            input: undefined,
+            path: [${k}]
+          });
+          if (ctx && ctx.abortEarly) {
+            payload.value = newResult;
+            return payload;
+          }
+        }
+
+        if (${id2}_present) {
+          newResult[${k}] = ${id2}.value;
+        }
+
+      `);
+      } else {
+        doc.write(`
+        if (${id2}.issues.length) {${prefixStr(id2, k)}
+        }
+      `);
+        if (optin === "defaulted") {
+          doc.write(`newResult[${k}] = ${id2}.value;`);
+        } else {
+          doc.write(`
+        if (${id2}.value !== undefined || ${isPresent}) {
+          newResult[${k}] = ${id2}.value;
+        }
+      `);
+        }
+      }
+    }
+    doc.write(`payload.value = newResult;`);
+    doc.write(`return payload;`);
+    return doc.compile();
+  };
+  let fastpass;
+  const isObject$1 = isObject;
+  const jit = !globalConfig.jitless;
+  const allowsEval$1 = allowsEval;
+  const fastEnabled = jit && allowsEval$1.value;
+  const catchall = def.catchall;
+  let value;
+  inst._zod.parse = (payload, ctx) => {
+    value ?? (value = _normalized.value);
+    const input = payload.value;
+    if (!isObject$1(input)) {
+      payload.issues.push({
+        expected: "object",
+        code: "invalid_type",
+        input,
+        inst
+      });
+      return payload;
+    }
+    if (jit && fastEnabled && (ctx == null ? void 0 : ctx.async) === false && ctx.jitless !== true) {
+      if (!fastpass)
+        fastpass = generateFastpass(def.shape);
+      payload = fastpass(payload, ctx);
+      if (!catchall)
+        return payload;
+      return handleCatchall([], input, payload, ctx, value, inst, (ctx == null ? void 0 : ctx.abortEarly) === true);
+    }
+    return superParse(payload, ctx);
+  };
+});
+function handleUnionResults(results, final, inst, ctx) {
+  for (const result of results) {
+    if (result.issues.length === 0) {
+      final.value = result.value;
+      return final;
+    }
+  }
+  const nonaborted = results.filter((r2) => !aborted(r2));
+  if (nonaborted.length === 1) {
+    final.value = nonaborted[0].value;
+    return nonaborted[0];
+  }
+  final.issues.push({
+    code: "invalid_union",
+    input: final.value,
+    inst,
+    errors: results.map((result) => result.issues.map((iss) => finalizeIssue(iss, ctx, config())))
+  });
+  return final;
+}
+const $ZodUnion = /* @__PURE__ */ $constructor("$ZodUnion", (inst, def) => {
+  $ZodType.init(inst, def);
+  defineLazyInternal(inst, "optin", (zod) => zod.def.options.some((o) => o._zod.optin === "defaulted") ? "defaulted" : zod.def.options.some((o) => o._zod.optin !== void 0) ? "optional" : void 0);
+  defineLazyInternal(inst, "optout", (zod) => zod.def.options.some((o) => o._zod.optout === "optional") ? "optional" : void 0);
+  defineLazyInternal(inst, "values", (zod) => {
+    if (zod.def.options.every((o) => o._zod.values)) {
+      return new Set(zod.def.options.flatMap((option) => Array.from(option._zod.values)));
+    }
+    return void 0;
+  });
+  defineLazyInternal(inst, "pattern", (zod) => {
+    if (zod.def.options.every((o) => o._zod.pattern)) {
+      const patterns = zod.def.options.map((o) => o._zod.pattern);
+      return new RegExp(`^(${patterns.map((p) => cleanRegex(p.source)).join("|")})$`);
+    }
+    return void 0;
+  });
+  const first = def.options.length === 1 ? def.options[0]._zod.run : null;
+  inst._zod.parse = (payload, ctx) => {
+    if (first) {
+      return first(payload, ctx);
+    }
+    let async = false;
+    const results = [];
+    for (const option of def.options) {
+      const result = option._zod.run({
+        value: payload.value,
+        issues: []
+      }, ctx);
+      if (result instanceof Promise) {
+        results.push(result);
+        async = true;
+      } else {
+        if (result.issues.length === 0)
           return result;
-        } else if (result.status === "dirty" && !dirty) {
-          dirty = { result, ctx: childCtx };
-        }
-        if (childCtx.common.issues.length) {
-          issues.push(childCtx.common.issues);
-        }
+        results.push(result);
       }
-      if (dirty) {
-        ctx.common.issues.push(...dirty.ctx.common.issues);
-        return dirty.result;
-      }
-      const unionErrors = issues.map((issues2) => new ZodError(issues2));
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_union,
-        unionErrors
-      });
-      return INVALID;
     }
-  }
-  get options() {
-    return this._def.options;
-  }
-}
-ZodUnion.create = (types, params) => {
-  return new ZodUnion({
-    options: types,
-    typeName: ZodFirstPartyTypeKind.ZodUnion,
-    ...processCreateParams(params)
-  });
-};
+    if (!async)
+      return handleUnionResults(results, payload, inst, ctx);
+    return Promise.all(results).then((results2) => {
+      return handleUnionResults(results2, payload, inst, ctx);
+    });
+  };
+});
+const $ZodIntersection = /* @__PURE__ */ $constructor("$ZodIntersection", (inst, def) => {
+  $ZodType.init(inst, def);
+  inst._zod.parse = (payload, ctx) => {
+    const input = payload.value;
+    const left = def.left._zod.run({ value: input, issues: [] }, ctx);
+    const right = def.right._zod.run({ value: input, issues: [] }, ctx);
+    const async = left instanceof Promise || right instanceof Promise;
+    if (async) {
+      return Promise.all([left, right]).then(([left2, right2]) => {
+        return handleIntersectionResults(payload, left2, right2);
+      });
+    }
+    return handleIntersectionResults(payload, left, right);
+  };
+});
 function mergeValues(a, b2) {
-  const aType = getParsedType(a);
-  const bType = getParsedType(b2);
   if (a === b2) {
     return { valid: true, data: a };
-  } else if (aType === ZodParsedType.object && bType === ZodParsedType.object) {
-    const bKeys = util.objectKeys(b2);
-    const sharedKeys = util.objectKeys(a).filter((key) => bKeys.indexOf(key) !== -1);
+  }
+  if (a instanceof Date && b2 instanceof Date && +a === +b2) {
+    return { valid: true, data: a };
+  }
+  if (isPlainObject(a) && isPlainObject(b2)) {
+    const bKeys = Object.keys(b2);
+    const sharedKeys = Object.keys(a).filter((key) => bKeys.indexOf(key) !== -1);
     const newObj = { ...a, ...b2 };
+    if (Object.prototype.hasOwnProperty.call(newObj, "__proto__"))
+      delete newObj.__proto__;
     for (const key of sharedKeys) {
+      if (key === "__proto__")
+        continue;
       const sharedValue = mergeValues(a[key], b2[key]);
       if (!sharedValue.valid) {
-        return { valid: false };
+        return {
+          valid: false,
+          mergeErrorPath: [key, ...sharedValue.mergeErrorPath]
+        };
       }
       newObj[key] = sharedValue.data;
     }
     return { valid: true, data: newObj };
-  } else if (aType === ZodParsedType.array && bType === ZodParsedType.array) {
+  }
+  if (Array.isArray(a) && Array.isArray(b2)) {
     if (a.length !== b2.length) {
-      return { valid: false };
+      return { valid: false, mergeErrorPath: [] };
     }
     const newArray = [];
     for (let index = 0; index < a.length; index++) {
@@ -30760,960 +30434,3437 @@ function mergeValues(a, b2) {
       const itemB = b2[index];
       const sharedValue = mergeValues(itemA, itemB);
       if (!sharedValue.valid) {
-        return { valid: false };
+        return {
+          valid: false,
+          mergeErrorPath: [index, ...sharedValue.mergeErrorPath]
+        };
       }
       newArray.push(sharedValue.data);
     }
     return { valid: true, data: newArray };
-  } else if (aType === ZodParsedType.date && bType === ZodParsedType.date && +a === +b2) {
-    return { valid: true, data: a };
-  } else {
-    return { valid: false };
   }
+  return { valid: false, mergeErrorPath: [] };
 }
-class ZodIntersection extends ZodType {
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    const handleParsed = (parsedLeft, parsedRight) => {
-      if (isAborted(parsedLeft) || isAborted(parsedRight)) {
-        return INVALID;
-      }
-      const merged = mergeValues(parsedLeft.value, parsedRight.value);
-      if (!merged.valid) {
-        addIssueToContext(ctx, {
-          code: ZodIssueCode.invalid_intersection_types
-        });
-        return INVALID;
-      }
-      if (isDirty(parsedLeft) || isDirty(parsedRight)) {
-        status.dirty();
-      }
-      return { status: status.value, value: merged.data };
-    };
-    if (ctx.common.async) {
-      return Promise.all([
-        this._def.left._parseAsync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: ctx
-        }),
-        this._def.right._parseAsync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: ctx
-        })
-      ]).then(([left, right]) => handleParsed(left, right));
+function handleIntersectionResults(result, left, right) {
+  const unrecKeys = /* @__PURE__ */ new Map();
+  let unrecIssue;
+  const keyIssues = /* @__PURE__ */ new Map();
+  const collect = (iss, side) => {
+    var _a2, _b;
+    let keys;
+    if (iss.code === "unrecognized_keys" && !((_a2 = iss.path) == null ? void 0 : _a2.length)) {
+      unrecIssue ?? (unrecIssue = iss);
+      keys = iss.keys;
+    } else if (iss.code === "invalid_key" && iss.origin === "record" && ((_b = iss.path) == null ? void 0 : _b.length) === 1) {
+      const k = String(iss.path[0]);
+      if (!keyIssues.has(k))
+        keyIssues.set(k, iss);
+      keys = [k];
     } else {
-      return handleParsed(this._def.left._parseSync({
-        data: ctx.data,
-        path: ctx.path,
-        parent: ctx
-      }), this._def.right._parseSync({
-        data: ctx.data,
-        path: ctx.path,
-        parent: ctx
-      }));
+      return false;
+    }
+    for (const k of keys) {
+      if (!unrecKeys.has(k))
+        unrecKeys.set(k, {});
+      unrecKeys.get(k)[side] = true;
+    }
+    return true;
+  };
+  for (const iss of left.issues) {
+    if (!collect(iss, "l"))
+      result.issues.push(iss);
+  }
+  for (const iss of right.issues) {
+    if (!collect(iss, "r"))
+      result.issues.push(iss);
+  }
+  const bothKeys = [...unrecKeys].filter(([, f]) => f.l && f.r).map(([k]) => k);
+  if (bothKeys.length) {
+    const aggregated = unrecIssue ? bothKeys.filter((k) => unrecIssue.keys.includes(k)) : [];
+    if (aggregated.length)
+      result.issues.push({ ...unrecIssue, keys: aggregated });
+    for (const k of bothKeys) {
+      if (!aggregated.includes(k) && keyIssues.has(k))
+        result.issues.push(keyIssues.get(k));
     }
   }
+  const merged = mergeValues(left.value, right.value);
+  if (!merged.valid) {
+    if (aborted(result))
+      return result;
+    throw new Error(`Unmergable intersection. Error path: ${JSON.stringify(merged.mergeErrorPath)}`);
+  }
+  result.value = merged.data;
+  return result;
 }
-ZodIntersection.create = (left, right, params) => {
-  return new ZodIntersection({
-    left,
-    right,
-    typeName: ZodFirstPartyTypeKind.ZodIntersection,
-    ...processCreateParams(params)
-  });
-};
-class ZodTuple extends ZodType {
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.array) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.array,
-        received: ctx.parsedType
+const $ZodRecord = /* @__PURE__ */ $constructor("$ZodRecord", (inst, def) => {
+  $ZodType.init(inst, def);
+  const memo2 = globalConfig.memoizer;
+  memo2 == null ? void 0 : memo2.attach(inst);
+  inst._zod.parse = (payload, ctx) => {
+    const input = payload.value;
+    if (!isPlainObject(input)) {
+      payload.issues.push({
+        expected: "record",
+        code: "invalid_type",
+        input,
+        inst
       });
-      return INVALID;
+      return payload;
     }
-    if (ctx.data.length < this._def.items.length) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.too_small,
-        minimum: this._def.items.length,
-        inclusive: true,
-        exact: false,
-        type: "array"
-      });
-      return INVALID;
-    }
-    const rest = this._def.rest;
-    if (!rest && ctx.data.length > this._def.items.length) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.too_big,
-        maximum: this._def.items.length,
-        inclusive: true,
-        exact: false,
-        type: "array"
-      });
-      status.dirty();
-    }
-    const items = [...ctx.data].map((item, itemIndex) => {
-      const schema = this._def.items[itemIndex] || this._def.rest;
-      if (!schema)
-        return null;
-      return schema._parse(new ParseInputLazyPath(ctx, item, ctx.path, itemIndex));
-    }).filter((x2) => !!x2);
-    if (ctx.common.async) {
-      return Promise.all(items).then((results) => {
-        return ParseStatus.mergeArray(status, results);
-      });
-    } else {
-      return ParseStatus.mergeArray(status, items);
-    }
-  }
-  get items() {
-    return this._def.items;
-  }
-  rest(rest) {
-    return new ZodTuple({
-      ...this._def,
-      rest
-    });
-  }
-}
-ZodTuple.create = (schemas, params) => {
-  if (!Array.isArray(schemas)) {
-    throw new Error("You must pass an array of schemas to z.tuple([ ... ])");
-  }
-  return new ZodTuple({
-    items: schemas,
-    typeName: ZodFirstPartyTypeKind.ZodTuple,
-    rest: null,
-    ...processCreateParams(params)
-  });
-};
-class ZodRecord extends ZodType {
-  get keySchema() {
-    return this._def.keyType;
-  }
-  get valueSchema() {
-    return this._def.valueType;
-  }
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.object) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.object,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    const pairs = [];
-    const keyType = this._def.keyType;
-    const valueType = this._def.valueType;
-    for (const key in ctx.data) {
-      pairs.push({
-        key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, key)),
-        value: valueType._parse(new ParseInputLazyPath(ctx, ctx.data[key], ctx.path, key)),
-        alwaysSet: key in ctx.data
-      });
-    }
-    if (ctx.common.async) {
-      return ParseStatus.mergeObjectAsync(status, pairs);
-    } else {
-      return ParseStatus.mergeObjectSync(status, pairs);
-    }
-  }
-  get element() {
-    return this._def.valueType;
-  }
-  static create(first, second, third) {
-    if (second instanceof ZodType) {
-      return new ZodRecord({
-        keyType: first,
-        valueType: second,
-        typeName: ZodFirstPartyTypeKind.ZodRecord,
-        ...processCreateParams(third)
-      });
-    }
-    return new ZodRecord({
-      keyType: ZodString.create(),
-      valueType: first,
-      typeName: ZodFirstPartyTypeKind.ZodRecord,
-      ...processCreateParams(second)
-    });
-  }
-}
-class ZodMap extends ZodType {
-  get keySchema() {
-    return this._def.keyType;
-  }
-  get valueSchema() {
-    return this._def.valueType;
-  }
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.map) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.map,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    const keyType = this._def.keyType;
-    const valueType = this._def.valueType;
-    const pairs = [...ctx.data.entries()].map(([key, value], index) => {
-      return {
-        key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, [index, "key"])),
-        value: valueType._parse(new ParseInputLazyPath(ctx, value, ctx.path, [index, "value"]))
-      };
-    });
-    if (ctx.common.async) {
-      const finalMap = /* @__PURE__ */ new Map();
-      return Promise.resolve().then(async () => {
-        for (const pair of pairs) {
-          const key = await pair.key;
-          const value = await pair.value;
-          if (key.status === "aborted" || value.status === "aborted") {
-            return INVALID;
+    const proms = [];
+    const values = def.keyType._zod.values;
+    if (values && !def.partial) {
+      payload.value = memo2 ? memo2.alloc(inst, payload, {}, ctx) : {};
+      const recordKeys = /* @__PURE__ */ new Set();
+      for (const key of values) {
+        if (typeof key === "string" || typeof key === "number" || typeof key === "symbol") {
+          recordKeys.add(typeof key === "number" ? key.toString() : key);
+          if (key === "__proto__")
+            continue;
+          const keyResult = def.keyType._zod.run({ value: key, issues: [] }, ctx);
+          if (keyResult instanceof Promise) {
+            throw new Error("Async schemas not supported in object keys currently");
           }
-          if (key.status === "dirty" || value.status === "dirty") {
-            status.dirty();
+          if (keyResult.issues.length) {
+            payload.issues.push({
+              code: "invalid_key",
+              origin: "record",
+              issues: keyResult.issues.map((iss) => finalizeIssue(iss, ctx, config())),
+              input: key,
+              path: [key],
+              inst
+            });
+            continue;
           }
-          finalMap.set(key.value, value.value);
+          const outKey = keyResult.value;
+          if (outKey === "__proto__")
+            continue;
+          const result = def.valueType._zod.run({ value: input[key], issues: [] }, ctx);
+          if (result instanceof Promise) {
+            proms.push(result.then((result2) => {
+              if (result2.issues.length) {
+                payload.issues.push(...prefixIssues(key, result2.issues));
+              }
+              payload.value[outKey] = result2.value;
+            }));
+          } else {
+            if (result.issues.length) {
+              payload.issues.push(...prefixIssues(key, result.issues));
+            }
+            payload.value[outKey] = result.value;
+          }
         }
-        return { status: status.value, value: finalMap };
-      });
-    } else {
-      const finalMap = /* @__PURE__ */ new Map();
-      for (const pair of pairs) {
-        const key = pair.key;
-        const value = pair.value;
-        if (key.status === "aborted" || value.status === "aborted") {
-          return INVALID;
-        }
-        if (key.status === "dirty" || value.status === "dirty") {
-          status.dirty();
-        }
-        finalMap.set(key.value, value.value);
       }
-      return { status: status.value, value: finalMap };
-    }
-  }
-}
-ZodMap.create = (keyType, valueType, params) => {
-  return new ZodMap({
-    valueType,
-    keyType,
-    typeName: ZodFirstPartyTypeKind.ZodMap,
-    ...processCreateParams(params)
-  });
-};
-class ZodSet extends ZodType {
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.set) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.set,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    const def = this._def;
-    if (def.minSize !== null) {
-      if (ctx.data.size < def.minSize.value) {
-        addIssueToContext(ctx, {
-          code: ZodIssueCode.too_small,
-          minimum: def.minSize.value,
-          type: "set",
-          inclusive: true,
-          exact: false,
-          message: def.minSize.message
+      let unrecognized;
+      for (const key in input) {
+        if (!recordKeys.has(key)) {
+          if (def.mode === "loose") {
+            if (key === "__proto__")
+              continue;
+            payload.value[key] = input[key];
+          } else {
+            unrecognized = unrecognized ?? [];
+            unrecognized.push(key);
+          }
+        }
+      }
+      if (unrecognized && unrecognized.length > 0) {
+        payload.issues.push({
+          code: "unrecognized_keys",
+          input,
+          inst,
+          keys: unrecognized,
+          continue: true
         });
-        status.dirty();
       }
-    }
-    if (def.maxSize !== null) {
-      if (ctx.data.size > def.maxSize.value) {
-        addIssueToContext(ctx, {
-          code: ZodIssueCode.too_big,
-          maximum: def.maxSize.value,
-          type: "set",
-          inclusive: true,
-          exact: false,
-          message: def.maxSize.message
-        });
-        status.dirty();
-      }
-    }
-    const valueType = this._def.valueType;
-    function finalizeSet(elements2) {
-      const parsedSet = /* @__PURE__ */ new Set();
-      for (const element of elements2) {
-        if (element.status === "aborted")
-          return INVALID;
-        if (element.status === "dirty")
-          status.dirty();
-        parsedSet.add(element.value);
-      }
-      return { status: status.value, value: parsedSet };
-    }
-    const elements = [...ctx.data.values()].map((item, i) => valueType._parse(new ParseInputLazyPath(ctx, item, ctx.path, i)));
-    if (ctx.common.async) {
-      return Promise.all(elements).then((elements2) => finalizeSet(elements2));
     } else {
-      return finalizeSet(elements);
-    }
-  }
-  min(minSize, message) {
-    return new ZodSet({
-      ...this._def,
-      minSize: { value: minSize, message: errorUtil.toString(message) }
-    });
-  }
-  max(maxSize, message) {
-    return new ZodSet({
-      ...this._def,
-      maxSize: { value: maxSize, message: errorUtil.toString(message) }
-    });
-  }
-  size(size, message) {
-    return this.min(size, message).max(size, message);
-  }
-  nonempty(message) {
-    return this.min(1, message);
-  }
-}
-ZodSet.create = (valueType, params) => {
-  return new ZodSet({
-    valueType,
-    minSize: null,
-    maxSize: null,
-    typeName: ZodFirstPartyTypeKind.ZodSet,
-    ...processCreateParams(params)
-  });
-};
-class ZodLazy extends ZodType {
-  get schema() {
-    return this._def.getter();
-  }
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    const lazySchema = this._def.getter();
-    return lazySchema._parse({ data: ctx.data, path: ctx.path, parent: ctx });
-  }
-}
-ZodLazy.create = (getter, params) => {
-  return new ZodLazy({
-    getter,
-    typeName: ZodFirstPartyTypeKind.ZodLazy,
-    ...processCreateParams(params)
-  });
-};
-class ZodLiteral extends ZodType {
-  _parse(input) {
-    if (input.data !== this._def.value) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        received: ctx.data,
-        code: ZodIssueCode.invalid_literal,
-        expected: this._def.value
-      });
-      return INVALID;
-    }
-    return { status: "valid", value: input.data };
-  }
-  get value() {
-    return this._def.value;
-  }
-}
-ZodLiteral.create = (value, params) => {
-  return new ZodLiteral({
-    value,
-    typeName: ZodFirstPartyTypeKind.ZodLiteral,
-    ...processCreateParams(params)
-  });
-};
-function createZodEnum(values, params) {
-  return new ZodEnum({
-    values,
-    typeName: ZodFirstPartyTypeKind.ZodEnum,
-    ...processCreateParams(params)
-  });
-}
-class ZodEnum extends ZodType {
-  _parse(input) {
-    if (typeof input.data !== "string") {
-      const ctx = this._getOrReturnCtx(input);
-      const expectedValues = this._def.values;
-      addIssueToContext(ctx, {
-        expected: util.joinValues(expectedValues),
-        received: ctx.parsedType,
-        code: ZodIssueCode.invalid_type
-      });
-      return INVALID;
-    }
-    if (!this._cache) {
-      this._cache = new Set(this._def.values);
-    }
-    if (!this._cache.has(input.data)) {
-      const ctx = this._getOrReturnCtx(input);
-      const expectedValues = this._def.values;
-      addIssueToContext(ctx, {
-        received: ctx.data,
-        code: ZodIssueCode.invalid_enum_value,
-        options: expectedValues
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-  get options() {
-    return this._def.values;
-  }
-  get enum() {
-    const enumValues = {};
-    for (const val of this._def.values) {
-      enumValues[val] = val;
-    }
-    return enumValues;
-  }
-  get Values() {
-    const enumValues = {};
-    for (const val of this._def.values) {
-      enumValues[val] = val;
-    }
-    return enumValues;
-  }
-  get Enum() {
-    const enumValues = {};
-    for (const val of this._def.values) {
-      enumValues[val] = val;
-    }
-    return enumValues;
-  }
-  extract(values, newDef = this._def) {
-    return ZodEnum.create(values, {
-      ...this._def,
-      ...newDef
-    });
-  }
-  exclude(values, newDef = this._def) {
-    return ZodEnum.create(this.options.filter((opt) => !values.includes(opt)), {
-      ...this._def,
-      ...newDef
-    });
-  }
-}
-ZodEnum.create = createZodEnum;
-class ZodNativeEnum extends ZodType {
-  _parse(input) {
-    const nativeEnumValues = util.getValidEnumValues(this._def.values);
-    const ctx = this._getOrReturnCtx(input);
-    if (ctx.parsedType !== ZodParsedType.string && ctx.parsedType !== ZodParsedType.number) {
-      const expectedValues = util.objectValues(nativeEnumValues);
-      addIssueToContext(ctx, {
-        expected: util.joinValues(expectedValues),
-        received: ctx.parsedType,
-        code: ZodIssueCode.invalid_type
-      });
-      return INVALID;
-    }
-    if (!this._cache) {
-      this._cache = new Set(util.getValidEnumValues(this._def.values));
-    }
-    if (!this._cache.has(input.data)) {
-      const expectedValues = util.objectValues(nativeEnumValues);
-      addIssueToContext(ctx, {
-        received: ctx.data,
-        code: ZodIssueCode.invalid_enum_value,
-        options: expectedValues
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-  get enum() {
-    return this._def.values;
-  }
-}
-ZodNativeEnum.create = (values, params) => {
-  return new ZodNativeEnum({
-    values,
-    typeName: ZodFirstPartyTypeKind.ZodNativeEnum,
-    ...processCreateParams(params)
-  });
-};
-class ZodPromise extends ZodType {
-  unwrap() {
-    return this._def.type;
-  }
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.promise && ctx.common.async === false) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.promise,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    const promisified = ctx.parsedType === ZodParsedType.promise ? ctx.data : Promise.resolve(ctx.data);
-    return OK(promisified.then((data) => {
-      return this._def.type.parseAsync(data, {
-        path: ctx.path,
-        errorMap: ctx.common.contextualErrorMap
-      });
-    }));
-  }
-}
-ZodPromise.create = (schema, params) => {
-  return new ZodPromise({
-    type: schema,
-    typeName: ZodFirstPartyTypeKind.ZodPromise,
-    ...processCreateParams(params)
-  });
-};
-class ZodEffects extends ZodType {
-  innerType() {
-    return this._def.schema;
-  }
-  sourceType() {
-    return this._def.schema._def.typeName === ZodFirstPartyTypeKind.ZodEffects ? this._def.schema.sourceType() : this._def.schema;
-  }
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    const effect = this._def.effect || null;
-    const checkCtx = {
-      addIssue: (arg) => {
-        addIssueToContext(ctx, arg);
-        if (arg.fatal) {
-          status.abort();
+      payload.value = memo2 ? memo2.alloc(inst, payload, {}, ctx) : {};
+      let unrecognized;
+      for (const key of Reflect.ownKeys(input)) {
+        if (key === "__proto__")
+          continue;
+        if (!Object.prototype.propertyIsEnumerable.call(input, key))
+          continue;
+        let keyResult = def.keyType._zod.run({ value: key, issues: [] }, ctx);
+        if (keyResult instanceof Promise) {
+          throw new Error("Async schemas not supported in object keys currently");
+        }
+        const checkNumericKey = typeof key === "string" && number$1.test(key) && keyResult.issues.length;
+        if (checkNumericKey) {
+          const retryResult = def.keyType._zod.run({ value: Number(key), issues: [] }, ctx);
+          if (retryResult instanceof Promise) {
+            throw new Error("Async schemas not supported in object keys currently");
+          }
+          if (retryResult.issues.length === 0) {
+            keyResult = retryResult;
+          }
+        }
+        if (keyResult.issues.length) {
+          if (def.mode === "loose") {
+            payload.value[key] = input[key];
+          } else if (values) {
+            unrecognized = unrecognized ?? [];
+            unrecognized.push(key);
+          } else {
+            payload.issues.push({
+              code: "invalid_key",
+              origin: "record",
+              issues: keyResult.issues.map((iss) => finalizeIssue(iss, ctx, config())),
+              input: key,
+              path: [key],
+              inst
+            });
+          }
+          continue;
+        }
+        const outKey = keyResult.value;
+        if (outKey === "__proto__")
+          continue;
+        const result = def.valueType._zod.run({ value: input[key], issues: [] }, ctx);
+        if (result instanceof Promise) {
+          proms.push(result.then((result2) => {
+            if (result2.issues.length) {
+              payload.issues.push(...prefixIssues(key, result2.issues));
+            }
+            payload.value[outKey] = result2.value;
+          }));
         } else {
-          status.dirty();
+          if (result.issues.length) {
+            payload.issues.push(...prefixIssues(key, result.issues));
+          }
+          payload.value[outKey] = result.value;
+        }
+      }
+      if (unrecognized && unrecognized.length > 0) {
+        payload.issues.push({
+          code: "unrecognized_keys",
+          input,
+          inst,
+          keys: unrecognized,
+          continue: true
+        });
+      }
+    }
+    if (proms.length) {
+      return Promise.all(proms).then(() => payload);
+    }
+    return payload;
+  };
+});
+const $ZodEnum = /* @__PURE__ */ $constructor("$ZodEnum", (inst, def) => {
+  $ZodType.init(inst, def);
+  const values = getEnumValues(def.entries);
+  const valuesSet = new Set(values);
+  inst._zod.values = valuesSet;
+  defineLazyInternal(inst, "pattern", (zod) => {
+    const patternValues = getEnumValues(zod.def.entries).filter((k) => propertyKeyTypes.has(typeof k));
+    return new RegExp(patternValues.length ? `^(${patternValues.map((o) => escapeRegex(o.toString())).join("|")})$` : "^[^\\s\\S]$");
+  });
+  inst._zod.parse = (payload, _ctx) => {
+    const input = payload.value;
+    if (valuesSet.has(input)) {
+      return payload;
+    }
+    payload.issues.push({
+      code: "invalid_value",
+      values,
+      input,
+      inst
+    });
+    return payload;
+  };
+});
+const $ZodTransform = /* @__PURE__ */ $constructor("$ZodTransform", (inst, def) => {
+  var _a2;
+  $ZodType.init(inst, def);
+  inst._zod.optin = "optional";
+  (_a2 = globalConfig.memoizer) == null ? void 0 : _a2.guard(inst);
+  inst._zod.parse = (payload, ctx) => {
+    if (ctx.direction === "backward") {
+      throw new $ZodEncodeError(inst.constructor.name);
+    }
+    const _out = def.transform(payload.value, payload);
+    if (ctx.async) {
+      const output = _out instanceof Promise ? _out : Promise.resolve(_out);
+      return output.then((output2) => {
+        payload.value = output2;
+        return payload;
+      });
+    }
+    if (_out instanceof Promise) {
+      throw new $ZodAsyncError();
+    }
+    payload.value = _out;
+    return payload;
+  };
+});
+function handleOptionalResult(payload, result) {
+  payload.value = result.issues.length ? void 0 : result.value;
+  return payload;
+}
+const $ZodOptional = /* @__PURE__ */ $constructor("$ZodOptional", (inst, def) => {
+  $ZodType.init(inst, def);
+  defineLazyInternal(inst, "optin", (zod) => zod.def.innerType._zod.optin === "defaulted" ? "defaulted" : "optional");
+  inst._zod.optout = "optional";
+  defineLazyInternal(inst, "values", (zod) => {
+    const values = zod.def.innerType._zod.values;
+    return values ? /* @__PURE__ */ new Set([...values, void 0]) : void 0;
+  });
+  defineLazyInternal(inst, "pattern", (zod) => {
+    const pattern = zod.def.innerType._zod.pattern;
+    return pattern ? new RegExp(`^(${cleanRegex(pattern.source)})?$`) : void 0;
+  });
+  inst._zod.parse = (payload, ctx) => {
+    if (payload.value === void 0) {
+      if (def.innerType._zod.optin !== "defaulted")
+        return payload;
+      const result = def.innerType._zod.run({ value: payload.value, issues: [] }, ctx);
+      if (result instanceof Promise)
+        return result.then((result2) => handleOptionalResult(payload, result2));
+      return handleOptionalResult(payload, result);
+    }
+    return def.innerType._zod.run(payload, ctx);
+  };
+});
+const $ZodExactOptional = /* @__PURE__ */ $constructor("$ZodExactOptional", (inst, def) => {
+  $ZodOptional.init(inst, def);
+  defineLazyInternal(inst, "values", (zod) => zod.def.innerType._zod.values);
+  defineLazyInternal(inst, "pattern", (zod) => zod.def.innerType._zod.pattern);
+  inst._zod.parse = (payload, ctx) => {
+    return def.innerType._zod.run(payload, ctx);
+  };
+});
+const $ZodNullable = /* @__PURE__ */ $constructor("$ZodNullable", (inst, def) => {
+  $ZodType.init(inst, def);
+  defineLazyInternal(inst, "optin", (zod) => zod.def.innerType._zod.optin);
+  defineLazyInternal(inst, "optout", (zod) => zod.def.innerType._zod.optout);
+  defineLazyInternal(inst, "pattern", (zod) => {
+    const pattern = zod.def.innerType._zod.pattern;
+    return pattern ? new RegExp(`^(${cleanRegex(pattern.source)}|null)$`) : void 0;
+  });
+  defineLazyInternal(inst, "values", (zod) => {
+    return zod.def.innerType._zod.values ? /* @__PURE__ */ new Set([...zod.def.innerType._zod.values, null]) : void 0;
+  });
+  inst._zod.parse = (payload, ctx) => {
+    if (payload.value === null)
+      return payload;
+    return def.innerType._zod.run(payload, ctx);
+  };
+});
+const $ZodDefault = /* @__PURE__ */ $constructor("$ZodDefault", (inst, def) => {
+  $ZodType.init(inst, def);
+  inst._zod.optin = "defaulted";
+  defineLazyInternal(inst, "values", (zod) => zod.def.innerType._zod.values);
+  inst._zod.parse = (payload, ctx) => {
+    if (ctx.direction === "backward") {
+      return def.innerType._zod.run(payload, ctx);
+    }
+    if (payload.value === void 0) {
+      payload.value = def.defaultValue;
+      return payload;
+    }
+    const result = def.innerType._zod.run(payload, ctx);
+    if (result instanceof Promise) {
+      return result.then((result2) => handleDefaultResult(result2, def));
+    }
+    return handleDefaultResult(result, def);
+  };
+});
+function handleDefaultResult(payload, def) {
+  if (payload.value === void 0) {
+    payload.value = def.defaultValue;
+  }
+  return payload;
+}
+const $ZodPrefault = /* @__PURE__ */ $constructor("$ZodPrefault", (inst, def) => {
+  $ZodType.init(inst, def);
+  inst._zod.optin = "defaulted";
+  defineLazyInternal(inst, "values", (zod) => zod.def.innerType._zod.values);
+  inst._zod.parse = (payload, ctx) => {
+    if (ctx.direction === "backward") {
+      return def.innerType._zod.run(payload, ctx);
+    }
+    if (payload.value === void 0) {
+      payload.value = def.defaultValue;
+    }
+    return def.innerType._zod.run(payload, ctx);
+  };
+});
+const $ZodNonOptional = /* @__PURE__ */ $constructor("$ZodNonOptional", (inst, def) => {
+  $ZodType.init(inst, def);
+  defineLazyInternal(inst, "values", (zod) => {
+    const v2 = zod.def.innerType._zod.values;
+    return v2 ? new Set([...v2].filter((x2) => x2 !== void 0)) : void 0;
+  });
+  inst._zod.parse = (payload, ctx) => {
+    const result = def.innerType._zod.run(payload, ctx);
+    if (result instanceof Promise) {
+      return result.then((result2) => handleNonOptionalResult(result2, inst));
+    }
+    return handleNonOptionalResult(result, inst);
+  };
+});
+function handleNonOptionalResult(payload, inst) {
+  if (!payload.issues.length && payload.value === void 0) {
+    payload.issues.push({
+      code: "invalid_type",
+      expected: "nonoptional",
+      input: payload.value,
+      inst
+    });
+  }
+  return payload;
+}
+function handleCatchResult(payload, result, def, ctx) {
+  if (!result.issues.length) {
+    payload.value = result.value;
+    if (result.memo)
+      payload.memo = true;
+    return payload;
+  }
+  payload.value = def.catchValue({
+    ...result,
+    value: payload.value,
+    error: {
+      issues: result.issues.map((iss) => finalizeIssue(iss, ctx, config()))
+    },
+    input: payload.value
+  });
+  return payload;
+}
+const $ZodCatch = /* @__PURE__ */ $constructor("$ZodCatch", (inst, def) => {
+  $ZodType.init(inst, def);
+  defineLazyInternal(inst, "optin", (zod) => zod.def.innerType._zod.optin === "defaulted" ? "defaulted" : "optional");
+  defineLazyInternal(inst, "optout", (zod) => zod.def.innerType._zod.optout);
+  defineLazyInternal(inst, "values", (zod) => zod.def.innerType._zod.values);
+  inst._zod.parse = (payload, ctx) => {
+    if (ctx.direction === "backward") {
+      return def.innerType._zod.run(payload, ctx);
+    }
+    const result = def.innerType._zod.run({ value: payload.value, issues: [] }, ctx);
+    if (result instanceof Promise) {
+      return result.then((result2) => handleCatchResult(payload, result2, def, ctx));
+    }
+    return handleCatchResult(payload, result, def, ctx);
+  };
+});
+const $ZodPipe = /* @__PURE__ */ $constructor("$ZodPipe", (inst, def) => {
+  $ZodType.init(inst, def);
+  defineLazyInternal(inst, "values", (zod) => zod.def.in._zod.values);
+  defineLazyInternal(inst, "optin", (zod) => zod.def.in._zod.optin);
+  defineLazyInternal(inst, "optout", (zod) => zod.def.out._zod.optout);
+  defineLazyInternal(inst, "propValues", (zod) => zod.def.in._zod.propValues);
+  inst._zod.parse = (payload, ctx) => {
+    if (ctx.direction === "backward") {
+      const right = def.out._zod.run(payload, ctx);
+      if (right instanceof Promise) {
+        return right.then((right2) => handlePipeResult(right2, def.in, ctx));
+      }
+      return handlePipeResult(right, def.in, ctx);
+    }
+    const left = def.in._zod.run(payload, ctx);
+    if (left instanceof Promise) {
+      return left.then((left2) => handlePipeResult(left2, def.out, ctx));
+    }
+    return handlePipeResult(left, def.out, ctx);
+  };
+});
+function handlePipeResult(left, next, ctx) {
+  if (left.issues.some((iss) => iss.code !== "unrecognized_keys")) {
+    left.aborted = true;
+    return left;
+  }
+  return next._zod.run({ value: left.value, issues: left.issues }, ctx);
+}
+const $ZodReadonly = /* @__PURE__ */ $constructor("$ZodReadonly", (inst, def) => {
+  $ZodType.init(inst, def);
+  defineLazyInternal(inst, "propValues", (zod) => zod.def.innerType._zod.propValues);
+  defineLazyInternal(inst, "values", (zod) => zod.def.innerType._zod.values);
+  defineLazyInternal(inst, "optin", (zod) => {
+    var _a2, _b;
+    return (_b = (_a2 = zod.def.innerType) == null ? void 0 : _a2._zod) == null ? void 0 : _b.optin;
+  });
+  defineLazyInternal(inst, "optout", (zod) => {
+    var _a2, _b;
+    return (_b = (_a2 = zod.def.innerType) == null ? void 0 : _a2._zod) == null ? void 0 : _b.optout;
+  });
+  inst._zod.parse = (payload, ctx) => {
+    if (ctx.direction === "backward") {
+      return def.innerType._zod.run(payload, ctx);
+    }
+    const result = def.innerType._zod.run(payload, ctx);
+    if (result instanceof Promise) {
+      return result.then(handleReadonlyResult);
+    }
+    return handleReadonlyResult(result);
+  };
+});
+function handleReadonlyResult(payload) {
+  if (!payload.memo)
+    payload.value = Object.freeze(payload.value);
+  return payload;
+}
+const $ZodCustom = /* @__PURE__ */ $constructor("$ZodCustom", (inst, def) => {
+  $ZodCheck.init(inst, def);
+  $ZodType.init(inst, def);
+  inst._zod.parse = (payload, _2) => {
+    return payload;
+  };
+  inst._zod.check = (payload) => {
+    const input = payload.value;
+    const r2 = def.fn(input);
+    if (r2 instanceof Promise) {
+      return r2.then((r3) => handleRefineResult(r3, payload, input, inst));
+    }
+    handleRefineResult(r2, payload, input, inst);
+    return;
+  };
+});
+function handleRefineResult(result, payload, input, inst) {
+  if (!result) {
+    const _iss = {
+      code: "custom",
+      input,
+      inst,
+      // incorporates params.error into issue reporting
+      path: [...inst._zod.def.path ?? []],
+      // incorporates params.error into issue reporting
+      continue: !inst._zod.def.abort
+      // params: inst._zod.def.params,
+    };
+    if (inst._zod.def.params)
+      _iss.params = inst._zod.def.params;
+    payload.issues.push(issue(_iss));
+  }
+}
+class $ZodCyclicError extends Error {
+  constructor() {
+    super(`Cannot parse a reference cycle that closes through a transform`);
+    this.name = "ZodCyclicError";
+  }
+}
+const STATE = "~memo";
+const NO_ISSUES = [];
+function isRef(value) {
+  return value !== null && typeof value === "object";
+}
+function cloneIssues(issues) {
+  return issues.map((iss) => iss.path ? { ...iss, path: iss.path.slice() } : { ...iss });
+}
+const recursive = /* @__PURE__ */ new WeakMap();
+const NONE = 0;
+const ASSUMED = 1;
+const PROVEN = 2;
+function isRecursive(inst, stack, resolve) {
+  const cached2 = recursive.get(inst);
+  if (cached2 !== void 0)
+    return cached2 ? PROVEN : NONE;
+  if (stack.has(inst))
+    return PROVEN;
+  stack.add(inst);
+  let result = NONE;
+  const check = (child) => {
+    if (result !== PROVEN && (child == null ? void 0 : child._zod)) {
+      const answer = isRecursive(child, stack);
+      if (answer > result)
+        result = answer;
+    }
+  };
+  const shape = (sh, spread) => {
+    var _a2;
+    let answer = NONE;
+    for (const key of Reflect.ownKeys(sh)) {
+      const desc = Object.getOwnPropertyDescriptor(sh, key);
+      if (!desc.enumerable)
+        continue;
+      const child = desc.get ? ASSUMED : ((_a2 = desc.value) == null ? void 0 : _a2._zod) ? isRecursive(desc.value, stack) : NONE;
+      if (child > answer)
+        answer = child;
+    }
+    return answer;
+  };
+  const merge2 = (answer) => {
+    if (answer > result)
+      result = answer;
+  };
+  const def = inst._zod.def;
+  const kind = def.type;
+  switch (kind) {
+    case "object": {
+      const raw = rawShape(def);
+      merge2(raw ? shape(raw) : ASSUMED);
+      check(def.catchall);
+      break;
+    }
+    case "array":
+      check(def.element);
+      break;
+    case "tuple":
+      for (const el of def.items)
+        check(el);
+      check(def.rest);
+      break;
+    case "record":
+    case "map":
+      check(def.keyType);
+      check(def.valueType);
+      break;
+    case "set":
+      check(def.valueType);
+      break;
+    case "union":
+      for (const el of def.options)
+        check(el);
+      break;
+    case "intersection":
+      check(def.left);
+      check(def.right);
+      break;
+    case "optional":
+    case "nullable":
+    case "default":
+    case "prefault":
+    case "catch":
+    case "readonly":
+    case "nonoptional":
+    case "promise":
+    case "success":
+      check(def.innerType);
+      break;
+    case "pipe":
+      check(def.in);
+      check(def.out);
+      break;
+    case "function":
+      check(def.input);
+      check(def.output);
+      break;
+    // `$ZodLazy` caches its inner on the def, so a resolved edge is followed exactly
+    case "lazy": {
+      const inner = def._cachedInner ?? void 0;
+      merge2(inner ? isRecursive(inner, stack) : ASSUMED);
+      break;
+    }
+    // a leaf by choice: `parts` are regex fragments, not data positions
+    case "template_literal":
+    // leaves
+    case "string":
+    case "number":
+    case "int":
+    case "boolean":
+    case "bigint":
+    case "symbol":
+    case "undefined":
+    case "null":
+    case "void":
+    case "never":
+    case "any":
+    case "unknown":
+    case "date":
+    case "nan":
+    case "enum":
+    case "literal":
+    case "file":
+    case "transform":
+    case "custom":
+      break;
+    default: {
+      for (const key in def) {
+        const desc = Object.getOwnPropertyDescriptor(def, key);
+        if (!desc || desc.get)
+          continue;
+        const value = desc.value;
+        if (!value || typeof value !== "object")
+          continue;
+        if (value._zod)
+          check(value);
+        else if (Array.isArray(value))
+          for (const el of value)
+            check(el);
+      }
+    }
+  }
+  stack.delete(inst);
+  return settle(inst, result);
+}
+function settle(inst, answer) {
+  if (answer !== ASSUMED)
+    recursive.set(inst, answer === PROVEN);
+  return answer;
+}
+function bucketFor(state, inst) {
+  let bucket = state.buckets.get(inst);
+  if (!bucket) {
+    bucket = /* @__PURE__ */ new WeakMap();
+    state.buckets.set(inst, bucket);
+  }
+  return bucket;
+}
+let handoff;
+const open = [];
+const memo = {
+  alloc(_inst, payload, empty) {
+    const bucket = handoff;
+    if (!bucket)
+      return empty;
+    handoff = void 0;
+    const entry = { value: empty, issues: null };
+    bucket.set(payload.value, entry);
+    open.push(entry);
+    return empty;
+  },
+  guard(inst) {
+    var _a2;
+    (_a2 = inst._zod).deferred ?? (_a2.deferred = []);
+    inst._zod.deferred.push(() => {
+      const base = inst._zod.parse;
+      const wrapped = (payload, ctx) => {
+        if (ctx.direction !== "backward" && isBackEdge(ctx, payload.value))
+          throw new $ZodCyclicError();
+        return base(payload, ctx);
+      };
+      inst._zod.parse = wrapped;
+      if (inst._zod.run === base)
+        inst._zod.run = wrapped;
+    });
+  },
+  attach(inst) {
+    var _a2;
+    let isRecursiveInst;
+    let rechecked = false;
+    let lastCtx;
+    let lastBucket;
+    (_a2 = inst._zod).deferred ?? (_a2.deferred = []);
+    inst._zod.deferred.push(() => {
+      const base = inst._zod.parse;
+      const wrapped = (payload, ctx) => {
+        if (isRecursiveInst === void 0) {
+          const walked = isRecursive(inst, /* @__PURE__ */ new Set());
+          if (walked === NONE) {
+            inst._zod.parse = base;
+            if (inst._zod.run === wrapped)
+              inst._zod.run = base;
+            return base(payload, ctx);
+          }
+          if (walked === PROVEN || rechecked)
+            isRecursiveInst = true;
+          else
+            rechecked = true;
+        }
+        const input = payload.value;
+        if (!isRef(input))
+          return base(payload, ctx);
+        let state = ctx[STATE];
+        if (!state) {
+          state = { buckets: /* @__PURE__ */ new WeakMap(), backEdges: void 0 };
+          ctx[STATE] = state;
+        }
+        let bucket;
+        if (lastCtx === ctx) {
+          bucket = lastBucket;
+        } else {
+          bucket = bucketFor(state, inst);
+          lastCtx = ctx;
+          lastBucket = bucket;
+        }
+        const hit = bucket.get(input);
+        if (hit) {
+          payload.value = hit.value;
+          if (hit.issues) {
+            if (hit.issues.length)
+              payload.issues.push(...cloneIssues(hit.issues));
+          } else {
+            payload.memo = true;
+            state.backEdges ?? (state.backEdges = /* @__PURE__ */ new WeakSet());
+            state.backEdges.add(hit.value);
+          }
+          return payload;
+        }
+        handoff = bucket;
+        const depth = open.length;
+        const result = base(payload, ctx);
+        handoff = void 0;
+        const entry = open.length > depth ? open.pop() : void 0;
+        if (result instanceof Promise) {
+          return result.then((r2) => {
+            if (entry)
+              entry.issues = r2.issues.length ? cloneIssues(r2.issues) : NO_ISSUES;
+            return r2;
+          });
+        }
+        if (entry)
+          entry.issues = result.issues.length ? cloneIssues(result.issues) : NO_ISSUES;
+        return result;
+      };
+      inst._zod.parse = wrapped;
+      if (inst._zod.run === base)
+        inst._zod.run = wrapped;
+    });
+  }
+};
+function memoizer() {
+  return memo;
+}
+function isBackEdge(ctx, value) {
+  var _a2;
+  const backEdges = (_a2 = ctx[STATE]) == null ? void 0 : _a2.backEdges;
+  return backEdges !== void 0 && isRef(value) && backEdges.has(value);
+}
+const error = () => {
+  const Sizable = {
+    string: { unit: "characters", verb: "to have" },
+    file: { unit: "bytes", verb: "to have" },
+    array: { unit: "items", verb: "to have" },
+    set: { unit: "items", verb: "to have" },
+    map: { unit: "entries", verb: "to have" }
+  };
+  function getSizing(origin) {
+    return Sizable[origin] ?? null;
+  }
+  const FormatDictionary = {
+    regex: "input",
+    email: "email address",
+    url: "URL",
+    emoji: "emoji",
+    uuid: "UUID",
+    uuidv4: "UUIDv4",
+    uuidv6: "UUIDv6",
+    nanoid: "nanoid",
+    guid: "GUID",
+    cuid: "cuid",
+    cuid2: "cuid2",
+    ulid: "ULID",
+    xid: "XID",
+    ksuid: "KSUID",
+    datetime: "ISO datetime",
+    date: "ISO date",
+    time: "ISO time",
+    duration: "ISO duration",
+    ipv4: "IPv4 address",
+    ipv6: "IPv6 address",
+    mac: "MAC address",
+    cidrv4: "IPv4 range",
+    cidrv6: "IPv6 range",
+    base64: "base64-encoded string",
+    base64url: "base64url-encoded string",
+    json_string: "JSON string",
+    e164: "E.164 number",
+    currency_code: "currency code",
+    credit_card: "credit card number",
+    iban: "IBAN",
+    jwt: "JWT",
+    template_literal: "input"
+  };
+  const TypeDictionary = {
+    // Compatibility: "nan" -> "NaN" for display
+    nan: "NaN"
+    // All other type names omitted - they fall back to raw values via ?? operator
+  };
+  function getTypeName(type, input) {
+    if (type === "number" && typeof input === "number" && !Number.isFinite(input)) {
+      return String(input);
+    }
+    return TypeDictionary[type] ?? type;
+  }
+  return (issue2) => {
+    switch (issue2.code) {
+      case "invalid_type": {
+        const expected = getTypeName(issue2.expected);
+        const receivedType = parsedType(issue2.input);
+        const received = getTypeName(receivedType, issue2.input);
+        return `Invalid input: expected ${expected}, received ${received}`;
+      }
+      case "invalid_value":
+        if (issue2.values.length === 1)
+          return `Invalid input: expected ${stringifyPrimitive(issue2.values[0])}`;
+        return `Invalid option: expected one of ${joinValues(issue2.values, "|")}`;
+      case "too_big": {
+        const adj = issue2.exact ? "exactly " : issue2.inclusive ? "<=" : "<";
+        const sizing = getSizing(issue2.origin);
+        if (sizing)
+          return `Too big: expected ${issue2.origin ?? "value"} to have ${adj}${issue2.maximum.toString()} ${sizing.unit ?? "elements"}`;
+        return `Too big: expected ${issue2.origin ?? "value"} to be ${adj}${issue2.maximum.toString()}`;
+      }
+      case "too_small": {
+        const adj = issue2.exact ? "exactly " : issue2.inclusive ? ">=" : ">";
+        const sizing = getSizing(issue2.origin);
+        if (sizing) {
+          return `Too small: expected ${issue2.origin} to have ${adj}${issue2.minimum.toString()} ${sizing.unit}`;
+        }
+        return `Too small: expected ${issue2.origin} to be ${adj}${issue2.minimum.toString()}`;
+      }
+      case "invalid_format": {
+        const _issue = issue2;
+        if (_issue.format === "starts_with") {
+          return `Invalid string: must start with "${_issue.prefix}"`;
+        }
+        if (_issue.format === "ends_with")
+          return `Invalid string: must end with "${_issue.suffix}"`;
+        if (_issue.format === "includes")
+          return `Invalid string: must include "${_issue.includes}"`;
+        if (_issue.format === "regex")
+          return `Invalid string: must match pattern ${_issue.pattern}`;
+        return `Invalid ${FormatDictionary[_issue.format] ?? issue2.format}`;
+      }
+      case "not_multiple_of":
+        return `Invalid number: must be a multiple of ${issue2.divisor}`;
+      case "unrecognized_keys":
+        return `Unrecognized key${issue2.keys.length > 1 ? "s" : ""}: ${joinValues(issue2.keys, ", ")}`;
+      case "invalid_key":
+        return `Invalid key in ${issue2.origin}`;
+      case "invalid_union":
+        if (issue2.options && Array.isArray(issue2.options) && issue2.options.length > 0) {
+          const opts = issue2.options.map((o) => `'${o}'`).join(" | ");
+          return `Invalid discriminator value. Expected ${opts}`;
+        }
+        if (issue2.inclusive === false) {
+          return "Invalid input: more than one option matched";
+        }
+        return "Invalid input";
+      case "invalid_element":
+        return `Invalid value in ${issue2.origin}`;
+      default:
+        return `Invalid input`;
+    }
+  };
+};
+function en() {
+  return {
+    localeError: error()
+  };
+}
+var _a;
+class $ZodRegistry {
+  constructor() {
+    this._map = /* @__PURE__ */ new WeakMap();
+    this._idmap = /* @__PURE__ */ new Map();
+  }
+  add(schema, ..._meta) {
+    const meta2 = _meta[0];
+    this._map.set(schema, meta2);
+    if (meta2 && typeof meta2 === "object" && "id" in meta2) {
+      this._idmap.set(meta2.id, schema);
+    }
+    return this;
+  }
+  clear() {
+    this._map = /* @__PURE__ */ new WeakMap();
+    this._idmap = /* @__PURE__ */ new Map();
+    return this;
+  }
+  remove(schema) {
+    const meta2 = this._map.get(schema);
+    if (meta2 && typeof meta2 === "object" && "id" in meta2) {
+      this._idmap.delete(meta2.id);
+    }
+    this._map.delete(schema);
+    return this;
+  }
+  get(schema) {
+    const p = schema._zod.parent;
+    if (p) {
+      const pm = { ...this.get(p) ?? {} };
+      delete pm.id;
+      const f = { ...pm, ...this._map.get(schema) };
+      return Object.keys(f).length ? f : void 0;
+    }
+    return this._map.get(schema);
+  }
+  has(schema) {
+    return this._map.has(schema);
+  }
+}
+function registry() {
+  return new $ZodRegistry();
+}
+(_a = globalThis).__zod_globalRegistry ?? (_a.__zod_globalRegistry = registry());
+const globalRegistry = globalThis.__zod_globalRegistry;
+function snapshotChecks(def) {
+  if (def.checks)
+    def.checks = [...def.checks];
+  return def;
+}
+// @__NO_SIDE_EFFECTS__
+function _string(Class, params) {
+  return new Class(snapshotChecks({ type: "string", ...normalizeParams(params) }));
+}
+// @__NO_SIDE_EFFECTS__
+function _email(Class, params) {
+  return new Class({
+    type: "string",
+    format: "email",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _guid(Class, params) {
+  return new Class({
+    type: "string",
+    format: "guid",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _uuid(Class, params) {
+  return new Class({
+    type: "string",
+    format: "uuid",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _uuidv4(Class, params) {
+  return new Class({
+    type: "string",
+    format: "uuid",
+    check: "string_format",
+    abort: false,
+    version: "v4",
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _uuidv6(Class, params) {
+  return new Class({
+    type: "string",
+    format: "uuid",
+    check: "string_format",
+    abort: false,
+    version: "v6",
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _uuidv7(Class, params) {
+  return new Class({
+    type: "string",
+    format: "uuid",
+    check: "string_format",
+    abort: false,
+    version: "v7",
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _url(Class, params) {
+  return new Class({
+    type: "string",
+    format: "url",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _emoji(Class, params) {
+  return new Class({
+    type: "string",
+    format: "emoji",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _nanoid(Class, params) {
+  return new Class({
+    type: "string",
+    format: "nanoid",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _cuid(Class, params) {
+  return new Class({
+    type: "string",
+    format: "cuid",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _cuid2(Class, params) {
+  return new Class({
+    type: "string",
+    format: "cuid2",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _ulid(Class, params) {
+  return new Class({
+    type: "string",
+    format: "ulid",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _xid(Class, params) {
+  return new Class({
+    type: "string",
+    format: "xid",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _ksuid(Class, params) {
+  return new Class({
+    type: "string",
+    format: "ksuid",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _ipv4(Class, params) {
+  return new Class({
+    type: "string",
+    format: "ipv4",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _ipv6(Class, params) {
+  return new Class({
+    type: "string",
+    format: "ipv6",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _cidrv4(Class, params) {
+  return new Class({
+    type: "string",
+    format: "cidrv4",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _cidrv6(Class, params) {
+  return new Class({
+    type: "string",
+    format: "cidrv6",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _base64(Class, params) {
+  return new Class({
+    type: "string",
+    format: "base64",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _base64url(Class, params) {
+  return new Class({
+    type: "string",
+    format: "base64url",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _e164(Class, params) {
+  return new Class({
+    type: "string",
+    format: "e164",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _jwt(Class, params) {
+  return new Class({
+    type: "string",
+    format: "jwt",
+    check: "string_format",
+    abort: false,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _isoDateTime(Class, params) {
+  return new Class({
+    type: "string",
+    format: "datetime",
+    check: "string_format",
+    offset: false,
+    local: false,
+    precision: null,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _isoDate(Class, params) {
+  return new Class({
+    type: "string",
+    format: "date",
+    check: "string_format",
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _isoTime(Class, params) {
+  return new Class({
+    type: "string",
+    format: "time",
+    check: "string_format",
+    precision: null,
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _isoDuration(Class, params) {
+  return new Class({
+    type: "string",
+    format: "duration",
+    check: "string_format",
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _number(Class, params) {
+  return new Class(snapshotChecks({ type: "number", checks: [], ...normalizeParams(params) }));
+}
+// @__NO_SIDE_EFFECTS__
+function _int(Class, params) {
+  return new Class({
+    type: "number",
+    check: "number_format",
+    abort: false,
+    format: "safeint",
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _boolean(Class, params) {
+  return new Class({
+    type: "boolean",
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _unknown(Class) {
+  return new Class({
+    type: "unknown"
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _never(Class, params) {
+  return new Class({
+    type: "never",
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _lt(value, params) {
+  return new $ZodCheckLessThan({
+    check: "less_than",
+    ...normalizeParams(params),
+    value,
+    inclusive: false
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _lte(value, params) {
+  return new $ZodCheckLessThan({
+    check: "less_than",
+    ...normalizeParams(params),
+    value,
+    inclusive: true
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _gt(value, params) {
+  return new $ZodCheckGreaterThan({
+    check: "greater_than",
+    ...normalizeParams(params),
+    value,
+    inclusive: false
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _gte(value, params) {
+  return new $ZodCheckGreaterThan({
+    check: "greater_than",
+    ...normalizeParams(params),
+    value,
+    inclusive: true
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _multipleOf(value, params) {
+  return new $ZodCheckMultipleOf({
+    check: "multiple_of",
+    ...normalizeParams(params),
+    value
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _maxLength(maximum, params) {
+  const ch = new $ZodCheckMaxLength({
+    check: "max_length",
+    ...normalizeParams(params),
+    maximum
+  });
+  return ch;
+}
+// @__NO_SIDE_EFFECTS__
+function _minLength(minimum, params) {
+  return new $ZodCheckMinLength({
+    check: "min_length",
+    ...normalizeParams(params),
+    minimum
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _length(length, params) {
+  return new $ZodCheckLengthEquals({
+    check: "length_equals",
+    ...normalizeParams(params),
+    length
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _regex(pattern, params) {
+  return new $ZodCheckRegex({
+    check: "string_format",
+    format: "regex",
+    ...normalizeParams(params),
+    pattern
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _lowercase(params) {
+  return new $ZodCheckLowerCase({
+    check: "string_format",
+    format: "lowercase",
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _uppercase(params) {
+  return new $ZodCheckUpperCase({
+    check: "string_format",
+    format: "uppercase",
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _includes(includes, params) {
+  return new $ZodCheckIncludes({
+    check: "string_format",
+    format: "includes",
+    ...normalizeParams(params),
+    includes
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _startsWith(prefix, params) {
+  return new $ZodCheckStartsWith({
+    check: "string_format",
+    format: "starts_with",
+    ...normalizeParams(params),
+    prefix
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _endsWith(suffix, params) {
+  return new $ZodCheckEndsWith({
+    check: "string_format",
+    format: "ends_with",
+    ...normalizeParams(params),
+    suffix
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _overwrite(tx) {
+  return new $ZodCheckOverwrite({
+    check: "overwrite",
+    tx
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _normalize(form2) {
+  return /* @__PURE__ */ _overwrite((input) => input.normalize(form2));
+}
+// @__NO_SIDE_EFFECTS__
+function _trim() {
+  return /* @__PURE__ */ _overwrite((input) => input.trim());
+}
+// @__NO_SIDE_EFFECTS__
+function _toLowerCase() {
+  return /* @__PURE__ */ _overwrite((input) => input.toLowerCase());
+}
+// @__NO_SIDE_EFFECTS__
+function _toUpperCase() {
+  return /* @__PURE__ */ _overwrite((input) => input.toUpperCase());
+}
+// @__NO_SIDE_EFFECTS__
+function _slugify() {
+  return /* @__PURE__ */ _overwrite((input) => slugify(input));
+}
+// @__NO_SIDE_EFFECTS__
+function _array(Class, element, params) {
+  return new Class({
+    type: "array",
+    element,
+    // get element() {
+    //   return element;
+    // },
+    ...normalizeParams(params)
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function _refine(Class, fn, _params) {
+  const schema = new Class({
+    type: "custom",
+    check: "custom",
+    fn,
+    ...normalizeParams(_params)
+  });
+  return schema;
+}
+// @__NO_SIDE_EFFECTS__
+function _superRefine(fn, params) {
+  const ch = /* @__PURE__ */ _check((payload) => {
+    payload.addIssue = (issue$1) => {
+      if (typeof issue$1 === "string") {
+        payload.issues.push(issue(issue$1, payload.value, ch._zod.def));
+      } else {
+        const _issue = issue$1;
+        if (_issue.fatal)
+          _issue.continue = false;
+        _issue.code ?? (_issue.code = "custom");
+        if (!("input" in _issue))
+          _issue.input = payload.value;
+        _issue.inst ?? (_issue.inst = ch);
+        _issue.continue ?? (_issue.continue = !ch._zod.def.abort);
+        payload.issues.push(issue(_issue));
+      }
+    };
+    return fn(payload.value, payload);
+  }, params);
+  return ch;
+}
+// @__NO_SIDE_EFFECTS__
+function _check(fn, params) {
+  const ch = new $ZodCheck({
+    check: "custom",
+    ...normalizeParams(params)
+  });
+  ch._zod.check = fn;
+  return ch;
+}
+function assignProps(target, ...sources) {
+  for (const source of sources) {
+    for (const key of Reflect.ownKeys(source)) {
+      if (Object.prototype.propertyIsEnumerable.call(source, key)) {
+        assignProp(target, key, source[key]);
+      }
+    }
+  }
+  return target;
+}
+function initializeContext(params) {
+  let target = (params == null ? void 0 : params.target) ?? "draft-2020-12";
+  if (target === "draft-4")
+    target = "draft-04";
+  if (target === "draft-7")
+    target = "draft-07";
+  return {
+    processors: params.processors ?? {},
+    metadataRegistry: (params == null ? void 0 : params.metadata) ?? globalRegistry,
+    target,
+    unrepresentable: (params == null ? void 0 : params.unrepresentable) ?? "throw",
+    override: (params == null ? void 0 : params.override) ?? (() => {
+    }),
+    io: (params == null ? void 0 : params.io) ?? "output",
+    counter: 0,
+    seen: /* @__PURE__ */ new Map(),
+    sharedDefsExtractedFor: void 0,
+    sharedEmitDoneFor: void 0,
+    cycles: (params == null ? void 0 : params.cycles) ?? "ref",
+    reused: (params == null ? void 0 : params.reused) ?? "inline",
+    intersections: [],
+    deferred: [],
+    external: (params == null ? void 0 : params.external) ?? void 0
+  };
+}
+function handleUnrepresentable(schema, ctx, json, params, message) {
+  const result = typeof ctx.unrepresentable === "function" ? ctx.unrepresentable({ zodSchema: schema, path: params.path, message }) : ctx.unrepresentable;
+  if (result === "any")
+    return false;
+  if (result === void 0 || result === "throw")
+    throw new Error(message);
+  Object.assign(json, result);
+  return true;
+}
+function processSchema(schema, ctx, _params = { path: [], schemaPath: [] }) {
+  var _a3, _b;
+  var _a2;
+  const def = schema._zod.def;
+  const seen = ctx.seen.get(schema);
+  if (seen) {
+    seen.count++;
+    const isCycle = _params.schemaPath.includes(schema);
+    if (isCycle) {
+      seen.cycle = _params.path;
+    }
+    return seen.schema;
+  }
+  const result = { schema: {}, count: 1, cycle: void 0, path: _params.path };
+  ctx.seen.set(schema, result);
+  ctx.sharedDefsExtractedFor = void 0;
+  ctx.sharedEmitDoneFor = void 0;
+  const overrideSchema = (_b = (_a3 = schema._zod).toJSONSchema) == null ? void 0 : _b.call(_a3);
+  if (overrideSchema) {
+    result.schema = overrideSchema;
+  } else {
+    const params = {
+      ..._params,
+      schemaPath: [..._params.schemaPath, schema],
+      path: _params.path
+    };
+    if (schema._zod.processJSONSchema) {
+      schema._zod.processJSONSchema(ctx, result.schema, params);
+    } else {
+      const _json = result.schema;
+      const processor = ctx.processors[def.type];
+      if (!processor) {
+        throw new Error(`[toJSONSchema]: Non-representable type encountered: ${def.type}`);
+      }
+      processor(schema, ctx, _json, params);
+    }
+    const parent = schema._zod.parent;
+    if (parent) {
+      if (!result.ref)
+        result.ref = parent;
+      processSchema(parent, ctx, params);
+      ctx.seen.get(parent).isParent = true;
+    }
+  }
+  const meta2 = ctx.metadataRegistry.get(schema);
+  if (meta2)
+    assignProps(result.schema, meta2);
+  if (ctx.io === "input" && isTransforming(schema)) {
+    delete result.schema.examples;
+    delete result.schema.default;
+  }
+  if (ctx.io === "input" && "_prefault" in result.schema)
+    (_a2 = result.schema).default ?? (_a2.default = result.schema._prefault);
+  delete result.schema._prefault;
+  const _result = ctx.seen.get(schema);
+  return _result.schema;
+}
+function encodeJSONPointerSegment(segment) {
+  return segment.replace(/~/g, "~0").replace(/\//g, "~1");
+}
+function extractDefs(ctx, schema) {
+  var _a2, _b, _c, _d;
+  const root = ctx.seen.get(schema);
+  if (!root)
+    throw new Error("Unprocessed schema. This is a bug in Zod.");
+  if (ctx.external && ctx.sharedDefsExtractedFor === ctx.external)
+    return;
+  const idToSchema = /* @__PURE__ */ new Map();
+  for (const entry of ctx.seen.entries()) {
+    const id2 = (_a2 = ctx.metadataRegistry.get(entry[0])) == null ? void 0 : _a2.id;
+    if (id2) {
+      const existing = idToSchema.get(id2);
+      if (existing && existing !== entry[0]) {
+        throw new Error(`Duplicate schema id "${id2}" detected during JSON Schema conversion. Two different schemas cannot share the same id when converted together.`);
+      }
+      idToSchema.set(id2, entry[0]);
+    }
+  }
+  const makeURI = (entry) => {
+    var _a3;
+    const defsSegment = ctx.target === "draft-2020-12" ? "$defs" : "definitions";
+    if (ctx.external) {
+      const externalId = (_a3 = ctx.external.registry.get(entry[0])) == null ? void 0 : _a3.id;
+      const uriGenerator = ctx.external.uri ?? ((id3) => id3);
+      if (externalId) {
+        return { ref: uriGenerator(externalId) };
+      }
+      const id2 = entry[1].defId ?? entry[1].schema.id ?? `schema${ctx.counter++}`;
+      entry[1].defId = id2;
+      return { defId: id2, ref: `${uriGenerator("__shared")}#/${defsSegment}/${encodeJSONPointerSegment(id2)}` };
+    }
+    const uriPrefix = `#`;
+    const defUriPrefix = `${uriPrefix}/${defsSegment}/`;
+    if (entry[1] === root && !entry[1].schema.id) {
+      return { ref: uriPrefix };
+    }
+    const defId = entry[1].schema.id ?? `__schema${ctx.counter++}`;
+    return { defId, ref: defUriPrefix + encodeJSONPointerSegment(defId) };
+  };
+  const extractToDef = (entry) => {
+    if (entry[1].schema.$ref) {
+      return;
+    }
+    const seen = entry[1];
+    const { ref, defId } = makeURI(entry);
+    seen.def = { ...seen.schema };
+    if (defId)
+      seen.defId = defId;
+    const schema2 = seen.schema;
+    for (const key in schema2) {
+      delete schema2[key];
+    }
+    schema2.$ref = ref;
+  };
+  if (ctx.cycles === "throw") {
+    for (const entry of ctx.seen.entries()) {
+      const seen = entry[1];
+      if (seen.cycle) {
+        throw new Error(`Cycle detected: #/${(_b = seen.cycle) == null ? void 0 : _b.join("/")}/<root>
+
+Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.`);
+      }
+    }
+  }
+  for (const entry of ctx.seen.entries()) {
+    const seen = entry[1];
+    if (schema === entry[0]) {
+      extractToDef(entry);
+      continue;
+    }
+    if (ctx.external) {
+      const ext = (_c = ctx.external.registry.get(entry[0])) == null ? void 0 : _c.id;
+      if (schema !== entry[0] && ext) {
+        extractToDef(entry);
+        continue;
+      }
+    }
+    const id2 = (_d = ctx.metadataRegistry.get(entry[0])) == null ? void 0 : _d.id;
+    if (id2) {
+      extractToDef(entry);
+      continue;
+    }
+    if (seen.cycle) {
+      extractToDef(entry);
+      continue;
+    }
+    if (seen.count > 1) {
+      if (ctx.reused === "ref") {
+        extractToDef(entry);
+      }
+    }
+  }
+  if (ctx.external)
+    ctx.sharedDefsExtractedFor = ctx.external;
+}
+function compactTypeUnion(schema) {
+  const options = schema.anyOf;
+  if (!Array.isArray(options) || options.length === 0 || schema.type !== void 0)
+    return;
+  const types = [];
+  for (const option of options) {
+    if (!option || typeof option !== "object")
+      return;
+    compactTypeUnion(option);
+    const keys = Object.keys(option);
+    if (keys.length !== 1 || keys[0] !== "type")
+      return;
+    const type = option.type;
+    for (const member of Array.isArray(type) ? type : [type]) {
+      if (typeof member !== "string")
+        return;
+      if (!types.includes(member))
+        types.push(member);
+    }
+  }
+  delete schema.anyOf;
+  schema.type = types.length === 1 ? types[0] : types;
+}
+const FOLDABLE_KEYS = /* @__PURE__ */ new Set(["type", "properties", "required", "additionalProperties"]);
+const UNION_KEYS = ["oneOf", "anyOf"];
+function undeclaredConstraint(member) {
+  const extra = member.additionalProperties;
+  if (extra === void 0 || extra === false || typeof extra !== "object" || extra === null)
+    return null;
+  return Object.keys(extra).length ? extra : null;
+}
+function foldObjects(members2) {
+  var _a2;
+  const objects = [];
+  for (const member of members2) {
+    if (typeof member !== "object" || member.type !== "object")
+      return null;
+    for (const key in member) {
+      if (!FOLDABLE_KEYS.has(key))
+        return null;
+    }
+    objects.push(member);
+  }
+  const properties = {};
+  const required2 = /* @__PURE__ */ new Set();
+  for (const object2 of objects) {
+    for (const key in object2.properties) {
+      if (Object.prototype.hasOwnProperty.call(properties, key))
+        continue;
+      const parts = [];
+      for (const other of objects) {
+        const part = ((_a2 = other.properties) == null ? void 0 : _a2[key]) ?? undeclaredConstraint(other);
+        if (part === null || part === void 0)
+          continue;
+        if (!parts.some((seen) => JSON.stringify(seen) === JSON.stringify(part)))
+          parts.push(part);
+      }
+      const merged = parts.length === 1 ? parts[0] : foldObjects(parts) ?? { allOf: parts };
+      assignProp(properties, key, merged);
+    }
+    for (const key of object2.required ?? [])
+      required2.add(key);
+  }
+  const folded = { type: "object", properties };
+  if (required2.size)
+    folded.required = [...required2];
+  if (objects.every((object2) => object2.additionalProperties === false)) {
+    folded.additionalProperties = false;
+  } else {
+    const constraints = [];
+    for (const object2 of objects) {
+      const constraint = undeclaredConstraint(object2);
+      if (constraint && !constraints.some((seen) => JSON.stringify(seen) === JSON.stringify(constraint)))
+        constraints.push(constraint);
+    }
+    if (constraints.length === 1)
+      folded.additionalProperties = constraints[0];
+    else if (constraints.length > 1)
+      folded.additionalProperties = { allOf: constraints };
+  }
+  return folded;
+}
+function foldIntersection(json) {
+  const allOf = json.allOf;
+  if (!Array.isArray(allOf) || allOf.length < 2)
+    return;
+  for (const key of FOLDABLE_KEYS)
+    if (key in json)
+      return;
+  const unions = allOf.filter((m) => UNION_KEYS.some((k) => Array.isArray(m[k])));
+  let folded = null;
+  if (!unions.length) {
+    folded = foldObjects(allOf);
+  } else {
+    const union2 = unions[0];
+    const keyword = UNION_KEYS.find((k) => Array.isArray(union2[k]));
+    if (Object.keys(union2).length !== 1)
+      return;
+    const rest = allOf.filter((m) => m !== union2);
+    const branches = union2[keyword].map((branch) => foldObjects([...rest, branch]));
+    if (branches.some((b2) => !b2))
+      return;
+    folded = { [keyword]: branches };
+  }
+  if (!folded)
+    return;
+  delete json.allOf;
+  assignProps(json, folded);
+}
+function finalize(ctx, schema) {
+  var _a2, _b, _c, _d;
+  const root = ctx.seen.get(schema);
+  if (!root)
+    throw new Error("Unprocessed schema. This is a bug in Zod.");
+  const flattenRef = (zodSchema) => {
+    const seen = ctx.seen.get(zodSchema);
+    if (seen.ref === null)
+      return;
+    const schema2 = seen.def ?? seen.schema;
+    const _cached = { ...schema2 };
+    const ref = seen.ref;
+    seen.ref = null;
+    if (ref) {
+      flattenRef(ref);
+      const refSeen = ctx.seen.get(ref);
+      const refSchema = refSeen.schema;
+      if (refSchema.$ref && (ctx.target === "draft-07" || ctx.target === "draft-04" || ctx.target === "openapi-3.0")) {
+        schema2.allOf = schema2.allOf ?? [];
+        schema2.allOf.push(refSchema);
+      } else {
+        assignProps(schema2, refSchema);
+      }
+      assignProps(schema2, _cached);
+      const isParentRef = zodSchema._zod.parent === ref;
+      if (isParentRef) {
+        for (const key in schema2) {
+          if (key === "$ref" || key === "allOf")
+            continue;
+          if (!(key in _cached)) {
+            delete schema2[key];
+          }
+        }
+      }
+      if (refSchema.$ref && refSeen.def) {
+        for (const key in schema2) {
+          if (key === "$ref" || key === "allOf")
+            continue;
+          if (key in refSeen.def && JSON.stringify(schema2[key]) === JSON.stringify(refSeen.def[key])) {
+            delete schema2[key];
+          }
+        }
+      }
+    }
+    const parent = zodSchema._zod.parent;
+    if (parent && parent !== ref) {
+      flattenRef(parent);
+      const parentSeen = ctx.seen.get(parent);
+      if (parentSeen == null ? void 0 : parentSeen.schema.$ref) {
+        schema2.$ref = parentSeen.schema.$ref;
+        if (parentSeen.def) {
+          for (const key in schema2) {
+            if (key === "$ref" || key === "allOf")
+              continue;
+            if (key in parentSeen.def && JSON.stringify(schema2[key]) === JSON.stringify(parentSeen.def[key])) {
+              delete schema2[key];
+            }
+          }
+        }
+      }
+    }
+    ctx.override({
+      zodSchema,
+      jsonSchema: schema2,
+      path: seen.path ?? []
+    });
+  };
+  if (!ctx.external || ctx.sharedEmitDoneFor !== ctx.external) {
+    for (const entry of [...ctx.seen.entries()].reverse()) {
+      flattenRef(entry[0]);
+    }
+    if (ctx.target !== "openapi-3.0") {
+      for (const entry of ctx.seen.entries()) {
+        compactTypeUnion(entry[1].def ?? entry[1].schema);
+      }
+    }
+    for (const rewrite of ctx.deferred)
+      rewrite();
+    if (ctx.intersections.length) {
+      const carriers = /* @__PURE__ */ new Map();
+      for (const seen of ctx.seen.values()) {
+        for (const json of [seen.schema, seen.def]) {
+          const allOf = json == null ? void 0 : json.allOf;
+          if (!Array.isArray(allOf))
+            continue;
+          const existing = carriers.get(allOf);
+          if (existing)
+            existing.push(json);
+          else
+            carriers.set(allOf, [json]);
+        }
+      }
+      for (const allOf of ctx.intersections) {
+        for (const json of carriers.get(allOf) ?? [])
+          foldIntersection(json);
+      }
+    }
+  }
+  const result = {};
+  if (ctx.target === "draft-2020-12") {
+    result.$schema = "https://json-schema.org/draft/2020-12/schema";
+  } else if (ctx.target === "draft-07") {
+    result.$schema = "http://json-schema.org/draft-07/schema#";
+  } else if (ctx.target === "draft-04") {
+    result.$schema = "http://json-schema.org/draft-04/schema#";
+  } else if (ctx.target === "openapi-3.0") ;
+  else ;
+  if ((_a2 = ctx.external) == null ? void 0 : _a2.uri) {
+    const id2 = (_b = ctx.external.registry.get(schema)) == null ? void 0 : _b.id;
+    if (!id2)
+      throw new Error("Schema is missing an `id` property");
+    result.$id = ctx.external.uri(id2);
+  }
+  assignProps(result, root.defId ? root.schema : root.def ?? root.schema);
+  const rootMetaId = (_c = ctx.metadataRegistry.get(schema)) == null ? void 0 : _c.id;
+  if (rootMetaId !== void 0 && result.id === rootMetaId)
+    delete result.id;
+  const defs = ((_d = ctx.external) == null ? void 0 : _d.defs) ?? {};
+  if (!ctx.external || ctx.sharedEmitDoneFor !== ctx.external) {
+    for (const entry of ctx.seen.entries()) {
+      const seen = entry[1];
+      if (seen.def && seen.defId) {
+        if (seen.def.id === seen.defId)
+          delete seen.def.id;
+        assignProp(defs, seen.defId, seen.def);
+      }
+    }
+  }
+  if (ctx.external)
+    ctx.sharedEmitDoneFor = ctx.external;
+  if (ctx.external) ;
+  else {
+    if (Object.keys(defs).length > 0) {
+      if (ctx.target === "draft-2020-12") {
+        result.$defs = defs;
+      } else {
+        result.definitions = defs;
+      }
+    }
+  }
+  try {
+    const finalized = JSON.parse(JSON.stringify(result));
+    Object.defineProperty(finalized, "~standard", {
+      value: {
+        ...schema["~standard"],
+        jsonSchema: {
+          input: createStandardJSONSchemaMethod(schema, "input", ctx.processors),
+          output: createStandardJSONSchemaMethod(schema, "output", ctx.processors)
         }
       },
-      get path() {
-        return ctx.path;
+      enumerable: false,
+      writable: false
+    });
+    return finalized;
+  } catch (_err) {
+    throw new Error("Error converting schema to JSON.");
+  }
+}
+function isTransforming(_schema, _ctx) {
+  const ctx = _ctx ?? { seen: /* @__PURE__ */ new Set() };
+  if (ctx.seen.has(_schema))
+    return false;
+  ctx.seen.add(_schema);
+  const def = _schema._zod.def;
+  if (def.type === "transform")
+    return true;
+  if (def.type === "array")
+    return isTransforming(def.element, ctx);
+  if (def.type === "set")
+    return isTransforming(def.valueType, ctx);
+  if (def.type === "lazy")
+    return isTransforming(def.getter(), ctx);
+  if (def.type === "promise" || def.type === "optional" || def.type === "nonoptional" || def.type === "nullable" || def.type === "readonly" || def.type === "default" || def.type === "prefault" || def.type === "catch") {
+    return isTransforming(def.innerType, ctx);
+  }
+  if (def.type === "intersection") {
+    return isTransforming(def.left, ctx) || isTransforming(def.right, ctx);
+  }
+  if (def.type === "record" || def.type === "map") {
+    return isTransforming(def.keyType, ctx) || isTransforming(def.valueType, ctx);
+  }
+  if (def.type === "pipe") {
+    if (_schema._zod.traits.has("$ZodCodec"))
+      return true;
+    return isTransforming(def.in, ctx) || isTransforming(def.out, ctx);
+  }
+  if (def.type === "object") {
+    for (const key in def.shape) {
+      if (isTransforming(def.shape[key], ctx))
+        return true;
+    }
+    return false;
+  }
+  if (def.type === "union") {
+    for (const option of def.options) {
+      if (isTransforming(option, ctx))
+        return true;
+    }
+    return false;
+  }
+  if (def.type === "tuple") {
+    for (const item of def.items) {
+      if (isTransforming(item, ctx))
+        return true;
+    }
+    if (def.rest && isTransforming(def.rest, ctx))
+      return true;
+    return false;
+  }
+  return false;
+}
+const createToJSONSchemaMethod = (schema, processors = {}) => (params) => {
+  const ctx = initializeContext({ ...params, processors });
+  processSchema(schema, ctx);
+  extractDefs(ctx, schema);
+  return finalize(ctx, schema);
+};
+const createStandardJSONSchemaMethod = (schema, io, processors = {}) => (params) => {
+  const { libraryOptions, target } = params ?? {};
+  const ctx = initializeContext({ ...libraryOptions ?? {}, target, io, processors });
+  processSchema(schema, ctx);
+  extractDefs(ctx, schema);
+  return finalize(ctx, schema);
+};
+const narrowMin = (agg, key, value) => {
+  if (agg[key] === void 0 || value > agg[key])
+    agg[key] = value;
+};
+const narrowMax = (agg, key, value) => {
+  if (agg[key] === void 0 || value < agg[key])
+    agg[key] = value;
+};
+const narrowBoth = (agg, value) => {
+  narrowMin(agg, "minimum", value);
+  narrowMax(agg, "maximum", value);
+};
+const addDivisor = (agg, value) => {
+  agg.multipleOf ?? (agg.multipleOf = []);
+  if (!agg.multipleOf.includes(value))
+    agg.multipleOf.push(value);
+};
+const addPattern = (agg, pattern) => {
+  agg.patterns ?? (agg.patterns = /* @__PURE__ */ new Set());
+  agg.patterns.add(pattern);
+};
+const intersectMime = (agg, mime) => {
+  agg.mime = agg.mime ? agg.mime.filter((m) => mime.includes(m)) : [...mime];
+};
+const setFormat = (agg, format) => {
+  agg.format = format;
+  if (format.includes("int"))
+    agg.isInt = true;
+};
+const minContributor = (agg, def) => narrowMin(agg, "minimum", def.minimum);
+const maxContributor = (agg, def) => narrowMax(agg, "maximum", def.maximum);
+const formatContributor = (ranges) => (agg, def) => {
+  setFormat(agg, def.format);
+  const [minimum, maximum] = ranges[def.format];
+  narrowMin(agg, "minimum", minimum);
+  narrowMax(agg, "maximum", maximum);
+};
+const contributors = {
+  greater_than: (agg, def) => narrowMin(agg, def.inclusive ? "minimum" : "exclusiveMinimum", def.value),
+  less_than: (agg, def) => narrowMax(agg, def.inclusive ? "maximum" : "exclusiveMaximum", def.value),
+  multiple_of: (agg, def) => addDivisor(agg, def.value),
+  number_format: formatContributor(NUMBER_FORMAT_RANGES),
+  bigint_format: formatContributor(BIGINT_FORMAT_RANGES),
+  min_length: minContributor,
+  max_length: maxContributor,
+  length_equals: (agg, def) => narrowBoth(agg, def.length),
+  min_size: minContributor,
+  max_size: maxContributor,
+  size_equals: (agg, def) => narrowBoth(agg, def.size),
+  string_format: (agg, def) => {
+    setFormat(agg, def.format);
+    if (def.pattern)
+      addPattern(agg, def.pattern);
+    if (def.format === "base64" || def.format === "base64url")
+      agg.contentEncoding = def.format;
+    if (def.local || def.precision === -1)
+      agg.laxFormat = true;
+  },
+  mime_type: (agg, def) => intersectMime(agg, def.mime)
+};
+function aggregateChecks(schema) {
+  var _a2;
+  const agg = {};
+  const def = schema._zod.def;
+  const list = schema._zod.traits.has("$ZodCheck") ? [schema, ...def.checks ?? []] : def.checks ?? [];
+  for (const ch of list)
+    (_a2 = contributors[ch._zod.def.check]) == null ? void 0 : _a2.call(contributors, agg, ch._zod.def);
+  const bag = schema._zod.bag;
+  if (bag.minimum !== void 0)
+    narrowMin(agg, "minimum", bag.minimum);
+  if (bag.exclusiveMinimum !== void 0)
+    narrowMin(agg, "exclusiveMinimum", bag.exclusiveMinimum);
+  if (bag.maximum !== void 0)
+    narrowMax(agg, "maximum", bag.maximum);
+  if (bag.exclusiveMaximum !== void 0)
+    narrowMax(agg, "exclusiveMaximum", bag.exclusiveMaximum);
+  if (bag.multipleOf !== void 0)
+    addDivisor(agg, bag.multipleOf);
+  if (bag.format !== void 0) {
+    agg.format ?? (agg.format = bag.format);
+    if (bag.format.includes("int"))
+      agg.isInt = true;
+  }
+  if (bag.mime)
+    intersectMime(agg, bag.mime);
+  for (const pattern of bag.patterns ?? [])
+    addPattern(agg, pattern);
+  return agg;
+}
+const formatMap = {
+  guid: "uuid",
+  url: "uri",
+  datetime: "date-time",
+  json_string: "json-string",
+  regex: ""
+  // do not set
+};
+const exactPatterns = /* @__PURE__ */ new Map([
+  [base64Charset, base64],
+  [base64urlCharset, base64url]
+]);
+const exactPattern = (p) => exactPatterns.get(p) ?? p;
+const stringProcessor = (schema, ctx, _json, _params) => {
+  const json = _json;
+  json.type = "string";
+  const { minimum, maximum, format, patterns, contentEncoding, laxFormat } = aggregateChecks(schema);
+  if (typeof minimum === "number")
+    json.minLength = minimum;
+  if (typeof maximum === "number")
+    json.maxLength = maximum;
+  if (format) {
+    json.format = formatMap[format] ?? format;
+    if (json.format === "")
+      delete json.format;
+    if (format === "time" || laxFormat) {
+      delete json.format;
+    }
+  }
+  if (contentEncoding)
+    json.contentEncoding = contentEncoding;
+  if (patterns && patterns.size > 0) {
+    const patternList = [...patterns].map(exactPattern);
+    if (patternList.length === 1)
+      json.pattern = patternList[0].source;
+    else if (patternList.length > 1) {
+      json.allOf = [
+        ...patternList.map((regex) => ({
+          ...ctx.target === "draft-07" || ctx.target === "draft-04" || ctx.target === "openapi-3.0" ? { type: "string" } : {},
+          pattern: regex.source
+        }))
+      ];
+    }
+  }
+};
+const numberProcessor = (schema, ctx, _json, params) => {
+  const json = _json;
+  const { minimum, maximum, multipleOf, exclusiveMaximum, exclusiveMinimum, isInt } = aggregateChecks(schema);
+  json.type = isInt ? "integer" : "number";
+  const exMin = typeof exclusiveMinimum === "number" && exclusiveMinimum >= (minimum ?? Number.NEGATIVE_INFINITY);
+  const exMax = typeof exclusiveMaximum === "number" && exclusiveMaximum <= (maximum ?? Number.POSITIVE_INFINITY);
+  const legacy = ctx.target === "draft-04" || ctx.target === "openapi-3.0";
+  if (exMin) {
+    if (legacy) {
+      json.minimum = exclusiveMinimum;
+      json.exclusiveMinimum = true;
+    } else {
+      json.exclusiveMinimum = exclusiveMinimum;
+    }
+  } else if (typeof minimum === "number") {
+    json.minimum = minimum;
+  }
+  if (exMax) {
+    if (legacy) {
+      json.maximum = exclusiveMaximum;
+      json.exclusiveMaximum = true;
+    } else {
+      json.exclusiveMaximum = exclusiveMaximum;
+    }
+  } else if (typeof maximum === "number") {
+    json.maximum = maximum;
+  }
+  if (multipleOf) {
+    const divisors = /* @__PURE__ */ new Set();
+    for (const divisor of multipleOf) {
+      if (Number.isFinite(divisor) && divisor !== 0)
+        divisors.add(Math.abs(divisor));
+      else
+        handleUnrepresentable(schema, ctx, json, params, `A multipleOf divisor of ${divisor} cannot be represented in JSON Schema`);
+    }
+    const [first, ...rest] = divisors;
+    if (first !== void 0)
+      json.multipleOf = first;
+    if (rest.length)
+      json.allOf = [...json.allOf ?? [], ...rest.map((m) => ({ multipleOf: m }))];
+  }
+};
+const booleanProcessor = (_schema, _ctx, json, _params) => {
+  json.type = "boolean";
+};
+const neverProcessor = (_schema, _ctx, json, _params) => {
+  json.not = {};
+};
+const unknownProcessor = (_schema, _ctx, _json, _params) => {
+};
+const enumProcessor = (schema, _ctx, json, _params) => {
+  const def = schema._zod.def;
+  const values = getEnumValues(def.entries);
+  if (values.length === 0) {
+    json.not = {};
+    return;
+  }
+  if (values.every((v2) => typeof v2 === "number"))
+    json.type = "number";
+  if (values.every((v2) => typeof v2 === "string"))
+    json.type = "string";
+  json.enum = values;
+};
+const customProcessor = (schema, ctx, json, params) => {
+  handleUnrepresentable(schema, ctx, json, params, "Custom types cannot be represented in JSON Schema");
+};
+const transformProcessor = (schema, ctx, json, params) => {
+  handleUnrepresentable(schema, ctx, json, params, "Transforms cannot be represented in JSON Schema");
+};
+const arrayProcessor = (schema, ctx, _json, params) => {
+  const json = _json;
+  const def = schema._zod.def;
+  const { minimum, maximum } = aggregateChecks(schema);
+  if (typeof minimum === "number")
+    json.minItems = minimum;
+  if (typeof maximum === "number")
+    json.maxItems = maximum;
+  json.type = "array";
+  json.items = processSchema(def.element, ctx, {
+    ...params,
+    path: [...params.path, "items"]
+  });
+};
+function inputOptin(schema) {
+  const def = schema._zod.def;
+  if (def.type === "pipe" && def.in._zod.traits.has("$ZodTransform")) {
+    return inputOptin(def.out);
+  }
+  if (def.type === "catch") {
+    return inputOptin(def.innerType);
+  }
+  return schema._zod.optin;
+}
+const objectProcessor = (schema, ctx, _json, params) => {
+  var _a2;
+  const json = _json;
+  const def = schema._zod.def;
+  const shape = def.shape;
+  const symbolKeys = Object.getOwnPropertySymbols(shape);
+  if (symbolKeys.length && handleUnrepresentable(schema, ctx, json, params, "Symbol keys cannot be represented in JSON Schema")) {
+    return;
+  }
+  json.type = "object";
+  json.properties = {};
+  for (const key in shape) {
+    assignProp(json.properties, key, processSchema(shape[key], ctx, {
+      ...params,
+      path: [...params.path, "properties", key]
+    }));
+  }
+  const requiredKeys = [];
+  for (const key of Object.keys(shape)) {
+    const field = def.shape[key];
+    if (ctx.io === "input" ? inputOptin(field) === void 0 : field._zod.optout === void 0) {
+      requiredKeys.push(key);
+    }
+  }
+  if (requiredKeys.length > 0) {
+    json.required = requiredKeys;
+  }
+  if (((_a2 = def.catchall) == null ? void 0 : _a2._zod.def.type) === "never") {
+    json.additionalProperties = false;
+  } else if (!def.catchall) {
+    if (ctx.io === "output")
+      json.additionalProperties = false;
+  } else if (def.catchall) {
+    json.additionalProperties = processSchema(def.catchall, ctx, {
+      ...params,
+      path: [...params.path, "additionalProperties"]
+    });
+  }
+};
+const unionProcessor = (schema, ctx, json, params) => {
+  const def = schema._zod.def;
+  const isExclusive = def.inclusive === false;
+  const options = def.options.map((x2, i) => processSchema(x2, ctx, {
+    ...params,
+    path: [...params.path, isExclusive ? "oneOf" : "anyOf", i]
+  }));
+  if (isExclusive) {
+    json.oneOf = options;
+  } else {
+    json.anyOf = options;
+  }
+};
+const intersectionProcessor = (schema, ctx, json, params) => {
+  const def = schema._zod.def;
+  const a = processSchema(def.left, ctx, {
+    ...params,
+    path: [...params.path, "allOf", 0]
+  });
+  const b2 = processSchema(def.right, ctx, {
+    ...params,
+    path: [...params.path, "allOf", 1]
+  });
+  const isSimpleIntersection = (val) => "allOf" in val && Object.keys(val).length === 1;
+  const allOf = [
+    ...isSimpleIntersection(a) ? a.allOf : [a],
+    ...isSimpleIntersection(b2) ? b2.allOf : [b2]
+  ];
+  json.allOf = allOf;
+  ctx.intersections.push(allOf);
+};
+function stringifyKeyNames(bySchema, json, visited) {
+  var _a2;
+  if (json.$ref) {
+    if (visited.has(json))
+      return json;
+    visited.add(json);
+    const def = (_a2 = bySchema.get(json)) == null ? void 0 : _a2.def;
+    if (!def)
+      return json;
+    const inlined = stringifyKeyNames(bySchema, def, visited);
+    return inlined === def ? json : inlined;
+  }
+  for (const keyword of ["anyOf", "oneOf"]) {
+    const branches = json[keyword];
+    if (!Array.isArray(branches))
+      continue;
+    const mapped = branches.map((branch) => stringifyKeyNames(bySchema, branch, visited));
+    if (mapped.some((branch, i) => branch !== branches[i]))
+      json = { ...json, [keyword]: mapped };
+  }
+  const types = Array.isArray(json.type) ? json.type : [json.type];
+  const numericType = !types.includes("string") && types.some((t) => t === "number" || t === "integer");
+  const values = json.enum ?? (json.const !== void 0 ? [json.const] : void 0);
+  if (!numericType && !(values == null ? void 0 : values.some((v2) => typeof v2 === "number")))
+    return json;
+  const { minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf, format, id: id2, ...rest } = json;
+  if (rest.enum)
+    rest.enum = rest.enum.map((v2) => typeof v2 === "number" ? String(v2) : v2);
+  else if (typeof rest.const === "number")
+    rest.const = String(rest.const);
+  if (!numericType)
+    return rest;
+  rest.type = "string";
+  if (!values)
+    rest.pattern = (types.includes("number") ? number$1 : integer).source;
+  return rest;
+}
+const pendingRecords = /* @__PURE__ */ new WeakMap();
+function rewriteKeyNames(ctx) {
+  var _a2;
+  const bySchema = /* @__PURE__ */ new Map();
+  for (const entry of ctx.seen.values()) {
+    if (entry.def && !bySchema.has(entry.schema))
+      bySchema.set(entry.schema, entry);
+  }
+  const rewrites = /* @__PURE__ */ new Map();
+  for (const record2 of pendingRecords.get(ctx) ?? []) {
+    const seen = ctx.seen.get(record2);
+    const names = (_a2 = (seen == null ? void 0 : seen.def) ?? (seen == null ? void 0 : seen.schema)) == null ? void 0 : _a2.propertyNames;
+    if (!names || names === true || rewrites.has(names))
+      continue;
+    const rewritten = stringifyKeyNames(bySchema, names, /* @__PURE__ */ new Set());
+    if (rewritten !== names)
+      rewrites.set(names, rewritten);
+  }
+  if (!rewrites.size)
+    return;
+  for (const entry of ctx.seen.values()) {
+    for (const carrier of [entry.schema, entry.def]) {
+      const rewritten = carrier && rewrites.get(carrier.propertyNames);
+      if (rewritten)
+        carrier.propertyNames = rewritten;
+    }
+  }
+}
+const recordProcessor = (schema, ctx, _json, params) => {
+  const json = _json;
+  const def = schema._zod.def;
+  json.type = "object";
+  const keyType = def.keyType;
+  const patterns = aggregateChecks(keyType).patterns;
+  if (def.mode === "loose" && patterns && patterns.size > 0) {
+    const valueSchema = processSchema(def.valueType, ctx, {
+      ...params,
+      path: [...params.path, "patternProperties", "*"]
+    });
+    json.patternProperties = {};
+    for (const pattern of patterns) {
+      assignProp(json.patternProperties, exactPattern(pattern).source, valueSchema);
+    }
+  } else {
+    if (ctx.target === "draft-07" || ctx.target === "draft-2020-12") {
+      json.propertyNames = processSchema(def.keyType, ctx, {
+        ...params,
+        path: [...params.path, "propertyNames"]
+      });
+      let pending = pendingRecords.get(ctx);
+      if (!pending) {
+        pending = [];
+        pendingRecords.set(ctx, pending);
+        ctx.deferred.push(() => rewriteKeyNames(ctx));
+      }
+      pending.push(schema);
+    }
+    json.additionalProperties = processSchema(def.valueType, ctx, {
+      ...params,
+      path: [...params.path, "additionalProperties"]
+    });
+  }
+  const keyValues = keyType._zod.values;
+  const omittableOnInput = ctx.io === "input" && inputOptin(def.valueType) !== void 0;
+  if (keyValues && !def.partial && !omittableOnInput) {
+    const validKeyValues = [...keyValues].filter((v2) => typeof v2 === "string" || typeof v2 === "number");
+    if (validKeyValues.length > 0) {
+      json.required = validKeyValues.map(String);
+    }
+  }
+};
+const nullableProcessor = (schema, ctx, json, params) => {
+  const def = schema._zod.def;
+  const inner = processSchema(def.innerType, ctx, params);
+  const seen = ctx.seen.get(schema);
+  if (ctx.target === "openapi-3.0") {
+    seen.ref = def.innerType;
+    json.nullable = true;
+  } else {
+    json.anyOf = [inner, { type: "null" }];
+  }
+};
+const nonoptionalProcessor = (schema, ctx, _json, params) => {
+  const def = schema._zod.def;
+  processSchema(def.innerType, ctx, params);
+  const seen = ctx.seen.get(schema);
+  seen.ref = def.innerType;
+};
+const UNREPRESENTABLE_DEFAULT = Symbol();
+function serializeDefaultValue(value, schema, ctx, json, params) {
+  let unrepresentable = false;
+  const serialized = JSON.stringify(value, (_2, val) => {
+    if (typeof val !== "bigint")
+      return val;
+    unrepresentable = true;
+    return null;
+  });
+  if (!unrepresentable)
+    return JSON.parse(serialized);
+  handleUnrepresentable(schema, ctx, json, params, "BigInt defaults cannot be represented in JSON Schema");
+  return UNREPRESENTABLE_DEFAULT;
+}
+const defaultProcessor = (schema, ctx, json, params) => {
+  const def = schema._zod.def;
+  processSchema(def.innerType, ctx, params);
+  const seen = ctx.seen.get(schema);
+  seen.ref = def.innerType;
+  const value = serializeDefaultValue(def.defaultValue, schema, ctx, json, params);
+  if (value !== UNREPRESENTABLE_DEFAULT)
+    json.default = value;
+};
+const prefaultProcessor = (schema, ctx, json, params) => {
+  const def = schema._zod.def;
+  processSchema(def.innerType, ctx, params);
+  const seen = ctx.seen.get(schema);
+  seen.ref = def.innerType;
+  if (ctx.io !== "input")
+    return;
+  const value = serializeDefaultValue(def.defaultValue, schema, ctx, json, params);
+  if (value !== UNREPRESENTABLE_DEFAULT)
+    json._prefault = value;
+};
+const catchProcessor = (schema, ctx, json, params) => {
+  const def = schema._zod.def;
+  processSchema(def.innerType, ctx, params);
+  const seen = ctx.seen.get(schema);
+  seen.ref = def.innerType;
+  let catchValue;
+  try {
+    catchValue = def.catchValue(void 0);
+  } catch {
+    handleUnrepresentable(schema, ctx, json, params, "Dynamic catch values are not supported in JSON Schema");
+    return;
+  }
+  json.default = catchValue;
+};
+const pipeProcessor = (schema, ctx, _json, params) => {
+  const def = schema._zod.def;
+  const inIsTransform = def.in._zod.traits.has("$ZodTransform");
+  const innerType = ctx.io === "input" ? inIsTransform ? def.out : def.in : def.out;
+  processSchema(innerType, ctx, params);
+  const seen = ctx.seen.get(schema);
+  seen.ref = innerType;
+};
+const readonlyProcessor = (schema, ctx, json, params) => {
+  const def = schema._zod.def;
+  processSchema(def.innerType, ctx, params);
+  const seen = ctx.seen.get(schema);
+  seen.ref = def.innerType;
+  json.readOnly = true;
+};
+const optionalProcessor = (schema, ctx, _json, params) => {
+  const def = schema._zod.def;
+  processSchema(def.innerType, ctx, params);
+  const seen = ctx.seen.get(schema);
+  seen.ref = def.innerType;
+};
+const _installedErrorProtos = /* @__PURE__ */ new WeakSet([Object.prototype, Error.prototype]);
+function _lazyMethod(proto, key, make) {
+  Object.defineProperty(proto, key, {
+    configurable: true,
+    enumerable: false,
+    get() {
+      const value = make(this);
+      Object.defineProperty(this, key, { value, configurable: true, writable: true });
+      return value;
+    },
+    set(value) {
+      Object.defineProperty(this, key, { value, configurable: true, writable: true });
+    }
+  });
+}
+const initializer = (inst, issues) => {
+  $ZodError.init(inst, issues);
+  inst.name = "ZodError";
+  const proto = Object.getPrototypeOf(inst);
+  if (_installedErrorProtos.has(proto))
+    return;
+  _installedErrorProtos.add(proto);
+  _lazyMethod(proto, "format", (self) => (mapper) => formatError(self, mapper));
+  _lazyMethod(proto, "flatten", (self) => (mapper) => flattenError(self, mapper));
+  _lazyMethod(proto, "addIssue", (self) => (issue2) => {
+    self.issues.push(issue2);
+    self.message = JSON.stringify(self.issues, jsonStringifyReplacer, 2);
+  });
+  _lazyMethod(proto, "addIssues", (self) => (issues2) => {
+    self.issues.push(...issues2);
+    self.message = JSON.stringify(self.issues, jsonStringifyReplacer, 2);
+  });
+  Object.defineProperty(proto, "isEmpty", {
+    configurable: true,
+    enumerable: false,
+    get() {
+      return this.issues.length === 0;
+    }
+  });
+};
+const ZodRealError = /* @__PURE__ */ $constructor("ZodError", initializer, void 0, {
+  Parent: Error
+});
+const parse = /* @__PURE__ */ _parse(ZodRealError);
+const parseAsync = /* @__PURE__ */ _parseAsync(ZodRealError);
+const safeParse = /* @__PURE__ */ _safeParse(ZodRealError);
+const safeParseAsync = /* @__PURE__ */ _safeParseAsync(ZodRealError);
+const encode = /* @__PURE__ */ _encode(ZodRealError);
+const decode = /* @__PURE__ */ _decode(ZodRealError);
+const encodeAsync = /* @__PURE__ */ _encodeAsync(ZodRealError);
+const decodeAsync = /* @__PURE__ */ _decodeAsync(ZodRealError);
+const safeEncode = /* @__PURE__ */ _safeEncode(ZodRealError);
+const safeDecode = /* @__PURE__ */ _safeDecode(ZodRealError);
+const safeEncodeAsync = /* @__PURE__ */ _safeEncodeAsync(ZodRealError);
+const safeDecodeAsync = /* @__PURE__ */ _safeDecodeAsync(ZodRealError);
+function _ensureDefaultLocale() {
+  if (!globalConfig.localeError)
+    config(en());
+}
+function _ensureDefaultMemoizer() {
+  if (!globalConfig.memoizer)
+    config({ memoizer: memoizer() });
+}
+const ZodType = /* @__PURE__ */ $constructor("ZodType", (inst, def) => {
+  _ensureDefaultLocale();
+  $ZodType.init(inst, def);
+  inst.def = def;
+  inst.type = def.type;
+  return inst;
+}, {
+  check(...chks) {
+    const def = this.def;
+    return this.clone(mergeDefs(def, {
+      checks: [
+        ...def.checks ?? [],
+        ...chks.map((ch) => typeof ch === "function" ? { _zod: { check: ch, def: { check: "custom" }, onattach: [] } } : ch)
+      ]
+    }), { parent: true });
+  },
+  with(...chks) {
+    return this.check(...chks);
+  },
+  clone(def, params) {
+    return clone(this, def, params);
+  },
+  brand() {
+    return this;
+  },
+  register(reg, meta2) {
+    reg.add(this, meta2);
+    return this;
+  },
+  refine(check, params) {
+    return this.check(refine(check, params));
+  },
+  superRefine(refinement, params) {
+    return this.check(superRefine(refinement, params));
+  },
+  overwrite(fn) {
+    return this.check(/* @__PURE__ */ _overwrite(fn));
+  },
+  optional() {
+    return optional(this);
+  },
+  exactOptional() {
+    return exactOptional(this);
+  },
+  nullable() {
+    return nullable(this);
+  },
+  nullish() {
+    return optional(nullable(this));
+  },
+  nonoptional(params) {
+    return nonoptional(this, params);
+  },
+  array() {
+    return array(this);
+  },
+  or(arg) {
+    return union([this, arg]);
+  },
+  and(arg) {
+    return intersection(this, arg);
+  },
+  transform(tx) {
+    return pipe(this, transform(tx));
+  },
+  default(d2) {
+    return _default(this, d2);
+  },
+  prefault(d2) {
+    return prefault(this, d2);
+  },
+  catch(params) {
+    return _catch(this, params);
+  },
+  pipe(target) {
+    return pipe(this, target);
+  },
+  readonly() {
+    return readonly(this);
+  },
+  describe(description) {
+    const cl = this.clone();
+    globalRegistry.add(cl, { description });
+    return cl;
+  },
+  meta(...args) {
+    if (args.length === 0)
+      return globalRegistry.get(this);
+    const cl = this.clone();
+    globalRegistry.add(cl, args[0]);
+    return cl;
+  },
+  isOptional() {
+    return this.safeParse(void 0).success;
+  },
+  isNullable() {
+    return this.safeParse(null).success;
+  },
+  apply(fn, ...args) {
+    return args.length === 0 ? fn(this) : fn(this, ...args);
+  },
+  // Overrides core's `~standard` to add `jsonSchema`. Must stay a prototype entry: redefining it per instance demotes instances to dictionary mode.
+  get "~standard"() {
+    return hide(this, "~standard", {
+      ...standardProps(this),
+      jsonSchema: {
+        input: createStandardJSONSchemaMethod(this, "input"),
+        output: createStandardJSONSchemaMethod(this, "output")
+      }
+    });
+  },
+  set "~standard"(value) {
+    own(this, "~standard", value);
+  },
+  parse: function _parse2(data, params) {
+    return parse(this, data, params, { callee: _parse2 });
+  },
+  parseAsync: async function _parseAsync2(data, params) {
+    return await parseAsync(this, data, params, { callee: _parseAsync2 });
+  },
+  safeParse(data, params) {
+    return safeParse(this, data, params);
+  },
+  async safeParseAsync(data, params) {
+    return safeParseAsync(this, data, params);
+  },
+  // `spa` is an alias: same function object as `safeParseAsync`, as before.
+  get spa() {
+    return this == null ? void 0 : this.safeParseAsync;
+  },
+  set spa(value) {
+    own(this, "spa", value);
+  },
+  validate(data, params) {
+    return validate(this, data, params);
+  },
+  validateAsync(data, params) {
+    return validateAsync$1(this, data, params);
+  },
+  encode: function _encode2(data, params) {
+    return encode(this, data, params, { callee: _encode2 });
+  },
+  decode: function _decode2(data, params) {
+    return decode(this, data, params, { callee: _decode2 });
+  },
+  encodeAsync: async function _encodeAsync2(data, params) {
+    return await encodeAsync(this, data, params, { callee: _encodeAsync2 });
+  },
+  decodeAsync: async function _decodeAsync2(data, params) {
+    return await decodeAsync(this, data, params, { callee: _decodeAsync2 });
+  },
+  safeEncode(data, params) {
+    return safeEncode(this, data, params);
+  },
+  safeDecode(data, params) {
+    return safeDecode(this, data, params);
+  },
+  async safeEncodeAsync(data, params) {
+    return safeEncodeAsync(this, data, params);
+  },
+  async safeDecodeAsync(data, params) {
+    return safeDecodeAsync(this, data, params);
+  },
+  toJSONSchema(params) {
+    return createToJSONSchemaMethod(this, {})(params);
+  },
+  // Reads through to the registry on every access, so it must not cache.
+  get description() {
+    var _a2;
+    return (_a2 = globalRegistry.get(this)) == null ? void 0 : _a2.description;
+  },
+  // No setter: `schema._def = x` throws, as it did when `_def` was a non-writable own property.
+  get _def() {
+    return this._zod.def;
+  }
+});
+const _ZodString = /* @__PURE__ */ $constructor(
+  "_ZodString",
+  (inst, def) => {
+    $ZodString.init(inst, def);
+    ZodType.init(inst, def);
+    inst._zod.processJSONSchema = (ctx, json, params) => stringProcessor(inst, ctx, json);
+  },
+  /* @__PURE__ */ derived({
+    format: (inst) => aggregateChecks(inst).format ?? null,
+    minLength: (inst) => aggregateChecks(inst).minimum ?? null,
+    maxLength: (inst) => aggregateChecks(inst).maximum ?? null
+  }, {
+    regex(...args) {
+      return this.check(/* @__PURE__ */ _regex(...args));
+    },
+    includes(...args) {
+      return this.check(/* @__PURE__ */ _includes(...args));
+    },
+    startsWith(...args) {
+      return this.check(/* @__PURE__ */ _startsWith(...args));
+    },
+    endsWith(...args) {
+      return this.check(/* @__PURE__ */ _endsWith(...args));
+    },
+    min(...args) {
+      return this.check(/* @__PURE__ */ _minLength(...args));
+    },
+    max(...args) {
+      return this.check(/* @__PURE__ */ _maxLength(...args));
+    },
+    length(...args) {
+      return this.check(/* @__PURE__ */ _length(...args));
+    },
+    nonempty(...args) {
+      return this.check(/* @__PURE__ */ _minLength(1, ...args));
+    },
+    lowercase(params) {
+      return this.check(/* @__PURE__ */ _lowercase(params));
+    },
+    uppercase(params) {
+      return this.check(/* @__PURE__ */ _uppercase(params));
+    },
+    trim() {
+      return this.check(/* @__PURE__ */ _trim());
+    },
+    normalize(...args) {
+      return this.check(/* @__PURE__ */ _normalize(...args));
+    },
+    toLowerCase() {
+      return this.check(/* @__PURE__ */ _toLowerCase());
+    },
+    toUpperCase() {
+      return this.check(/* @__PURE__ */ _toUpperCase());
+    },
+    slugify() {
+      return this.check(/* @__PURE__ */ _slugify());
+    }
+  })
+);
+const ZodString = /* @__PURE__ */ $constructor("ZodString", (inst, def) => {
+  $ZodString.init(inst, def);
+  _ZodString.init(inst, def);
+}, {
+  email(params) {
+    return this.check(/* @__PURE__ */ _email(ZodEmail, params));
+  },
+  url(params) {
+    return this.check(/* @__PURE__ */ _url(ZodURL, params));
+  },
+  jwt(params) {
+    return this.check(/* @__PURE__ */ _jwt(ZodJWT, params));
+  },
+  emoji(params) {
+    return this.check(/* @__PURE__ */ _emoji(ZodEmoji, params));
+  },
+  guid(params) {
+    return this.check(/* @__PURE__ */ _guid(ZodGUID, params));
+  },
+  uuid(params) {
+    return this.check(/* @__PURE__ */ _uuid(ZodUUID, params));
+  },
+  uuidv4(params) {
+    return this.check(/* @__PURE__ */ _uuidv4(ZodUUID, params));
+  },
+  uuidv6(params) {
+    return this.check(/* @__PURE__ */ _uuidv6(ZodUUID, params));
+  },
+  uuidv7(params) {
+    return this.check(/* @__PURE__ */ _uuidv7(ZodUUID, params));
+  },
+  nanoid(params) {
+    return this.check(/* @__PURE__ */ _nanoid(ZodNanoID, params));
+  },
+  cuid(params) {
+    return this.check(/* @__PURE__ */ _cuid(ZodCUID, params));
+  },
+  cuid2(params) {
+    return this.check(/* @__PURE__ */ _cuid2(ZodCUID2, params));
+  },
+  ulid(params) {
+    return this.check(/* @__PURE__ */ _ulid(ZodULID, params));
+  },
+  base64(params) {
+    return this.check(/* @__PURE__ */ _base64(ZodBase64, params));
+  },
+  base64url(params) {
+    return this.check(/* @__PURE__ */ _base64url(ZodBase64URL, params));
+  },
+  xid(params) {
+    return this.check(/* @__PURE__ */ _xid(ZodXID, params));
+  },
+  ksuid(params) {
+    return this.check(/* @__PURE__ */ _ksuid(ZodKSUID, params));
+  },
+  ipv4(params) {
+    return this.check(/* @__PURE__ */ _ipv4(ZodIPv4, params));
+  },
+  ipv6(params) {
+    return this.check(/* @__PURE__ */ _ipv6(ZodIPv6, params));
+  },
+  cidrv4(params) {
+    return this.check(/* @__PURE__ */ _cidrv4(ZodCIDRv4, params));
+  },
+  cidrv6(params) {
+    return this.check(/* @__PURE__ */ _cidrv6(ZodCIDRv6, params));
+  },
+  e164(params) {
+    return this.check(/* @__PURE__ */ _e164(ZodE164, params));
+  },
+  datetime(params) {
+    return this.check(/* @__PURE__ */ _isoDateTime(ZodISODateTime, params));
+  },
+  date(params) {
+    return this.check(/* @__PURE__ */ _isoDate(ZodISODate, params));
+  },
+  time(params) {
+    return this.check(/* @__PURE__ */ _isoTime(ZodISOTime, params));
+  },
+  duration(params) {
+    return this.check(/* @__PURE__ */ _isoDuration(ZodISODuration, params));
+  }
+});
+function string(params) {
+  return /* @__PURE__ */ _string(ZodString, params);
+}
+const ZodStringFormat = /* @__PURE__ */ $constructor("ZodStringFormat", (inst, def) => {
+  $ZodStringFormat.init(inst, def);
+  _ZodString.init(inst, def);
+});
+const ZodISODateTime = /* @__PURE__ */ $constructor("ZodISODateTime", (inst, def) => {
+  $ZodISODateTime.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodISODate = /* @__PURE__ */ $constructor("ZodISODate", (inst, def) => {
+  $ZodISODate.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodISOTime = /* @__PURE__ */ $constructor("ZodISOTime", (inst, def) => {
+  $ZodISOTime.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodISODuration = /* @__PURE__ */ $constructor("ZodISODuration", (inst, def) => {
+  $ZodISODuration.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodEmail = /* @__PURE__ */ $constructor("ZodEmail", (inst, def) => {
+  $ZodEmail.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+function email(params) {
+  return /* @__PURE__ */ _email(ZodEmail, params);
+}
+const ZodGUID = /* @__PURE__ */ $constructor("ZodGUID", (inst, def) => {
+  $ZodGUID.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodUUID = /* @__PURE__ */ $constructor("ZodUUID", (inst, def) => {
+  $ZodUUID.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodURL = /* @__PURE__ */ $constructor("ZodURL", (inst, def) => {
+  $ZodURL.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodEmoji = /* @__PURE__ */ $constructor("ZodEmoji", (inst, def) => {
+  $ZodEmoji.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodNanoID = /* @__PURE__ */ $constructor("ZodNanoID", (inst, def) => {
+  $ZodNanoID.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodCUID = /* @__PURE__ */ $constructor("ZodCUID", (inst, def) => {
+  $ZodCUID.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodCUID2 = /* @__PURE__ */ $constructor("ZodCUID2", (inst, def) => {
+  $ZodCUID2.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodULID = /* @__PURE__ */ $constructor("ZodULID", (inst, def) => {
+  $ZodULID.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodXID = /* @__PURE__ */ $constructor("ZodXID", (inst, def) => {
+  $ZodXID.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodKSUID = /* @__PURE__ */ $constructor("ZodKSUID", (inst, def) => {
+  $ZodKSUID.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodIPv4 = /* @__PURE__ */ $constructor("ZodIPv4", (inst, def) => {
+  $ZodIPv4.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodIPv6 = /* @__PURE__ */ $constructor("ZodIPv6", (inst, def) => {
+  $ZodIPv6.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodCIDRv4 = /* @__PURE__ */ $constructor("ZodCIDRv4", (inst, def) => {
+  $ZodCIDRv4.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodCIDRv6 = /* @__PURE__ */ $constructor("ZodCIDRv6", (inst, def) => {
+  $ZodCIDRv6.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodBase64 = /* @__PURE__ */ $constructor("ZodBase64", (inst, def) => {
+  $ZodBase64.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodBase64URL = /* @__PURE__ */ $constructor("ZodBase64URL", (inst, def) => {
+  $ZodBase64URL.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodE164 = /* @__PURE__ */ $constructor("ZodE164", (inst, def) => {
+  $ZodE164.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodJWT = /* @__PURE__ */ $constructor("ZodJWT", (inst, def) => {
+  $ZodJWT.init(inst, def);
+  ZodStringFormat.init(inst, def);
+});
+const ZodNumber = /* @__PURE__ */ $constructor(
+  "ZodNumber",
+  (inst, def) => {
+    $ZodNumber.init(inst, def);
+    ZodType.init(inst, def);
+    inst._zod.processJSONSchema = (ctx, json, params) => numberProcessor(inst, ctx, json, params);
+    inst.isFinite = true;
+  },
+  /* @__PURE__ */ derived({
+    minValue: (inst) => {
+      const { minimum, exclusiveMinimum } = aggregateChecks(inst);
+      return Math.max(minimum ?? Number.NEGATIVE_INFINITY, exclusiveMinimum ?? Number.NEGATIVE_INFINITY);
+    },
+    maxValue: (inst) => {
+      const { maximum, exclusiveMaximum } = aggregateChecks(inst);
+      return Math.min(maximum ?? Number.POSITIVE_INFINITY, exclusiveMaximum ?? Number.POSITIVE_INFINITY);
+    },
+    isInt: (inst) => {
+      const { isInt, multipleOf } = aggregateChecks(inst);
+      return !!isInt || !!(multipleOf == null ? void 0 : multipleOf.some(Number.isSafeInteger));
+    },
+    format: (inst) => aggregateChecks(inst).format ?? null
+  }, {
+    gt(value, params) {
+      return this.check(/* @__PURE__ */ _gt(value, params));
+    },
+    gte(value, params) {
+      return this.check(/* @__PURE__ */ _gte(value, params));
+    },
+    min(value, params) {
+      return this.check(/* @__PURE__ */ _gte(value, params));
+    },
+    lt(value, params) {
+      return this.check(/* @__PURE__ */ _lt(value, params));
+    },
+    lte(value, params) {
+      return this.check(/* @__PURE__ */ _lte(value, params));
+    },
+    max(value, params) {
+      return this.check(/* @__PURE__ */ _lte(value, params));
+    },
+    int(params) {
+      return this.check(int(params));
+    },
+    safe(params) {
+      return this.check(int(params));
+    },
+    positive(params) {
+      return this.check(/* @__PURE__ */ _gt(0, params));
+    },
+    nonnegative(params) {
+      return this.check(/* @__PURE__ */ _gte(0, params));
+    },
+    negative(params) {
+      return this.check(/* @__PURE__ */ _lt(0, params));
+    },
+    nonpositive(params) {
+      return this.check(/* @__PURE__ */ _lte(0, params));
+    },
+    multipleOf(value, params) {
+      return this.check(/* @__PURE__ */ _multipleOf(value, params));
+    },
+    step(value, params) {
+      return this.check(/* @__PURE__ */ _multipleOf(value, params));
+    },
+    finite() {
+      return this;
+    }
+  })
+);
+function number(params) {
+  return /* @__PURE__ */ _number(ZodNumber, params);
+}
+const ZodNumberFormat = /* @__PURE__ */ $constructor("ZodNumberFormat", (inst, def) => {
+  $ZodNumberFormat.init(inst, def);
+  ZodNumber.init(inst, def);
+});
+function int(params) {
+  return /* @__PURE__ */ _int(ZodNumberFormat, params);
+}
+const ZodBoolean = /* @__PURE__ */ $constructor("ZodBoolean", (inst, def) => {
+  $ZodBoolean.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => booleanProcessor(inst, ctx, json);
+});
+function boolean(params) {
+  return /* @__PURE__ */ _boolean(ZodBoolean, params);
+}
+const ZodUnknown = /* @__PURE__ */ $constructor("ZodUnknown", (inst, def) => {
+  $ZodUnknown.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => unknownProcessor();
+});
+function unknown() {
+  return /* @__PURE__ */ _unknown(ZodUnknown);
+}
+const ZodNever = /* @__PURE__ */ $constructor("ZodNever", (inst, def) => {
+  $ZodNever.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => neverProcessor(inst, ctx, json);
+});
+function never(params) {
+  return /* @__PURE__ */ _never(ZodNever, params);
+}
+const ZodArray = /* @__PURE__ */ $constructor("ZodArray", (inst, def) => {
+  _ensureDefaultMemoizer();
+  $ZodArray.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => arrayProcessor(inst, ctx, json, params);
+  inst.element = def.element;
+}, {
+  min(n, params) {
+    return this.check(/* @__PURE__ */ _minLength(n, params));
+  },
+  nonempty(params) {
+    return this.check(/* @__PURE__ */ _minLength(1, params));
+  },
+  max(n, params) {
+    return this.check(/* @__PURE__ */ _maxLength(n, params));
+  },
+  length(n, params) {
+    return this.check(/* @__PURE__ */ _length(n, params));
+  },
+  unwrap() {
+    return this.element;
+  }
+});
+function array(element, params) {
+  return /* @__PURE__ */ _array(ZodArray, element, params);
+}
+const ZodObject = /* @__PURE__ */ $constructor("ZodObject", (inst, def) => {
+  _ensureDefaultMemoizer();
+  $ZodObjectJIT.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => objectProcessor(inst, ctx, json, params);
+  installLazyProp(inst, "shape", (self) => self._zod.def.shape, false);
+}, {
+  keyof() {
+    return _enum(Object.keys(this._zod.def.shape));
+  },
+  catchall(catchall) {
+    return this.clone(mergeDefs(this._zod.def, { catchall }));
+  },
+  passthrough() {
+    return this.clone(mergeDefs(this._zod.def, { catchall: unknown() }));
+  },
+  loose() {
+    return this.clone(mergeDefs(this._zod.def, { catchall: unknown() }));
+  },
+  strict() {
+    return this.clone(mergeDefs(this._zod.def, { catchall: never() }));
+  },
+  strip() {
+    return this.clone(mergeDefs(this._zod.def, { catchall: void 0 }));
+  },
+  extend(incoming) {
+    return extend(this, incoming);
+  },
+  safeExtend(incoming) {
+    return safeExtend(this, incoming);
+  },
+  merge(other) {
+    return merge(this, other);
+  },
+  pick(mask) {
+    return pick(this, mask);
+  },
+  omit(mask) {
+    return omit(this, mask);
+  },
+  partial(...args) {
+    return partial(ZodOptional, this, args[0]);
+  },
+  exactPartial(...args) {
+    return partial(ZodExactOptional, this, args[0], "exactPartial");
+  },
+  required(...args) {
+    return required(ZodNonOptional, this, args[0]);
+  }
+});
+function object(shape, params) {
+  const def = {
+    type: "object",
+    shape: shape ?? {},
+    ...normalizeParams(params)
+  };
+  return new ZodObject(def);
+}
+const ZodUnion = /* @__PURE__ */ $constructor("ZodUnion", (inst, def) => {
+  $ZodUnion.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => unionProcessor(inst, ctx, json, params);
+  inst.options = def.options;
+});
+function union(options, params) {
+  return new ZodUnion({
+    type: "union",
+    options,
+    ...normalizeParams(params)
+  });
+}
+const ZodIntersection = /* @__PURE__ */ $constructor("ZodIntersection", (inst, def) => {
+  $ZodIntersection.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => intersectionProcessor(inst, ctx, json, params);
+});
+function intersection(left, right) {
+  return new ZodIntersection({
+    type: "intersection",
+    left,
+    right
+  });
+}
+const ZodRecord = /* @__PURE__ */ $constructor("ZodRecord", (inst, def) => {
+  _ensureDefaultMemoizer();
+  $ZodRecord.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => recordProcessor(inst, ctx, json, params);
+  inst.keyType = def.keyType;
+  inst.valueType = def.valueType;
+});
+function record(keyType, valueType, params) {
+  if (!valueType || !valueType._zod) {
+    return new ZodRecord({
+      type: "record",
+      keyType: string(),
+      valueType: keyType,
+      ...normalizeParams(valueType)
+    });
+  }
+  return new ZodRecord({
+    type: "record",
+    keyType,
+    valueType,
+    ...normalizeParams(params)
+  });
+}
+const ZodEnum = /* @__PURE__ */ $constructor("ZodEnum", (inst, def) => {
+  $ZodEnum.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => enumProcessor(inst, ctx, json);
+  inst.enum = def.entries;
+  inst.options = [...inst._zod.values];
+  const keys = new Set(Object.keys(def.entries));
+  inst.extract = (values, params) => {
+    const newEntries = {};
+    for (const value of values) {
+      if (keys.has(value)) {
+        newEntries[value] = def.entries[value];
+      } else
+        throw new Error(`Key ${value} not found in enum`);
+    }
+    return new ZodEnum({
+      ...def,
+      checks: [],
+      ...normalizeParams(params),
+      entries: newEntries
+    });
+  };
+  inst.exclude = (values, params) => {
+    const newEntries = { ...def.entries };
+    for (const value of values) {
+      if (keys.has(value)) {
+        delete newEntries[value];
+      } else
+        throw new Error(`Key ${value} not found in enum`);
+    }
+    return new ZodEnum({
+      ...def,
+      checks: [],
+      ...normalizeParams(params),
+      entries: newEntries
+    });
+  };
+});
+function _enum(values, params) {
+  const entries = Array.isArray(values) ? Object.fromEntries(values.map((v2) => [v2, v2])) : values;
+  return new ZodEnum({
+    type: "enum",
+    entries,
+    ...normalizeParams(params)
+  });
+}
+const ZodTransform = /* @__PURE__ */ $constructor("ZodTransform", (inst, def) => {
+  _ensureDefaultMemoizer();
+  $ZodTransform.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => transformProcessor(inst, ctx, json, params);
+  inst._zod.parse = (payload, _ctx) => {
+    if (_ctx.direction === "backward") {
+      throw new $ZodEncodeError(inst.constructor.name);
+    }
+    payload.addIssue = (issue$1) => {
+      if (typeof issue$1 === "string") {
+        payload.issues.push(issue(issue$1, payload.value, def));
+      } else {
+        const _issue = issue$1;
+        if (_issue.fatal)
+          _issue.continue = false;
+        _issue.code ?? (_issue.code = "custom");
+        if (!("input" in _issue))
+          _issue.input = payload.value;
+        _issue.inst ?? (_issue.inst = inst);
+        payload.issues.push(issue(_issue));
       }
     };
-    checkCtx.addIssue = checkCtx.addIssue.bind(checkCtx);
-    if (effect.type === "preprocess") {
-      const processed = effect.transform(ctx.data, checkCtx);
-      if (ctx.common.async) {
-        return Promise.resolve(processed).then(async (processed2) => {
-          if (status.value === "aborted")
-            return INVALID;
-          const result = await this._def.schema._parseAsync({
-            data: processed2,
-            path: ctx.path,
-            parent: ctx
-          });
-          if (result.status === "aborted")
-            return INVALID;
-          if (result.status === "dirty")
-            return DIRTY(result.value);
-          if (status.value === "dirty")
-            return DIRTY(result.value);
-          return result;
-        });
-      } else {
-        if (status.value === "aborted")
-          return INVALID;
-        const result = this._def.schema._parseSync({
-          data: processed,
-          path: ctx.path,
-          parent: ctx
-        });
-        if (result.status === "aborted")
-          return INVALID;
-        if (result.status === "dirty")
-          return DIRTY(result.value);
-        if (status.value === "dirty")
-          return DIRTY(result.value);
-        return result;
-      }
+    const output = def.transform(payload.value, payload);
+    if (output instanceof Promise) {
+      return output.then((output2) => {
+        payload.value = output2;
+        return payload;
+      });
     }
-    if (effect.type === "refinement") {
-      const executeRefinement = (acc) => {
-        const result = effect.refinement(acc, checkCtx);
-        if (ctx.common.async) {
-          return Promise.resolve(result);
-        }
-        if (result instanceof Promise) {
-          throw new Error("Async refinement encountered during synchronous parse operation. Use .parseAsync instead.");
-        }
-        return acc;
-      };
-      if (ctx.common.async === false) {
-        const inner = this._def.schema._parseSync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: ctx
-        });
-        if (inner.status === "aborted")
-          return INVALID;
-        if (inner.status === "dirty")
-          status.dirty();
-        executeRefinement(inner.value);
-        return { status: status.value, value: inner.value };
-      } else {
-        return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((inner) => {
-          if (inner.status === "aborted")
-            return INVALID;
-          if (inner.status === "dirty")
-            status.dirty();
-          return executeRefinement(inner.value).then(() => {
-            return { status: status.value, value: inner.value };
-          });
-        });
-      }
-    }
-    if (effect.type === "transform") {
-      if (ctx.common.async === false) {
-        const base = this._def.schema._parseSync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: ctx
-        });
-        if (!isValid(base))
-          return INVALID;
-        const result = effect.transform(base.value, checkCtx);
-        if (result instanceof Promise) {
-          throw new Error(`Asynchronous transform encountered during synchronous parse operation. Use .parseAsync instead.`);
-        }
-        return { status: status.value, value: result };
-      } else {
-        return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((base) => {
-          if (!isValid(base))
-            return INVALID;
-          return Promise.resolve(effect.transform(base.value, checkCtx)).then((result) => ({
-            status: status.value,
-            value: result
-          }));
-        });
-      }
-    }
-    util.assertNever(effect);
-  }
-}
-ZodEffects.create = (schema, effect, params) => {
-  return new ZodEffects({
-    schema,
-    typeName: ZodFirstPartyTypeKind.ZodEffects,
-    effect,
-    ...processCreateParams(params)
+    payload.value = output;
+    return payload;
+  };
+});
+function transform(fn) {
+  return new ZodTransform({
+    type: "transform",
+    transform: fn
   });
-};
-ZodEffects.createWithPreprocess = (preprocess, schema, params) => {
-  return new ZodEffects({
-    schema,
-    effect: { type: "preprocess", transform: preprocess },
-    typeName: ZodFirstPartyTypeKind.ZodEffects,
-    ...processCreateParams(params)
-  });
-};
-class ZodOptional extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType === ZodParsedType.undefined) {
-      return OK(void 0);
-    }
-    return this._def.innerType._parse(input);
-  }
-  unwrap() {
-    return this._def.innerType;
-  }
 }
-ZodOptional.create = (type, params) => {
+const ZodOptional = /* @__PURE__ */ $constructor("ZodOptional", (inst, def) => {
+  $ZodOptional.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => optionalProcessor(inst, ctx, json, params);
+  inst.unwrap = () => inst._zod.def.innerType;
+});
+function optional(innerType) {
   return new ZodOptional({
-    innerType: type,
-    typeName: ZodFirstPartyTypeKind.ZodOptional,
-    ...processCreateParams(params)
+    type: "optional",
+    innerType
   });
-};
-class ZodNullable extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType === ZodParsedType.null) {
-      return OK(null);
-    }
-    return this._def.innerType._parse(input);
-  }
-  unwrap() {
-    return this._def.innerType;
-  }
 }
-ZodNullable.create = (type, params) => {
+const ZodExactOptional = /* @__PURE__ */ $constructor("ZodExactOptional", (inst, def) => {
+  $ZodExactOptional.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => optionalProcessor(inst, ctx, json, params);
+  inst.unwrap = () => inst._zod.def.innerType;
+});
+function exactOptional(innerType) {
+  return new ZodExactOptional({
+    type: "optional",
+    innerType
+  });
+}
+const ZodNullable = /* @__PURE__ */ $constructor("ZodNullable", (inst, def) => {
+  $ZodNullable.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => nullableProcessor(inst, ctx, json, params);
+  inst.unwrap = () => inst._zod.def.innerType;
+});
+function nullable(innerType) {
   return new ZodNullable({
-    innerType: type,
-    typeName: ZodFirstPartyTypeKind.ZodNullable,
-    ...processCreateParams(params)
+    type: "nullable",
+    innerType
   });
-};
-class ZodDefault extends ZodType {
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    let data = ctx.data;
-    if (ctx.parsedType === ZodParsedType.undefined) {
-      data = this._def.defaultValue();
-    }
-    return this._def.innerType._parse({
-      data,
-      path: ctx.path,
-      parent: ctx
-    });
-  }
-  removeDefault() {
-    return this._def.innerType;
-  }
 }
-ZodDefault.create = (type, params) => {
+const ZodDefault = /* @__PURE__ */ $constructor("ZodDefault", (inst, def) => {
+  $ZodDefault.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => defaultProcessor(inst, ctx, json, params);
+  inst.unwrap = () => inst._zod.def.innerType;
+  inst.removeDefault = inst.unwrap;
+});
+function _default(innerType, defaultValue) {
   return new ZodDefault({
-    innerType: type,
-    typeName: ZodFirstPartyTypeKind.ZodDefault,
-    defaultValue: typeof params.default === "function" ? params.default : () => params.default,
-    ...processCreateParams(params)
-  });
-};
-class ZodCatch extends ZodType {
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    const newCtx = {
-      ...ctx,
-      common: {
-        ...ctx.common,
-        issues: []
-      }
-    };
-    const result = this._def.innerType._parse({
-      data: newCtx.data,
-      path: newCtx.path,
-      parent: {
-        ...newCtx
-      }
-    });
-    if (isAsync(result)) {
-      return result.then((result2) => {
-        return {
-          status: "valid",
-          value: result2.status === "valid" ? result2.value : this._def.catchValue({
-            get error() {
-              return new ZodError(newCtx.common.issues);
-            },
-            input: newCtx.data
-          })
-        };
-      });
-    } else {
-      return {
-        status: "valid",
-        value: result.status === "valid" ? result.value : this._def.catchValue({
-          get error() {
-            return new ZodError(newCtx.common.issues);
-          },
-          input: newCtx.data
-        })
-      };
+    type: "default",
+    innerType,
+    get defaultValue() {
+      return typeof defaultValue === "function" ? defaultValue() : shallowClone(defaultValue);
     }
-  }
-  removeCatch() {
-    return this._def.innerType;
-  }
+  });
 }
-ZodCatch.create = (type, params) => {
+const ZodPrefault = /* @__PURE__ */ $constructor("ZodPrefault", (inst, def) => {
+  $ZodPrefault.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => prefaultProcessor(inst, ctx, json, params);
+  inst.unwrap = () => inst._zod.def.innerType;
+});
+function prefault(innerType, defaultValue) {
+  return new ZodPrefault({
+    type: "prefault",
+    innerType,
+    get defaultValue() {
+      return typeof defaultValue === "function" ? defaultValue() : shallowClone(defaultValue);
+    }
+  });
+}
+const ZodNonOptional = /* @__PURE__ */ $constructor("ZodNonOptional", (inst, def) => {
+  $ZodNonOptional.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => nonoptionalProcessor(inst, ctx, json, params);
+  inst.unwrap = () => inst._zod.def.innerType;
+});
+function nonoptional(innerType, params) {
+  return new ZodNonOptional({
+    type: "nonoptional",
+    innerType,
+    ...normalizeParams(params)
+  });
+}
+const ZodCatch = /* @__PURE__ */ $constructor("ZodCatch", (inst, def) => {
+  $ZodCatch.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => catchProcessor(inst, ctx, json, params);
+  inst.unwrap = () => inst._zod.def.innerType;
+  inst.removeCatch = inst.unwrap;
+});
+function _catch(innerType, catchValue) {
   return new ZodCatch({
-    innerType: type,
-    typeName: ZodFirstPartyTypeKind.ZodCatch,
-    catchValue: typeof params.catch === "function" ? params.catch : () => params.catch,
-    ...processCreateParams(params)
+    type: "catch",
+    innerType,
+    catchValue: typeof catchValue === "function" ? catchValue : constantCatch(catchValue)
   });
-};
-class ZodNaN extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.nan) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.nan,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return { status: "valid", value: input.data };
-  }
 }
-ZodNaN.create = (params) => {
-  return new ZodNaN({
-    typeName: ZodFirstPartyTypeKind.ZodNaN,
-    ...processCreateParams(params)
+const ZodPipe = /* @__PURE__ */ $constructor("ZodPipe", (inst, def) => {
+  $ZodPipe.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => pipeProcessor(inst, ctx, json, params);
+  inst.in = def.in;
+  inst.out = def.out;
+});
+function pipe(in_, out) {
+  return new ZodPipe({
+    type: "pipe",
+    in: in_,
+    out
+    // ...util.normalizeParams(params),
   });
-};
-class ZodBranded extends ZodType {
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    const data = ctx.data;
-    return this._def.type._parse({
-      data,
-      path: ctx.path,
-      parent: ctx
-    });
-  }
-  unwrap() {
-    return this._def.type;
-  }
 }
-class ZodPipeline extends ZodType {
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    if (ctx.common.async) {
-      const handleAsync = async () => {
-        const inResult = await this._def.in._parseAsync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: ctx
-        });
-        if (inResult.status === "aborted")
-          return INVALID;
-        if (inResult.status === "dirty") {
-          status.dirty();
-          return DIRTY(inResult.value);
-        } else {
-          return this._def.out._parseAsync({
-            data: inResult.value,
-            path: ctx.path,
-            parent: ctx
-          });
-        }
-      };
-      return handleAsync();
-    } else {
-      const inResult = this._def.in._parseSync({
-        data: ctx.data,
-        path: ctx.path,
-        parent: ctx
-      });
-      if (inResult.status === "aborted")
-        return INVALID;
-      if (inResult.status === "dirty") {
-        status.dirty();
-        return {
-          status: "dirty",
-          value: inResult.value
-        };
-      } else {
-        return this._def.out._parseSync({
-          data: inResult.value,
-          path: ctx.path,
-          parent: ctx
-        });
-      }
-    }
-  }
-  static create(a, b2) {
-    return new ZodPipeline({
-      in: a,
-      out: b2,
-      typeName: ZodFirstPartyTypeKind.ZodPipeline
-    });
-  }
-}
-class ZodReadonly extends ZodType {
-  _parse(input) {
-    const result = this._def.innerType._parse(input);
-    const freeze = (data) => {
-      if (isValid(data)) {
-        data.value = Object.freeze(data.value);
-      }
-      return data;
-    };
-    return isAsync(result) ? result.then((data) => freeze(data)) : freeze(result);
-  }
-  unwrap() {
-    return this._def.innerType;
-  }
-}
-ZodReadonly.create = (type, params) => {
+const ZodReadonly = /* @__PURE__ */ $constructor("ZodReadonly", (inst, def) => {
+  $ZodReadonly.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => readonlyProcessor(inst, ctx, json, params);
+  inst.unwrap = () => inst._zod.def.innerType;
+});
+function readonly(innerType) {
   return new ZodReadonly({
-    innerType: type,
-    typeName: ZodFirstPartyTypeKind.ZodReadonly,
-    ...processCreateParams(params)
+    type: "readonly",
+    innerType
   });
-};
-var ZodFirstPartyTypeKind;
-(function(ZodFirstPartyTypeKind2) {
-  ZodFirstPartyTypeKind2["ZodString"] = "ZodString";
-  ZodFirstPartyTypeKind2["ZodNumber"] = "ZodNumber";
-  ZodFirstPartyTypeKind2["ZodNaN"] = "ZodNaN";
-  ZodFirstPartyTypeKind2["ZodBigInt"] = "ZodBigInt";
-  ZodFirstPartyTypeKind2["ZodBoolean"] = "ZodBoolean";
-  ZodFirstPartyTypeKind2["ZodDate"] = "ZodDate";
-  ZodFirstPartyTypeKind2["ZodSymbol"] = "ZodSymbol";
-  ZodFirstPartyTypeKind2["ZodUndefined"] = "ZodUndefined";
-  ZodFirstPartyTypeKind2["ZodNull"] = "ZodNull";
-  ZodFirstPartyTypeKind2["ZodAny"] = "ZodAny";
-  ZodFirstPartyTypeKind2["ZodUnknown"] = "ZodUnknown";
-  ZodFirstPartyTypeKind2["ZodNever"] = "ZodNever";
-  ZodFirstPartyTypeKind2["ZodVoid"] = "ZodVoid";
-  ZodFirstPartyTypeKind2["ZodArray"] = "ZodArray";
-  ZodFirstPartyTypeKind2["ZodObject"] = "ZodObject";
-  ZodFirstPartyTypeKind2["ZodUnion"] = "ZodUnion";
-  ZodFirstPartyTypeKind2["ZodDiscriminatedUnion"] = "ZodDiscriminatedUnion";
-  ZodFirstPartyTypeKind2["ZodIntersection"] = "ZodIntersection";
-  ZodFirstPartyTypeKind2["ZodTuple"] = "ZodTuple";
-  ZodFirstPartyTypeKind2["ZodRecord"] = "ZodRecord";
-  ZodFirstPartyTypeKind2["ZodMap"] = "ZodMap";
-  ZodFirstPartyTypeKind2["ZodSet"] = "ZodSet";
-  ZodFirstPartyTypeKind2["ZodFunction"] = "ZodFunction";
-  ZodFirstPartyTypeKind2["ZodLazy"] = "ZodLazy";
-  ZodFirstPartyTypeKind2["ZodLiteral"] = "ZodLiteral";
-  ZodFirstPartyTypeKind2["ZodEnum"] = "ZodEnum";
-  ZodFirstPartyTypeKind2["ZodEffects"] = "ZodEffects";
-  ZodFirstPartyTypeKind2["ZodNativeEnum"] = "ZodNativeEnum";
-  ZodFirstPartyTypeKind2["ZodOptional"] = "ZodOptional";
-  ZodFirstPartyTypeKind2["ZodNullable"] = "ZodNullable";
-  ZodFirstPartyTypeKind2["ZodDefault"] = "ZodDefault";
-  ZodFirstPartyTypeKind2["ZodCatch"] = "ZodCatch";
-  ZodFirstPartyTypeKind2["ZodPromise"] = "ZodPromise";
-  ZodFirstPartyTypeKind2["ZodBranded"] = "ZodBranded";
-  ZodFirstPartyTypeKind2["ZodPipeline"] = "ZodPipeline";
-  ZodFirstPartyTypeKind2["ZodReadonly"] = "ZodReadonly";
-})(ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {}));
-const stringType = ZodString.create;
-const numberType = ZodNumber.create;
-const booleanType = ZodBoolean.create;
-ZodNever.create;
-const arrayType = ZodArray.create;
-const objectType = ZodObject.create;
-const unionType = ZodUnion.create;
-ZodIntersection.create;
-ZodTuple.create;
-const recordType = ZodRecord.create;
-const enumType = ZodEnum.create;
-ZodPromise.create;
-ZodOptional.create;
-ZodNullable.create;
-function rt$1(e, t) {
+}
+const ZodCustom = /* @__PURE__ */ $constructor("ZodCustom", (inst, def) => {
+  $ZodCustom.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json, params) => customProcessor(inst, ctx, json, params);
+});
+function refine(fn, _params = {}) {
+  return /* @__PURE__ */ _refine(ZodCustom, fn, _params);
+}
+function superRefine(fn, params) {
+  return /* @__PURE__ */ _superRefine(fn, params);
+}
+function nt(e, t) {
   return t.header != null && e["global-header"] !== false;
 }
-function x(e) {
+function S(e) {
   return typeof e == "object" && e !== null;
 }
-function ee$1(e) {
-  if (!x(e)) return false;
+function te$1(e) {
+  if (!S(e)) return false;
   const t = Object.getPrototypeOf(e);
   return t === Object.prototype || t === null;
 }
-function H(e) {
-  return x(e) && typeof e.$ref == "string" && e.$ref.trim().length > 0;
+function Z$1(e) {
+  return S(e) && typeof e.$ref == "string" && e.$ref.trim().length > 0;
 }
 function Pe$1(e) {
   return e.replace(/~1/g, "/").replace(/~0/g, "~");
 }
-function qe(e, t) {
+function Je(e, t) {
   if (!t || t === "#") return e;
   const o = t.startsWith("#") ? t.slice(1) : t;
   if (!o || o === "/") return e;
@@ -31726,12 +33877,12 @@ function qe(e, t) {
       r2 = r2[i];
       continue;
     }
-    if (!x(r2) || !(s in r2)) return;
+    if (!S(r2) || !(s in r2)) return;
     r2 = r2[s];
   }
   return r2;
 }
-function D(e) {
+function F(e) {
   const r2 = e.trim().replace(/\\/g, "/").replace(/^\/+/, "").split("/"), n = [];
   for (const s of r2)
     if (!(!s || s === ".")) {
@@ -31743,28 +33894,28 @@ function D(e) {
     }
   return n.join("/");
 }
-function zt(e) {
-  const t = D(e), o = t.lastIndexOf("/");
+function Mt$1(e) {
+  const t = F(e), o = t.lastIndexOf("/");
   return o === -1 ? "" : t.slice(0, o);
 }
-function Mt$1(e, t) {
-  const o = /* @__PURE__ */ new Set(), r2 = D(e);
+function Rt$1(e, t) {
+  const o = /* @__PURE__ */ new Set(), r2 = F(e);
   r2 && o.add(r2);
-  const n = zt(t), s = D(n ? `${n}/${e}` : e);
+  const n = Mt$1(t), s = F(n ? `${n}/${e}` : e);
   return s && o.add(s), Array.from(o);
 }
-function R(e) {
-  return Array.isArray(e) ? e.map((t) => R(t)) : ee$1(e) ? Object.fromEntries(
-    Object.entries(e).map(([t, o]) => [t, R(o)])
+function W(e) {
+  return Array.isArray(e) ? e.map((t) => W(t)) : te$1(e) ? Object.fromEntries(
+    Object.entries(e).map(([t, o]) => [t, W(o)])
   ) : e;
 }
-function V(e, t, o) {
+function H(e, t, o) {
   for (const r2 of t) {
-    const n = D(r2);
+    const n = F(r2);
     n && e.set(n, o);
   }
 }
-function Ie(e, t) {
+function Ae$1(e, t) {
   const o = {};
   for (const [r2, n] of Object.entries(e ?? {})) {
     const s = t == null ? void 0 : t[r2];
@@ -31782,14 +33933,14 @@ function Ie(e, t) {
 function _t$1(e, t) {
   if (!e) return null;
   const o = t[e.source];
-  if (!x(o)) return null;
+  if (!S(o)) return null;
   const r2 = o[e.paramValue];
   return r2 === void 0 ? null : {
     ...e,
     currentItem: r2
   };
 }
-function Rt$1({
+function Wt({
   pages: e,
   siteConfig: t,
   themeConfig: o,
@@ -31799,15 +33950,15 @@ function Rt$1({
 }) {
   const i = /* @__PURE__ */ new Map();
   for (const [l, a] of Object.entries(s ?? {}))
-    V(i, [l], a);
-  V(i, ["site.json", "config/site.json", "src/data/config/site.json"], t), V(i, ["theme.json", "config/theme.json", "src/data/config/theme.json"], o), V(i, ["menu.json", "config/menu.json", "src/data/config/menu.json"], r2);
+    H(i, [l], a);
+  H(i, ["site.json", "config/site.json", "src/data/config/site.json"], t), H(i, ["theme.json", "config/theme.json", "src/data/config/theme.json"], o), H(i, ["menu.json", "config/menu.json", "src/data/config/menu.json"], r2);
   for (const [l, a] of Object.entries(e)) {
     const c = l.replace(/^\/+|\/+$/g, "") || "home";
-    V(i, [`pages/${c}.json`, `src/data/pages/${c}.json`], a);
+    H(i, [`pages/${c}.json`, `src/data/pages/${c}.json`], a);
   }
   for (const [l, a] of Object.entries(n ?? {})) {
     const c = l.replace(/^\/+|\/+$/g, "");
-    c && V(i, [
+    c && H(i, [
       `collections/${c}/${c}.json`,
       `src/data/collections/${c}/${c}.json`
     ], a);
@@ -31827,71 +33978,71 @@ function Nt(e, t, o) {
   }
   const [r2, n = ""] = e.split("#"), s = n ? `/${n.replace(/^\//, "")}` : "";
   if (!r2) {
-    const c = D(t), p = o.documents.get(c);
+    const c = F(t), p = o.documents.get(c);
     if (p === void 0) return null;
-    const g = qe(p, s);
+    const g = Je(p, s);
     return g === void 0 ? null : { value: g, documentPath: c };
   }
-  for (const c of Mt$1(r2, t)) {
+  for (const c of Rt$1(r2, t)) {
     const p = o.documents.get(c);
     if (p === void 0) continue;
-    const g = qe(p, s);
+    const g = Je(p, s);
     if (g !== void 0)
       return { value: g, documentPath: c };
   }
   return null;
 }
-function F(e, t, o) {
+function D(e, t, o) {
   if (Array.isArray(e))
-    return e.map((r2) => F(r2, t, o));
-  if (!ee$1(e))
+    return e.map((r2) => D(r2, t, o));
+  if (!te$1(e))
     return e;
-  if (H(e)) {
-    const r2 = `${D(t)}::${e.$ref}`;
+  if (Z$1(e)) {
+    const r2 = `${F(t)}::${e.$ref}`;
     if (o.stack.includes(r2))
-      return console.warn("[JsonPages] Circular $ref skipped", e.$ref), R(e);
+      return console.warn("[JsonPages] Circular $ref skipped", e.$ref), W(e);
     if (o.cache.has(r2)) {
-      const a = R(o.cache.get(r2)), c = Object.entries(e).filter(([g]) => g !== "$ref");
+      const a = W(o.cache.get(r2)), c = Object.entries(e).filter(([g]) => g !== "$ref");
       if (c.length === 0) return a;
       const p = Object.fromEntries(
-        c.map(([g, w]) => [g, F(w, t, o)])
+        c.map(([g, y]) => [g, D(y, t, o)])
       );
-      return ee$1(a) ? { ...a, ...p } : a;
+      return te$1(a) ? { ...a, ...p } : a;
     }
     const n = Nt(e.$ref, t, o);
     if (!n)
       return console.warn("[JsonPages] Unresolved $ref", e.$ref), Object.fromEntries(
-        Object.entries(e).map(([a, c]) => [a, F(c, t, o)])
+        Object.entries(e).map(([a, c]) => [a, D(c, t, o)])
       );
     o.stack.push(r2);
-    const s = F(n.value, n.documentPath, o);
-    o.stack.pop(), o.cache.set(r2, R(s));
+    const s = D(n.value, n.documentPath, o);
+    o.stack.pop(), o.cache.set(r2, W(s));
     const i = Object.entries(e).filter(([a]) => a !== "$ref");
     if (i.length === 0) return s;
     const l = Object.fromEntries(
-      i.map(([a, c]) => [a, F(c, t, o)])
+      i.map(([a, c]) => [a, D(c, t, o)])
     );
-    return ee$1(s) ? { ...s, ...l } : s;
+    return te$1(s) ? { ...s, ...l } : s;
   }
   return Object.fromEntries(
-    Object.entries(e).map(([r2, n]) => [r2, F(n, t, o)])
+    Object.entries(e).map(([r2, n]) => [r2, D(n, t, o)])
   );
 }
-function le(e, t, o, r2) {
-  return F(e, t, {
+function ce(e, t, o, r2) {
+  return D(e, t, {
     documents: o,
     cache: /* @__PURE__ */ new Map(),
     stack: [],
     collectionContext: r2
   });
 }
-function nt(e, t, o) {
+function st$1(e, t, o) {
   const r2 = e.collection;
   if (!r2) return null;
   const n = String(r2.source), s = r2.paramKey, i = t[s];
   if (!i) return null;
   const l = o == null ? void 0 : o[n];
-  if (!x(l)) return null;
+  if (!S(l)) return null;
   const a = l[i];
   return a === void 0 ? null : {
     source: n,
@@ -31900,11 +34051,11 @@ function nt(e, t, o) {
     currentItem: a
   };
 }
-function Wt(e) {
-  return x(e) && typeof e.label == "string" && typeof e.href == "string";
-}
 function Lt(e) {
-  if (!H(e)) return null;
+  return S(e) && typeof e.label == "string" && typeof e.href == "string";
+}
+function Kt(e) {
+  if (!Z$1(e)) return null;
   const t = e.$ref.trim(), [o, r2 = ""] = t.split("#");
   if (!/menu\.json$/i.test(o)) return null;
   const n = r2.replace(/^\//, "");
@@ -31912,60 +34063,60 @@ function Lt(e) {
   const s = n.split("/").map(Pe$1).filter(Boolean);
   return s.length > 0 ? s : null;
 }
-function Ae$1(e) {
-  return x(e) ? Object.entries(e).map(([t, o]) => {
-    const r2 = Lt(o);
+function Oe(e) {
+  return S(e) ? Object.entries(e).map(([t, o]) => {
+    const r2 = Kt(o);
     return r2 ? { fieldKey: t, path: r2 } : null;
   }).filter((t) => t != null) : [];
 }
-function st$1(e, t, o) {
+function it$1(e, t, o) {
   if (t.length === 0) return o;
-  const [r2, ...n] = t, s = x(e) ? e : {};
+  const [r2, ...n] = t, s = S(e) ? e : {};
   return {
     ...s,
-    [r2]: st$1(s[r2], n, o)
+    [r2]: it$1(s[r2], n, o)
   };
 }
-function fe(e, t) {
-  if (H(t)) return R(t);
-  if (H(e)) return R(e);
+function me$1(e, t) {
+  if (Z$1(t)) return W(t);
+  if (Z$1(e)) return W(e);
   if (Array.isArray(t)) {
     const o = Array.isArray(e) ? e : [];
-    return t.map((r2, n) => fe(o[n], r2));
+    return t.map((r2, n) => me$1(o[n], r2));
   }
-  if (ee$1(t)) {
-    const o = x(e) ? e : {};
+  if (te$1(t)) {
+    const o = S(e) ? e : {};
     return Object.fromEntries(
       Object.entries(t).map(([r2, n]) => [
         r2,
-        fe(o[r2], n)
+        me$1(o[r2], n)
       ])
     );
   }
   return t;
 }
-function Oe(e, t, o) {
-  const r2 = Ae$1(e);
+function $e(e, t, o) {
+  const r2 = Oe(e);
   if (r2.length === 0)
     return { normalizedData: t, menuDraft: o };
-  const n = x(e) ? e : {}, s = { ...t };
+  const n = S(e) ? e : {}, s = { ...t };
   let i = o;
   for (const l of r2) {
     n[l.fieldKey] !== void 0 && (s[l.fieldKey] = n[l.fieldKey]);
     const a = t[l.fieldKey];
-    Array.isArray(a) && (i = st$1(i, l.path, a));
+    Array.isArray(a) && (i = it$1(i, l.path, a));
   }
   return { normalizedData: s, menuDraft: i };
 }
-function Kt(e, t) {
-  if (!H(e)) return null;
+function Bt(e, t) {
+  if (!Z$1(e)) return null;
   const o = e.$ref.trim();
   if (o === "collection:current")
     return t ? {
       source: t.source,
       itemId: t.paramValue
     } : null;
-  const [r2, n = ""] = o.split("#"), i = D(r2).match(/(?:^|\/)collections\/([^/]+)\/\1\.json$/);
+  const [r2, n = ""] = o.split("#"), i = F(r2).match(/(?:^|\/)collections\/([^/]+)\/\1\.json$/);
   if (!(i != null && i[1])) return null;
   const l = n.replace(/^\//, ""), a = l ? Pe$1(l.split("/")[0]) : void 0;
   return {
@@ -31973,30 +34124,30 @@ function Kt(e, t) {
     ...a ? { itemId: a } : {}
   };
 }
-function it$1(e, t) {
-  return x(e) ? Object.entries(e).map(([o, r2]) => {
-    const n = Kt(r2, t);
+function at$1(e, t) {
+  return S(e) ? Object.entries(e).map(([o, r2]) => {
+    const n = Bt(r2, t);
     return n ? { fieldKey: o, ...n } : null;
   }).filter((o) => o != null) : [];
 }
-function Ft$1(e, t, o, r2, n) {
-  const s = it$1(e, r2);
+function Dt(e, t, o, r2, n) {
+  const s = at$1(e, r2);
   if (s.length === 0)
     return { normalizedData: t, collectionsDraft: o };
-  const i = x(e) ? e : {}, l = { ...t }, a = R(o ?? {});
+  const i = S(e) ? e : {}, l = { ...t }, a = W(o ?? {});
   for (const c of s) {
     i[c.fieldKey] !== void 0 && (l[c.fieldKey] = i[c.fieldKey]);
     const p = t[c.fieldKey];
-    if (!H(p)) {
+    if (!Z$1(p)) {
       if (c.itemId) {
-        const g = x(a[c.source]) ? a[c.source] : {}, w = g[c.itemId];
+        const g = S(a[c.source]) ? a[c.source] : {}, y = g[c.itemId];
         a[c.source] = {
           ...g,
-          [c.itemId]: fe(w, p)
+          [c.itemId]: me$1(y, p)
         };
         continue;
       }
-      x(p) && (a[c.source] = fe(
+      S(p) && (a[c.source] = me$1(
         a[c.source],
         p
       ));
@@ -32004,13 +34155,13 @@ function Ft$1(e, t, o, r2, n) {
   }
   return {
     normalizedData: l,
-    collectionsDraft: Ie(a, n)
+    collectionsDraft: Ae$1(a, n)
   };
 }
-function Ve(e, t, o) {
-  if (!e || !t || !x(t.data))
+function He(e, t, o) {
+  if (!e || !t || !S(t.data))
     return { section: t, menuDraft: o };
-  const { normalizedData: r2, menuDraft: n } = Oe(
+  const { normalizedData: r2, menuDraft: n } = $e(
     e.data,
     t.data,
     o
@@ -32020,15 +34171,15 @@ function Ve(e, t, o) {
     menuDraft: n
   };
 }
-function at$1(e, t, o) {
+function lt$1(e, t, o) {
   let r2 = o;
-  const n = Ve(
+  const n = He(
     e.header,
     t.header,
     r2
   );
   r2 = n.menuDraft;
-  const s = Ve(
+  const s = He(
     e.footer,
     t.footer,
     r2
@@ -32042,21 +34193,21 @@ function at$1(e, t, o) {
     menuDraft: r2
   };
 }
-function lt$1(e) {
-  if (!x(e)) return null;
+function ct$1(e) {
+  if (!S(e)) return null;
   const t = e.menu;
-  return Array.isArray(t) && t.every(Wt) ? t : null;
+  return Array.isArray(t) && t.every(Lt) ? t : null;
 }
-function $e(e, t) {
-  return lt$1(e) ?? (Array.isArray(t) ? t : []);
+function Ee$1(e, t) {
+  return ct$1(e) ?? (Array.isArray(t) ? t : []);
 }
-function ct$1(e, t) {
-  const o = lt$1(e.data);
+function dt$1(e, t) {
+  const o = ct$1(e.data);
   if (o) return o;
   if (e.type === "header") return Array.isArray(t) ? t : [];
 }
-function Ee$1(e) {
-  const t = Ie(e.collections, e.collectionSchemas), o = _t$1(e.collectionContext, t), r2 = Rt$1({
+function ze(e) {
+  const t = Ae$1(e.collections, e.collectionSchemas), o = _t$1(e.collectionContext, t), r2 = Wt({
     ...e,
     collections: t
   });
@@ -32064,7 +34215,7 @@ function Ee$1(e) {
     pages: Object.fromEntries(
       Object.entries(e.pages).map(([n, s]) => [
         n,
-        le(
+        ce(
           s,
           `pages/${n.replace(/^\/+|\/+$/g, "") || "home"}.json`,
           r2,
@@ -32072,138 +34223,140 @@ function Ee$1(e) {
         )
       ])
     ),
-    siteConfig: le(e.siteConfig, "config/site.json", r2),
-    themeConfig: le(e.themeConfig, "config/theme.json", r2),
-    menuConfig: le(e.menuConfig, "config/menu.json", r2),
+    siteConfig: ce(e.siteConfig, "config/site.json", r2),
+    themeConfig: ce(e.themeConfig, "config/theme.json", r2),
+    menuConfig: ce(e.menuConfig, "config/menu.json", r2),
     collections: t,
     collectionContext: o
   };
 }
-const Bt = "olonjs:webmcp:tool-call", Dt = "olonjs:webmcp:tool-result";
-function Ut(e) {
+const Ut = "olonjs:webmcp:tool-call", Ft$1 = "olonjs:webmcp:tool-result";
+function Gt(e) {
   return e == null ? e : JSON.parse(JSON.stringify(e));
 }
-function ge(e) {
-  var t;
-  return (t = e == null ? void 0 : e._def) == null ? void 0 : t.typeName;
+function x(e) {
+  return (e == null ? void 0 : e._def) ?? {};
 }
-function me$1(e) {
+function be$1(e) {
+  return x(e).type;
+}
+function pe$1(e) {
   let t = e, o = false, r2 = false, n;
   for (; ; ) {
-    const s = ge(t);
-    if (s === ZodFirstPartyTypeKind.ZodOptional) {
-      o = true, t = t._def.innerType;
+    const s = be$1(t);
+    if (s === "optional") {
+      o = true, t = x(t).innerType;
       continue;
     }
-    if (s === ZodFirstPartyTypeKind.ZodDefault) {
-      if (o = true, n === void 0)
-        try {
-          n = t._def.defaultValue();
-        } catch {
-          n = void 0;
-        }
-      t = t._def.innerType;
+    if (s === "default") {
+      o = true, n === void 0 && (n = x(t).defaultValue), t = x(t).innerType;
       continue;
     }
-    if (s === ZodFirstPartyTypeKind.ZodNullable) {
-      r2 = true, t = t._def.innerType;
+    if (s === "nullable") {
+      r2 = true, t = x(t).innerType;
       continue;
     }
     break;
   }
   return { schema: t, isOptional: o, isNullable: r2, defaultValue: n };
 }
-function O(e, t, o) {
-  const r2 = Ut(t) ?? {};
+function $(e, t, o) {
+  const r2 = Gt(t) ?? {};
   return e.description && r2.description == null && (r2.description = e.description), o.defaultValue !== void 0 && r2.default == null && (r2.default = o.defaultValue), o.isNullable ? { anyOf: [r2, { type: "null" }] } : r2;
 }
-function Zt(e) {
+function qt(e) {
+  var r2;
   const t = [];
   let o = null;
-  for (const r2 of e) {
-    const n = me$1(r2).schema, s = ge(n);
-    if (s === ZodFirstPartyTypeKind.ZodLiteral) {
-      const i = n._def.value;
-      t.push(i);
-      const l = typeof i;
-      if (l === "string" || l === "number" || l === "boolean") {
-        o = o ?? l;
+  for (const n of e) {
+    const s = pe$1(n).schema, i = be$1(s);
+    if (i === "literal") {
+      const l = (r2 = x(s).values) == null ? void 0 : r2[0];
+      t.push(l);
+      const a = typeof l;
+      if (a === "string" || a === "number" || a === "boolean") {
+        o = o ?? a;
         continue;
       }
       return null;
     }
-    if (s === ZodFirstPartyTypeKind.ZodEnum) {
-      t.push(...n._def.values), o = o ?? "string";
+    if (i === "enum") {
+      t.push(...Object.values(x(s).entries ?? {})), o = o ?? "string";
       continue;
     }
     return null;
   }
-  return t.length === 0 ? null : o === "number" ? { type: "number", enum: t } : o === "boolean" ? { type: "boolean", enum: t } : { type: "string", enum: t.map((r2) => String(r2)) };
+  return t.length === 0 ? null : o === "number" ? { type: "number", enum: t } : o === "boolean" ? { type: "boolean", enum: t } : { type: "string", enum: t.map((n) => String(n)) };
 }
-function B(e) {
-  const t = me$1(e), o = t.schema;
-  switch (ge(o)) {
-    case ZodFirstPartyTypeKind.ZodObject: {
-      const n = o._def.shape(), s = {}, i = [];
-      for (const [a, c] of Object.entries(n)) {
-        const p = c, g = me$1(p);
-        s[a] = B(p), g.isOptional || i.push(a);
+function U(e) {
+  var n;
+  const t = pe$1(e), o = t.schema;
+  switch (be$1(o)) {
+    case "object": {
+      const s = x(o).shape ?? {}, i = {}, l = [];
+      for (const [c, p] of Object.entries(s)) {
+        const g = p, y = pe$1(g);
+        i[c] = U(g), y.isOptional || l.push(c);
       }
-      const l = {
+      const a = {
         type: "object",
-        properties: s,
+        properties: i,
         additionalProperties: false
       };
-      return i.length > 0 && (l.required = i), O(e, l, t);
+      return l.length > 0 && (a.required = l), $(e, a, t);
     }
-    case ZodFirstPartyTypeKind.ZodString:
-      return O(e, { type: "string" }, t);
-    case ZodFirstPartyTypeKind.ZodBoolean:
-      return O(e, { type: "boolean" }, t);
-    case ZodFirstPartyTypeKind.ZodNumber: {
-      const s = (Array.isArray(o._def.checks) ? o._def.checks : []).some((i) => i.kind === "int");
-      return O(e, { type: s ? "integer" : "number" }, t);
+    case "string":
+      return $(e, { type: "string" }, t);
+    case "boolean":
+      return $(e, { type: "boolean" }, t);
+    case "number": {
+      const i = (Array.isArray(x(o).checks) ? x(o).checks : []).some((l) => {
+        var a;
+        return ((a = l == null ? void 0 : l.def) == null ? void 0 : a.format) === "safeint";
+      });
+      return $(e, { type: i ? "integer" : "number" }, t);
     }
-    case ZodFirstPartyTypeKind.ZodArray:
-      return O(
+    case "array":
+      return $(
         e,
-        { type: "array", items: B(o._def.type) },
+        // v4: the element schema lives in `_def.element` (v3 used `_def.type`).
+        { type: "array", items: U(x(o).element) },
         t
       );
-    case ZodFirstPartyTypeKind.ZodEnum:
-      return O(
+    case "enum":
+      return $(
         e,
-        { type: "string", enum: [...o._def.values] },
+        { type: "string", enum: [...Object.values(x(o).entries ?? {})] },
         t
       );
-    case ZodFirstPartyTypeKind.ZodLiteral: {
-      const n = o._def.value, s = n === null ? "null" : typeof n, i = { const: n };
-      return s !== "object" && (i.type = s), O(e, i, t);
+    case "literal": {
+      const s = (n = x(o).values) == null ? void 0 : n[0], i = s === null ? "null" : typeof s, l = { const: s };
+      return i !== "object" && (l.type = i), $(e, l, t);
     }
-    case ZodFirstPartyTypeKind.ZodRecord:
-      return O(
+    case "record":
+      return $(
         e,
         {
           type: "object",
-          additionalProperties: B(
-            o._def.valueType
+          additionalProperties: U(
+            x(o).valueType
           )
         },
         t
       );
-    case ZodFirstPartyTypeKind.ZodUnion: {
-      const n = o._def.options, s = Zt(n);
-      return s ? O(e, s, t) : O(
+    case "union": {
+      const s = x(o).options ?? [], i = qt(s);
+      return i ? $(e, i, t) : $(
         e,
-        { anyOf: n.map((i) => B(i)) },
+        { anyOf: s.map((l) => U(l)) },
         t
       );
     }
     default:
-      return O(e, {}, t);
+      return $(e, {}, t);
   }
 }
-function Gt() {
+function Vt() {
   return {
     type: "object",
     additionalProperties: false,
@@ -32258,77 +34411,77 @@ function Gt() {
     ]
   };
 }
-function qt(e) {
+function Jt(e) {
   const t = e.data && typeof e.data == "object" ? e.data : {};
   return typeof t.title == "string" && t.title.trim() ? t.title.trim() : typeof t.sectionTitle == "string" && t.sectionTitle.trim() ? t.sectionTitle.trim() : typeof t.label == "string" && t.label.trim() ? t.label.trim() : e.type ?? "section";
 }
-function Vt() {
+function Ht() {
   return "update-section";
 }
-function be$1(e) {
+function he(e) {
   return `/schemas/${e}.schema.json`;
 }
-function he(e) {
+function ye$1(e) {
   return `/mcp-manifests/${e}.json`;
 }
-function Jt(e, t) {
+function Yt(e, t) {
   const o = Array.isArray(e == null ? void 0 : e.sections) ? e.sections : [], r2 = [];
   return t.header && e["global-header"] !== false && r2.push({ ...t.header, scope: "global" }), t.footer && r2.push({ ...t.footer, scope: "global" }), [
     ...r2,
     ...o.map((n) => ({ ...n, scope: "local" }))
   ];
 }
-function ze({
+function Me({
   slug: e,
   pageConfig: t,
   schemas: o,
   submissionSchemas: r2,
   siteConfig: n
 }) {
-  var E, C;
-  const s = typeof ((E = t.meta) == null ? void 0 : E.title) == "string" ? t.meta.title : e, i = typeof ((C = t.meta) == null ? void 0 : C.description) == "string" ? t.meta.description : "", l = Jt(t, n), a = Array.from(new Set(l.map((y) => String(y.type)).filter(Boolean))), c = Object.fromEntries(
-    a.filter((y) => (o == null ? void 0 : o[y]) != null).map((y) => {
-      const I = o[y];
-      return [y, B(I)];
+  var z, I;
+  const s = typeof ((z = t.meta) == null ? void 0 : z.title) == "string" ? t.meta.title : e, i = typeof ((I = t.meta) == null ? void 0 : I.description) == "string" ? t.meta.description : "", l = Yt(t, n), a = Array.from(new Set(l.map((h) => String(h.type)).filter(Boolean))), c = Object.fromEntries(
+    a.filter((h) => (o == null ? void 0 : o[h]) != null).map((h) => {
+      const A = o[h];
+      return [h, U(A)];
     })
   ), p = Object.fromEntries(
-    a.filter((y) => (r2 == null ? void 0 : r2[y]) != null).map((y) => {
-      const I = r2[y];
-      return [y, B(I)];
+    a.filter((h) => (r2 == null ? void 0 : r2[h]) != null).map((h) => {
+      const A = r2[h];
+      return [h, U(A)];
     })
-  ), g = l.map((y) => ({
-    id: y.id,
-    type: String(y.type),
-    scope: y.scope === "global" ? "global" : "local",
-    label: qt(y)
-  })), w = a.filter((y) => c[y] != null).length > 0 ? [
+  ), g = l.map((h) => ({
+    id: h.id,
+    type: String(h.type),
+    scope: h.scope === "global" ? "global" : "local",
+    label: Jt(h)
+  })), y = a.filter((h) => c[h] != null).length > 0 ? [
     {
-      name: Vt(),
+      name: Ht(),
       description: "Update a section field in the Studio draft. Does not persist — call save when all updates are complete. Use sectionType to select the matching schema from sectionSchemas.",
-      inputSchema: Gt()
+      inputSchema: Vt()
     },
     {
       name: "save",
       description: "Persist all pending draft changes using the active save mode (local file, hot save, or save2repo). Call once after all update-section calls are complete.",
       inputSchema: { type: "object", additionalProperties: false, properties: {} }
     }
-  ] : [], $ = {
+  ] : [], E = {
     version: "1.0.0",
     kind: "olonjs-page-contract",
     slug: e,
     title: s,
     description: i,
-    manifestHref: he(e),
+    manifestHref: ye$1(e),
     systemPrompt: `You are operating the "${s}" page in OlonJS Studio. Use only the declared tools and keep mutations valid against the section schema.`,
     sectionTypes: a,
     sectionInstances: g,
     sectionSchemas: c,
-    tools: w
+    tools: y
   };
-  return Object.keys(p).length > 0 && ($.sectionSubmissionSchemas = p), $;
+  return Object.keys(p).length > 0 && (E.sectionSubmissionSchemas = p), E;
 }
-function Me(e) {
-  const t = ze(e);
+function Re(e) {
+  const t = Me(e);
   return {
     version: "1.0.0",
     kind: "olonjs-page-mcp-manifest",
@@ -32336,11 +34489,11 @@ function Me(e) {
     slug: e.slug,
     title: t.title,
     description: t.description,
-    contractHref: be$1(e.slug),
+    contractHref: he(e.slug),
     transport: {
       kind: "window-message",
-      requestType: Bt,
-      resultType: Dt,
+      requestType: Ut,
+      resultType: Ft$1,
       target: "window"
     },
     capabilities: {
@@ -32379,13 +34532,13 @@ function _e({
     kind: "olonjs-mcp-manifest-index",
     generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
     pages: s.map(([l, a]) => {
-      const c = Me({ slug: l, pageConfig: a, schemas: t, submissionSchemas: o, siteConfig: r2 });
+      const c = Re({ slug: l, pageConfig: a, schemas: t, submissionSchemas: o, siteConfig: r2 });
       return {
         slug: l,
         title: c.title,
         description: c.description,
-        manifestHref: he(l),
-        contractHref: be$1(l),
+        manifestHref: ye$1(l),
+        contractHref: he(l),
         sectionTypes: c.sectionTypes
       };
     })
@@ -32393,26 +34546,26 @@ function _e({
   return n && Object.keys(n).length > 0 && (i.collections = Object.keys(n).sort().map((l) => ({
     source: l,
     dataHref: `/collections/${l}/${l}.json`,
-    contractHref: ye$1(l)
+    contractHref: we(l)
   }))), i;
 }
-function ye$1(e) {
+function we(e) {
   return `/schemas/collections/${e}.schema.json`;
 }
-function dt$1({ source: e, schema: t }) {
-  const r2 = me$1(t).schema, n = ge(r2);
+function ut$1({ source: e, schema: t }) {
+  const r2 = pe$1(t).schema, n = be$1(r2);
   let s;
-  return n === ZodFirstPartyTypeKind.ZodRecord ? s = r2._def.valueType : s = t, {
+  return n === "record" ? s = x(r2).valueType : s = t, {
     version: "1.0.0",
     kind: "olonjs-collection-contract",
     source: e,
     dataHref: `/collections/${e}/${e}.json`,
-    contractHref: ye$1(e),
+    contractHref: we(e),
     recordKeyMustMatchItemId: true,
-    itemSchema: B(s)
+    itemSchema: U(s)
   };
 }
-function ut$1(e, t) {
+function ft$1(e, t) {
   for (const [o, r2] of Object.entries(t)) {
     if (r2 == null || typeof r2 != "object")
       throw new Error(`[${e}] invalid item at key "${o}": expected an object`);
@@ -32423,7 +34576,7 @@ function ut$1(e, t) {
       );
   }
 }
-function ft$1(e) {
+function mt$1(e) {
   var n;
   const t = ((n = e.siteConfig.identity) == null ? void 0 : n.title) || "OlonJS Site", o = _e(e);
   let r2 = `# ${t}
@@ -32449,24 +34602,24 @@ function ft$1(e) {
   }
   return r2.trim();
 }
-function Ht(e) {
+function Zt(e) {
   return e.replace(/([a-z0-9])([A-Z])/g, "$1-$2").replace(/[_\s]+/g, "-").toLowerCase();
 }
-function mt$1(e, t = [], o = {}) {
+function pt$1(e, t = [], o = {}) {
   return Object.entries(e).forEach(([r2, n]) => {
-    const s = [...t, Ht(r2)];
+    const s = [...t, Zt(r2)];
     if (typeof n == "string" || typeof n == "number") {
       o[`--theme-${s.join("-")}`] = String(n);
       return;
     }
-    n && typeof n == "object" && !Array.isArray(n) && mt$1(n, s, o);
+    n && typeof n == "object" && !Array.isArray(n) && pt$1(n, s, o);
   }), o;
 }
 function T(e, t, o, r2) {
   r2 && (e[t] = `var(${o})`);
 }
-function Yt(e) {
-  const t = mt$1(e.tokens), o = { ...t };
+function Qt(e) {
+  const t = pt$1(e.tokens), o = { ...t };
   return T(o, "--theme-primary", "--theme-colors-primary", t["--theme-colors-primary"]), T(o, "--theme-secondary", "--theme-colors-secondary", t["--theme-colors-secondary"]), T(o, "--theme-accent", "--theme-colors-accent", t["--theme-colors-accent"]), T(o, "--theme-background", "--theme-colors-background", t["--theme-colors-background"]), T(o, "--theme-surface", "--theme-colors-surface", t["--theme-colors-surface"]), T(o, "--theme-surface-alt", "--theme-colors-surface-alt", t["--theme-colors-surface-alt"]), T(o, "--theme-text", "--theme-colors-text", t["--theme-colors-text"]), T(o, "--theme-text-muted", "--theme-colors-text-muted", t["--theme-colors-text-muted"]), T(o, "--theme-border", "--theme-colors-border", t["--theme-colors-border"]), T(
     o,
     "--theme-font-primary",
@@ -32484,14 +34637,14 @@ function Yt(e) {
     t["--theme-typography-font-family-display"]
   ), T(o, "--theme-radius-sm", "--theme-border-radius-sm", t["--theme-border-radius-sm"]), T(o, "--theme-radius-md", "--theme-border-radius-md", t["--theme-border-radius-md"]), T(o, "--theme-radius-lg", "--theme-border-radius-lg", t["--theme-border-radius-lg"]), o;
 }
-function Qt(e, t, o) {
+function Xt(e, t, o) {
   const r2 = [...e.sections], n = r2.findIndex((l) => l.id === t);
   if (n === -1 || o < 0 || o >= r2.length)
     return e;
   const [s] = r2.splice(n, 1), i = o > n ? o - 1 : o;
   return r2.splice(Math.min(i, r2.length), 0, s), { ...e, sections: r2 };
 }
-function Xt(e, t, o) {
+function eo(e, t, o) {
   const r2 = {
     id: crypto.randomUUID(),
     type: t,
@@ -32506,12 +34659,12 @@ function Xt(e, t, o) {
     section: r2
   };
 }
-function eo(e, t) {
+function to(e, t) {
   if (!t) return e;
   const o = e[e.length - 1];
   return o && o.itemId == null && o.fieldKey === t ? e : [...e, { fieldKey: t }];
 }
-function to(e, t) {
+function oo(e, t) {
   var s, i, l;
   const o = [];
   let r2 = null, n = e;
@@ -32523,9 +34676,9 @@ function to(e, t) {
     }
     n = n.parentElement;
   }
-  return o.reverse(), eo(o, r2);
+  return o.reverse(), to(o, r2);
 }
-const oo = {
+const ro = {
   UPDATE_DRAFTS: "jsonpages:update-drafts",
   SYNC_SELECTION: "jsonpages:sync-selection",
   SECTION_SELECT: "jsonpages:section-select",
@@ -32537,109 +34690,109 @@ const oo = {
   STAGE_READY: "jsonpages:stage-ready",
   WEBMCP_TOOL_CALL: "olonjs:webmcp:tool-call",
   WEBMCP_TOOL_RESULT: "olonjs:webmcp:tool-result"
-}, mr = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+}, pr = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  STUDIO_EVENTS: oo,
-  appendDraftSection: Xt,
-  applyCollectionRefBindingsToDraft: Ft$1,
-  applyMenuRefBindingsToDraft: Oe,
-  applySiteMenuRefBindingsToDraft: at$1,
-  assertCollectionRecordKeys: ut$1,
-  buildCollectionContract: dt$1,
-  buildCollectionContractHref: ye$1,
-  buildLlmsTxt: ft$1,
-  buildPageContract: ze,
-  buildPageContractHref: be$1,
-  buildPageManifest: Me,
-  buildPageManifestHref: he,
-  buildSelectionPath: to,
+  STUDIO_EVENTS: ro,
+  appendDraftSection: eo,
+  applyCollectionRefBindingsToDraft: Dt,
+  applyMenuRefBindingsToDraft: $e,
+  applySiteMenuRefBindingsToDraft: lt$1,
+  assertCollectionRecordKeys: ft$1,
+  buildCollectionContract: ut$1,
+  buildCollectionContractHref: we,
+  buildLlmsTxt: mt$1,
+  buildPageContract: Me,
+  buildPageContractHref: he,
+  buildPageManifest: Re,
+  buildPageManifestHref: ye$1,
+  buildSelectionPath: oo,
   buildSiteManifest: _e,
-  buildThemeVariableMap: Yt,
-  getCollectionRefBindings: it$1,
-  getMenuRefBindings: Ae$1,
-  reorderPageSections: Qt,
-  resolveCollectionContext: nt,
-  resolveHeaderMenuItems: $e,
-  resolveRuntimeConfig: Ee$1,
-  resolveSectionMenuItems: ct$1,
-  shouldRenderSiteGlobalHeader: rt$1,
-  validateCollectionDocuments: Ie
+  buildThemeVariableMap: Qt,
+  getCollectionRefBindings: at$1,
+  getMenuRefBindings: Oe,
+  reorderPageSections: Xt,
+  resolveCollectionContext: st$1,
+  resolveHeaderMenuItems: Ee$1,
+  resolveRuntimeConfig: ze,
+  resolveSectionMenuItems: dt$1,
+  shouldRenderSiteGlobalHeader: nt,
+  validateCollectionDocuments: Ae$1
 }, Symbol.toStringTag, { value: "Module" }));
-function bt$1(e) {
+function ht$1(e) {
   var t, o, r2 = "";
   if (typeof e == "string" || typeof e == "number") r2 += e;
   else if (typeof e == "object") if (Array.isArray(e)) {
     var n = e.length;
-    for (t = 0; t < n; t++) e[t] && (o = bt$1(e[t])) && (r2 && (r2 += " "), r2 += o);
+    for (t = 0; t < n; t++) e[t] && (o = ht$1(e[t])) && (r2 && (r2 += " "), r2 += o);
   } else for (o in e) e[o] && (r2 && (r2 += " "), r2 += o);
   return r2;
 }
-function po() {
-  for (var e, t, o = 0, r2 = "", n = arguments.length; o < n; o++) (e = arguments[o]) && (t = bt$1(e)) && (r2 && (r2 += " "), r2 += t);
+function go() {
+  for (var e, t, o = 0, r2 = "", n = arguments.length; o < n; o++) (e = arguments[o]) && (t = ht$1(e)) && (r2 && (r2 += " "), r2 += t);
   return r2;
 }
-const go = (e, t) => {
+const bo = (e, t) => {
   const o = new Array(e.length + t.length);
   for (let r2 = 0; r2 < e.length; r2++)
     o[r2] = e[r2];
   for (let r2 = 0; r2 < t.length; r2++)
     o[e.length + r2] = t[r2];
   return o;
-}, bo = (e, t) => ({
+}, ho = (e, t) => ({
   classGroupId: e,
   validator: t
-}), ht$1 = (e = /* @__PURE__ */ new Map(), t = null, o) => ({
+}), yt$1 = (e = /* @__PURE__ */ new Map(), t = null, o) => ({
   nextPart: e,
   validators: t,
   classGroupId: o
-}), pe$1 = "-", He = [], ho = "arbitrary..", yo = (e) => {
-  const t = vo(e), {
+}), ge = "-", Ze = [], yo = "arbitrary..", wo = (e) => {
+  const t = ko(e), {
     conflictingClassGroups: o,
     conflictingClassGroupModifiers: r2
   } = e;
   return {
     getClassGroupId: (i) => {
       if (i.startsWith("[") && i.endsWith("]"))
-        return wo(i);
-      const l = i.split(pe$1), a = l[0] === "" && l.length > 1 ? 1 : 0;
-      return yt$1(l, a, t);
+        return vo(i);
+      const l = i.split(ge), a = l[0] === "" && l.length > 1 ? 1 : 0;
+      return wt(l, a, t);
     },
     getConflictingClassGroupIds: (i, l) => {
       if (l) {
         const a = r2[i], c = o[i];
-        return a ? c ? go(c, a) : a : c || He;
+        return a ? c ? bo(c, a) : a : c || Ze;
       }
-      return o[i] || He;
+      return o[i] || Ze;
     }
   };
-}, yt$1 = (e, t, o) => {
+}, wt = (e, t, o) => {
   if (e.length - t === 0)
     return o.classGroupId;
   const n = e[t], s = o.nextPart.get(n);
   if (s) {
-    const c = yt$1(e, t + 1, s);
+    const c = wt(e, t + 1, s);
     if (c) return c;
   }
   const i = o.validators;
   if (i === null)
     return;
-  const l = t === 0 ? e.join(pe$1) : e.slice(t).join(pe$1), a = i.length;
+  const l = t === 0 ? e.join(ge) : e.slice(t).join(ge), a = i.length;
   for (let c = 0; c < a; c++) {
     const p = i[c];
     if (p.validator(l))
       return p.classGroupId;
   }
-}, wo = (e) => e.slice(1, -1).indexOf(":") === -1 ? void 0 : (() => {
+}, vo = (e) => e.slice(1, -1).indexOf(":") === -1 ? void 0 : (() => {
   const t = e.slice(1, -1), o = t.indexOf(":"), r2 = t.slice(0, o);
-  return r2 ? ho + r2 : void 0;
-})(), vo = (e) => {
+  return r2 ? yo + r2 : void 0;
+})(), ko = (e) => {
   const {
     theme: t,
     classGroups: o
   } = e;
-  return ko(o, t);
-}, ko = (e, t) => {
-  const o = ht$1();
+  return xo(o, t);
+}, xo = (e, t) => {
+  const o = yt$1();
   for (const r2 in e) {
     const n = e[r2];
     Ne$1(n, o, r2, t);
@@ -32649,43 +34802,43 @@ const go = (e, t) => {
   const n = e.length;
   for (let s = 0; s < n; s++) {
     const i = e[s];
-    xo(i, t, o, r2);
+    So(i, t, o, r2);
   }
-}, xo = (e, t, o, r2) => {
+}, So = (e, t, o, r2) => {
   if (typeof e == "string") {
-    So(e, t, o);
+    jo(e, t, o);
     return;
   }
   if (typeof e == "function") {
-    jo(e, t, o, r2);
+    Co(e, t, o, r2);
     return;
   }
   To(e, t, o, r2);
-}, So = (e, t, o) => {
-  const r2 = e === "" ? t : wt(t, e);
+}, jo = (e, t, o) => {
+  const r2 = e === "" ? t : vt$1(t, e);
   r2.classGroupId = o;
-}, jo = (e, t, o, r2) => {
-  if (Co(e)) {
+}, Co = (e, t, o, r2) => {
+  if (Io(e)) {
     Ne$1(e(r2), t, o, r2);
     return;
   }
-  t.validators === null && (t.validators = []), t.validators.push(bo(o, e));
+  t.validators === null && (t.validators = []), t.validators.push(ho(o, e));
 }, To = (e, t, o, r2) => {
   const n = Object.entries(e), s = n.length;
   for (let i = 0; i < s; i++) {
     const [l, a] = n[i];
-    Ne$1(a, wt(t, l), o, r2);
+    Ne$1(a, vt$1(t, l), o, r2);
   }
-}, wt = (e, t) => {
+}, vt$1 = (e, t) => {
   let o = e;
-  const r2 = t.split(pe$1), n = r2.length;
+  const r2 = t.split(ge), n = r2.length;
   for (let s = 0; s < n; s++) {
     const i = r2[s];
     let l = o.nextPart.get(i);
-    l || (l = ht$1(), o.nextPart.set(i, l)), o = l;
+    l || (l = yt$1(), o.nextPart.set(i, l)), o = l;
   }
   return o;
-}, Co = (e) => "isThemeGetter" in e && e.isThemeGetter === true, Po = (e) => {
+}, Io = (e) => "isThemeGetter" in e && e.isThemeGetter === true, Po = (e) => {
   if (e < 1)
     return {
       get: () => {
@@ -32709,13 +34862,13 @@ const go = (e, t) => {
       s in o ? o[s] = i : n(s, i);
     }
   };
-}, Ce = "!", Ye = ":", Io = [], Qe = (e, t, o, r2, n) => ({
+}, Ie = "!", Qe = ":", Ao = [], Xe = (e, t, o, r2, n) => ({
   modifiers: e,
   hasImportantModifier: t,
   baseClassName: o,
   maybePostfixModifierPosition: r2,
   isExternal: n
-}), Ao = (e) => {
+}), Oo = (e) => {
   const {
     prefix: t,
     experimentalParseClassName: o
@@ -32724,35 +34877,35 @@ const go = (e, t) => {
     const s = [];
     let i = 0, l = 0, a = 0, c;
     const p = n.length;
-    for (let C = 0; C < p; C++) {
-      const y = n[C];
+    for (let I = 0; I < p; I++) {
+      const h = n[I];
       if (i === 0 && l === 0) {
-        if (y === Ye) {
-          s.push(n.slice(a, C)), a = C + 1;
+        if (h === Qe) {
+          s.push(n.slice(a, I)), a = I + 1;
           continue;
         }
-        if (y === "/") {
-          c = C;
+        if (h === "/") {
+          c = I;
           continue;
         }
       }
-      y === "[" ? i++ : y === "]" ? i-- : y === "(" ? l++ : y === ")" && l--;
+      h === "[" ? i++ : h === "]" ? i-- : h === "(" ? l++ : h === ")" && l--;
     }
     const g = s.length === 0 ? n : n.slice(a);
-    let w = g, $ = false;
-    g.endsWith(Ce) ? (w = g.slice(0, -1), $ = true) : (
+    let y = g, E = false;
+    g.endsWith(Ie) ? (y = g.slice(0, -1), E = true) : (
       /**
        * In Tailwind CSS v3 the important modifier was at the start of the base class name. This is still supported for legacy reasons.
        * @see https://github.com/dcastil/tailwind-merge/issues/513#issuecomment-2614029864
        */
-      g.startsWith(Ce) && (w = g.slice(1), $ = true)
+      g.startsWith(Ie) && (y = g.slice(1), E = true)
     );
-    const E = c && c > a ? c - a : void 0;
-    return Qe(s, $, w, E);
+    const z = c && c > a ? c - a : void 0;
+    return Xe(s, E, y, z);
   };
   if (t) {
-    const n = t + Ye, s = r2;
-    r2 = (i) => i.startsWith(n) ? s(i.slice(n.length)) : Qe(Io, false, i, void 0, true);
+    const n = t + Qe, s = r2;
+    r2 = (i) => i.startsWith(n) ? s(i.slice(n.length)) : Xe(Ao, false, i, void 0, true);
   }
   if (o) {
     const n = r2;
@@ -32762,7 +34915,7 @@ const go = (e, t) => {
     });
   }
   return r2;
-}, Oo = (e) => {
+}, $o = (e) => {
   const t = /* @__PURE__ */ new Map();
   return e.orderSensitiveModifiers.forEach((o, r2) => {
     t.set(o, 1e6 + r2);
@@ -32775,96 +34928,96 @@ const go = (e, t) => {
     }
     return n.length > 0 && (n.sort(), r2.push(...n)), r2;
   };
-}, $o = (e) => ({
+}, Eo = (e) => ({
   cache: Po(e.cacheSize),
-  parseClassName: Ao(e),
-  sortModifiers: Oo(e),
-  ...yo(e)
-}), Eo = /\s+/, zo = (e, t) => {
+  parseClassName: Oo(e),
+  sortModifiers: $o(e),
+  ...wo(e)
+}), zo = /\s+/, Mo = (e, t) => {
   const {
     parseClassName: o,
     getClassGroupId: r2,
     getConflictingClassGroupIds: n,
     sortModifiers: s
-  } = t, i = [], l = e.trim().split(Eo);
+  } = t, i = [], l = e.trim().split(zo);
   let a = "";
   for (let c = l.length - 1; c >= 0; c -= 1) {
     const p = l[c], {
       isExternal: g,
-      modifiers: w,
-      hasImportantModifier: $,
-      baseClassName: E,
-      maybePostfixModifierPosition: C
+      modifiers: y,
+      hasImportantModifier: E,
+      baseClassName: z,
+      maybePostfixModifierPosition: I
     } = o(p);
     if (g) {
       a = p + (a.length > 0 ? " " + a : a);
       continue;
     }
-    let y = !!C, I = r2(y ? E.substring(0, C) : E);
-    if (!I) {
-      if (!y) {
+    let h = !!I, A = r2(h ? z.substring(0, I) : z);
+    if (!A) {
+      if (!h) {
         a = p + (a.length > 0 ? " " + a : a);
         continue;
       }
-      if (I = r2(E), !I) {
+      if (A = r2(z), !A) {
         a = p + (a.length > 0 ? " " + a : a);
         continue;
       }
-      y = false;
+      h = false;
     }
-    const oe = w.length === 0 ? "" : w.length === 1 ? w[0] : s(w).join(":"), Y = $ ? oe + Ce : oe, Z2 = Y + I;
-    if (i.indexOf(Z2) > -1)
+    const re = y.length === 0 ? "" : y.length === 1 ? y[0] : s(y).join(":"), Q = E ? re + Ie : re, q2 = Q + A;
+    if (i.indexOf(q2) > -1)
       continue;
-    i.push(Z2);
-    const G2 = n(I, y);
-    for (let W = 0; W < G2.length; ++W) {
-      const Q = G2[W];
-      i.push(Y + Q);
+    i.push(q2);
+    const V = n(A, h);
+    for (let L = 0; L < V.length; ++L) {
+      const X2 = V[L];
+      i.push(Q + X2);
     }
     a = p + (a.length > 0 ? " " + a : a);
   }
   return a;
-}, Mo = (...e) => {
+}, Ro = (...e) => {
   let t = 0, o, r2, n = "";
   for (; t < e.length; )
-    (o = e[t++]) && (r2 = vt$1(o)) && (n && (n += " "), n += r2);
+    (o = e[t++]) && (r2 = kt$1(o)) && (n && (n += " "), n += r2);
   return n;
-}, vt$1 = (e) => {
+}, kt$1 = (e) => {
   if (typeof e == "string")
     return e;
   let t, o = "";
   for (let r2 = 0; r2 < e.length; r2++)
-    e[r2] && (t = vt$1(e[r2])) && (o && (o += " "), o += t);
+    e[r2] && (t = kt$1(e[r2])) && (o && (o += " "), o += t);
   return o;
 }, _o = (e, ...t) => {
   let o, r2, n, s;
   const i = (a) => {
     const c = t.reduce((p, g) => g(p), e());
-    return o = $o(c), r2 = o.cache.get, n = o.cache.set, s = l, l(a);
+    return o = Eo(c), r2 = o.cache.get, n = o.cache.set, s = l, l(a);
   }, l = (a) => {
     const c = r2(a);
     if (c)
       return c;
-    const p = zo(a, o);
+    const p = Mo(a, o);
     return n(a, p), p;
   };
-  return s = i, (...a) => s(Mo(...a));
-}, Ro = [], v = (e) => {
-  const t = (o) => o[e] || Ro;
+  return s = i, (...a) => s(Ro(...a));
+}, Wo = [], v = (e) => {
+  const t = (o) => o[e] || Wo;
   return t.isThemeGetter = true, t;
-}, kt$1 = /^\[(?:(\w[\w-]*):)?(.+)\]$/i, xt = /^\((?:(\w[\w-]*):)?(.+)\)$/i, No = /^\d+(?:\.\d+)?\/\d+(?:\.\d+)?$/, Wo = /^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$/, Lo = /\d+(%|px|r?em|[sdl]?v([hwib]|min|max)|pt|pc|in|cm|mm|cap|ch|ex|r?lh|cq(w|h|i|b|min|max))|\b(calc|min|max|clamp)\(.+\)|^0$/, Ko = /^(rgba?|hsla?|hwb|(ok)?(lab|lch)|color-mix)\(.+\)$/, Fo = /^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)/, Bo = /^(url|image|image-set|cross-fade|element|(repeating-)?(linear|radial|conic)-gradient)\(.+\)$/, M = (e) => No.test(e), b = (e) => !!e && !Number.isNaN(Number(e)), _ = (e) => !!e && Number.isInteger(Number(e)), je = (e) => e.endsWith("%") && b(e.slice(0, -1)), z = (e) => Wo.test(e), St = () => true, Do = (e) => (
+}, xt = /^\[(?:(\w[\w-]*):)?(.+)\]$/i, St = /^\((?:(\w[\w-]*):)?(.+)\)$/i, No = /^\d+(?:\.\d+)?\/\d+(?:\.\d+)?$/, Lo = /^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$/, Ko = /\d+(%|px|r?em|[sdl]?v([hwib]|min|max)|pt|pc|in|cm|mm|cap|ch|ex|r?lh|cq(w|h|i|b|min|max))|\b(calc|min|max|clamp)\(.+\)|^0$/, Bo = /^(rgba?|hsla?|hwb|(ok)?(lab|lch)|color-mix)\(.+\)$/, Do = /^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)/, Uo = /^(url|image|image-set|cross-fade|element|(repeating-)?(linear|radial|conic)-gradient)\(.+\)$/, R = (e) => No.test(e), b = (e) => !!e && !Number.isNaN(Number(e)), _ = (e) => !!e && Number.isInteger(Number(e)), Ce = (e) => e.endsWith("%") && b(e.slice(0, -1)), M = (e) => Lo.test(e), jt = () => true, Fo = (e) => (
   // `colorFunctionRegex` check is necessary because color functions can have percentages in them which which would be incorrectly classified as lengths.
   // For example, `hsl(0 0% 0%)` would be classified as a length without this check.
   // I could also use lookbehind assertion in `lengthUnitRegex` but that isn't supported widely enough.
-  Lo.test(e) && !Ko.test(e)
-), We = () => false, Uo = (e) => Fo.test(e), Zo = (e) => Bo.test(e), Go = (e) => !d(e) && !u(e), qo = (e) => N(e, Ct, We), d = (e) => kt$1.test(e), K = (e) => N(e, Pt, Do), Xe = (e) => N(e, tr, b), Vo = (e) => N(e, At, St), Jo = (e) => N(e, It, We), et$1 = (e) => N(e, jt, We), Ho = (e) => N(e, Tt, Zo), ce = (e) => N(e, Ot, Uo), u = (e) => xt.test(e), X$1 = (e) => U(e, Pt), Yo = (e) => U(e, It), tt$1 = (e) => U(e, jt), Qo = (e) => U(e, Ct), Xo = (e) => U(e, Tt), de = (e) => U(e, Ot, true), er = (e) => U(e, At, true), N = (e, t, o) => {
-  const r2 = kt$1.exec(e);
-  return r2 ? r2[1] ? t(r2[1]) : o(r2[2]) : false;
-}, U = (e, t, o = false) => {
+  Ko.test(e) && !Bo.test(e)
+), Le = () => false, Go = (e) => Do.test(e), qo = (e) => Uo.test(e), Vo = (e) => !d(e) && !u(e), Jo = (e) => N(e, It, Le), d = (e) => xt.test(e), B = (e) => N(e, Pt, Fo), et$1 = (e) => N(e, or, b), Ho = (e) => N(e, Ot, jt), Yo = (e) => N(e, At, Le), tt$1 = (e) => N(e, Ct, Le), Zo = (e) => N(e, Tt, qo), de = (e) => N(e, $t$1, Go), u = (e) => St.test(e), ee$1 = (e) => G$1(e, Pt), Qo = (e) => G$1(e, At), ot = (e) => G$1(e, Ct), Xo = (e) => G$1(e, It), er = (e) => G$1(e, Tt), ue = (e) => G$1(e, $t$1, true), tr = (e) => G$1(e, Ot, true), N = (e, t, o) => {
   const r2 = xt.exec(e);
+  return r2 ? r2[1] ? t(r2[1]) : o(r2[2]) : false;
+}, G$1 = (e, t, o = false) => {
+  const r2 = St.exec(e);
   return r2 ? r2[1] ? t(r2[1]) : o : false;
-}, jt = (e) => e === "position" || e === "percentage", Tt = (e) => e === "image" || e === "url", Ct = (e) => e === "length" || e === "size" || e === "bg-size", Pt = (e) => e === "length", tr = (e) => e === "number", It = (e) => e === "family-name", At = (e) => e === "number" || e === "weight", Ot = (e) => e === "shadow", or = () => {
-  const e = v("color"), t = v("font"), o = v("text"), r2 = v("font-weight"), n = v("tracking"), s = v("leading"), i = v("breakpoint"), l = v("container"), a = v("spacing"), c = v("radius"), p = v("shadow"), g = v("inset-shadow"), w = v("text-shadow"), $ = v("drop-shadow"), E = v("blur"), C = v("perspective"), y = v("aspect"), I = v("ease"), oe = v("animate"), Y = () => ["auto", "avoid", "all", "avoid-page", "page", "left", "right", "column"], Z2 = () => [
+}, Ct = (e) => e === "position" || e === "percentage", Tt = (e) => e === "image" || e === "url", It = (e) => e === "length" || e === "size" || e === "bg-size", Pt = (e) => e === "length", or = (e) => e === "number", At = (e) => e === "family-name", Ot = (e) => e === "number" || e === "weight", $t$1 = (e) => e === "shadow", rr = () => {
+  const e = v("color"), t = v("font"), o = v("text"), r2 = v("font-weight"), n = v("tracking"), s = v("leading"), i = v("breakpoint"), l = v("container"), a = v("spacing"), c = v("radius"), p = v("shadow"), g = v("inset-shadow"), y = v("text-shadow"), E = v("drop-shadow"), z = v("blur"), I = v("perspective"), h = v("aspect"), A = v("ease"), re = v("animate"), Q = () => ["auto", "avoid", "all", "avoid-page", "page", "left", "right", "column"], q2 = () => [
     "center",
     "top",
     "bottom",
@@ -32882,15 +35035,15 @@ const go = (e, t) => {
     "bottom-left",
     // Deprecated since Tailwind CSS v4.1.0, see https://github.com/tailwindlabs/tailwindcss/pull/17378
     "left-bottom"
-  ], G2 = () => [...Z2(), u, d], W = () => ["auto", "hidden", "clip", "visible", "scroll"], Q = () => ["auto", "contain", "none"], f = () => [u, d, a], P = () => [M, "full", "auto", ...f()], Le = () => [_, "none", "subgrid", u, d], Ke = () => ["auto", {
+  ], V = () => [...q2(), u, d], L = () => ["auto", "hidden", "clip", "visible", "scroll"], X2 = () => ["auto", "contain", "none"], f = () => [u, d, a], P = () => [R, "full", "auto", ...f()], Ke = () => [_, "none", "subgrid", u, d], Be = () => ["auto", {
     span: ["full", _, u, d]
-  }, _, u, d], re = () => [_, "auto", u, d], Fe = () => ["auto", "min", "max", "fr", u, d], we = () => ["start", "end", "center", "between", "around", "evenly", "stretch", "baseline", "center-safe", "end-safe"], q2 = () => ["start", "end", "center", "stretch", "center-safe", "end-safe"], A = () => ["auto", ...f()], L = () => [M, "auto", "full", "dvw", "dvh", "lvw", "lvh", "svw", "svh", "min", "max", "fit", ...f()], ve = () => [M, "screen", "full", "dvw", "lvw", "svw", "min", "max", "fit", ...f()], ke = () => [M, "screen", "full", "lh", "dvh", "lvh", "svh", "min", "max", "fit", ...f()], m = () => [e, u, d], Be = () => [...Z2(), tt$1, et$1, {
+  }, _, u, d], ne = () => [_, "auto", u, d], De = () => ["auto", "min", "max", "fr", u, d], ve = () => ["start", "end", "center", "between", "around", "evenly", "stretch", "baseline", "center-safe", "end-safe"], J = () => ["start", "end", "center", "stretch", "center-safe", "end-safe"], O = () => ["auto", ...f()], K = () => [R, "auto", "full", "dvw", "dvh", "lvw", "lvh", "svw", "svh", "min", "max", "fit", ...f()], ke = () => [R, "screen", "full", "dvw", "lvw", "svw", "min", "max", "fit", ...f()], xe = () => [R, "screen", "full", "lh", "dvh", "lvh", "svh", "min", "max", "fit", ...f()], m = () => [e, u, d], Ue = () => [...q2(), ot, tt$1, {
     position: [u, d]
-  }], De = () => ["no-repeat", {
+  }], Fe = () => ["no-repeat", {
     repeat: ["", "x", "y", "space", "round"]
-  }], Ue = () => ["auto", "cover", "contain", Qo, qo, {
+  }], Ge = () => ["auto", "cover", "contain", Xo, Jo, {
     size: [u, d]
-  }], xe = () => [je, X$1, K], S = () => [
+  }], Se = () => [Ce, ee$1, B], j = () => [
     // Deprecated since Tailwind CSS v4.0.0
     "",
     "none",
@@ -32898,35 +35051,35 @@ const go = (e, t) => {
     c,
     u,
     d
-  ], j = () => ["", b, X$1, K], ne = () => ["solid", "dashed", "dotted", "double"], Ze = () => ["normal", "multiply", "screen", "overlay", "darken", "lighten", "color-dodge", "color-burn", "hard-light", "soft-light", "difference", "exclusion", "hue", "saturation", "color", "luminosity"], k = () => [b, je, tt$1, et$1], Ge = () => [
+  ], C = () => ["", b, ee$1, B], se = () => ["solid", "dashed", "dotted", "double"], qe = () => ["normal", "multiply", "screen", "overlay", "darken", "lighten", "color-dodge", "color-burn", "hard-light", "soft-light", "difference", "exclusion", "hue", "saturation", "color", "luminosity"], k = () => [b, Ce, ot, tt$1], Ve = () => [
     // Deprecated since Tailwind CSS v4.0.0
     "",
     "none",
-    E,
+    z,
     u,
     d
-  ], se = () => ["none", b, u, d], ie = () => ["none", b, u, d], Se = () => [b, u, d], ae = () => [M, "full", ...f()];
+  ], ie = () => ["none", b, u, d], ae = () => ["none", b, u, d], je = () => [b, u, d], le = () => [R, "full", ...f()];
   return {
     cacheSize: 500,
     theme: {
       animate: ["spin", "ping", "pulse", "bounce"],
       aspect: ["video"],
-      blur: [z],
-      breakpoint: [z],
-      color: [St],
-      container: [z],
-      "drop-shadow": [z],
+      blur: [M],
+      breakpoint: [M],
+      color: [jt],
+      container: [M],
+      "drop-shadow": [M],
       ease: ["in", "out", "in-out"],
-      font: [Go],
+      font: [Vo],
       "font-weight": ["thin", "extralight", "light", "normal", "medium", "semibold", "bold", "extrabold", "black"],
-      "inset-shadow": [z],
+      "inset-shadow": [M],
       leading: ["none", "tight", "snug", "normal", "relaxed", "loose"],
       perspective: ["dramatic", "near", "normal", "midrange", "distant", "none"],
-      radius: [z],
-      shadow: [z],
+      radius: [M],
+      shadow: [M],
       spacing: ["px", b],
-      text: [z],
-      "text-shadow": [z],
+      text: [M],
+      "text-shadow": [M],
       tracking: ["tighter", "tight", "normal", "wide", "wider", "widest"]
     },
     classGroups: {
@@ -32938,7 +35091,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/aspect-ratio
        */
       aspect: [{
-        aspect: ["auto", "square", M, d, u, y]
+        aspect: ["auto", "square", R, d, u, h]
       }],
       /**
        * Container
@@ -32958,14 +35111,14 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/break-after
        */
       "break-after": [{
-        "break-after": Y()
+        "break-after": Q()
       }],
       /**
        * Break Before
        * @see https://tailwindcss.com/docs/break-before
        */
       "break-before": [{
-        "break-before": Y()
+        "break-before": Q()
       }],
       /**
        * Break Inside
@@ -33029,49 +35182,49 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/object-position
        */
       "object-position": [{
-        object: G2()
+        object: V()
       }],
       /**
        * Overflow
        * @see https://tailwindcss.com/docs/overflow
        */
       overflow: [{
-        overflow: W()
+        overflow: L()
       }],
       /**
        * Overflow X
        * @see https://tailwindcss.com/docs/overflow
        */
       "overflow-x": [{
-        "overflow-x": W()
+        "overflow-x": L()
       }],
       /**
        * Overflow Y
        * @see https://tailwindcss.com/docs/overflow
        */
       "overflow-y": [{
-        "overflow-y": W()
+        "overflow-y": L()
       }],
       /**
        * Overscroll Behavior
        * @see https://tailwindcss.com/docs/overscroll-behavior
        */
       overscroll: [{
-        overscroll: Q()
+        overscroll: X2()
       }],
       /**
        * Overscroll Behavior X
        * @see https://tailwindcss.com/docs/overscroll-behavior
        */
       "overscroll-x": [{
-        "overscroll-x": Q()
+        "overscroll-x": X2()
       }],
       /**
        * Overscroll Behavior Y
        * @see https://tailwindcss.com/docs/overscroll-behavior
        */
       "overscroll-y": [{
-        "overscroll-y": Q()
+        "overscroll-y": X2()
       }],
       /**
        * Position
@@ -33187,7 +35340,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/flex-basis
        */
       basis: [{
-        basis: [M, "full", "auto", l, ...f()]
+        basis: [R, "full", "auto", l, ...f()]
       }],
       /**
        * Flex Direction
@@ -33208,7 +35361,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/flex
        */
       flex: [{
-        flex: [b, M, "auto", "initial", "none", d]
+        flex: [b, R, "auto", "initial", "none", d]
       }],
       /**
        * Flex Grow
@@ -33236,56 +35389,56 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/grid-template-columns
        */
       "grid-cols": [{
-        "grid-cols": Le()
+        "grid-cols": Ke()
       }],
       /**
        * Grid Column Start / End
        * @see https://tailwindcss.com/docs/grid-column
        */
       "col-start-end": [{
-        col: Ke()
+        col: Be()
       }],
       /**
        * Grid Column Start
        * @see https://tailwindcss.com/docs/grid-column
        */
       "col-start": [{
-        "col-start": re()
+        "col-start": ne()
       }],
       /**
        * Grid Column End
        * @see https://tailwindcss.com/docs/grid-column
        */
       "col-end": [{
-        "col-end": re()
+        "col-end": ne()
       }],
       /**
        * Grid Template Rows
        * @see https://tailwindcss.com/docs/grid-template-rows
        */
       "grid-rows": [{
-        "grid-rows": Le()
+        "grid-rows": Ke()
       }],
       /**
        * Grid Row Start / End
        * @see https://tailwindcss.com/docs/grid-row
        */
       "row-start-end": [{
-        row: Ke()
+        row: Be()
       }],
       /**
        * Grid Row Start
        * @see https://tailwindcss.com/docs/grid-row
        */
       "row-start": [{
-        "row-start": re()
+        "row-start": ne()
       }],
       /**
        * Grid Row End
        * @see https://tailwindcss.com/docs/grid-row
        */
       "row-end": [{
-        "row-end": re()
+        "row-end": ne()
       }],
       /**
        * Grid Auto Flow
@@ -33299,14 +35452,14 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/grid-auto-columns
        */
       "auto-cols": [{
-        "auto-cols": Fe()
+        "auto-cols": De()
       }],
       /**
        * Grid Auto Rows
        * @see https://tailwindcss.com/docs/grid-auto-rows
        */
       "auto-rows": [{
-        "auto-rows": Fe()
+        "auto-rows": De()
       }],
       /**
        * Gap
@@ -33334,35 +35487,35 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/justify-content
        */
       "justify-content": [{
-        justify: [...we(), "normal"]
+        justify: [...ve(), "normal"]
       }],
       /**
        * Justify Items
        * @see https://tailwindcss.com/docs/justify-items
        */
       "justify-items": [{
-        "justify-items": [...q2(), "normal"]
+        "justify-items": [...J(), "normal"]
       }],
       /**
        * Justify Self
        * @see https://tailwindcss.com/docs/justify-self
        */
       "justify-self": [{
-        "justify-self": ["auto", ...q2()]
+        "justify-self": ["auto", ...J()]
       }],
       /**
        * Align Content
        * @see https://tailwindcss.com/docs/align-content
        */
       "align-content": [{
-        content: ["normal", ...we()]
+        content: ["normal", ...ve()]
       }],
       /**
        * Align Items
        * @see https://tailwindcss.com/docs/align-items
        */
       "align-items": [{
-        items: [...q2(), {
+        items: [...J(), {
           baseline: ["", "last"]
         }]
       }],
@@ -33371,7 +35524,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/align-self
        */
       "align-self": [{
-        self: ["auto", ...q2(), {
+        self: ["auto", ...J(), {
           baseline: ["", "last"]
         }]
       }],
@@ -33380,21 +35533,21 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/place-content
        */
       "place-content": [{
-        "place-content": we()
+        "place-content": ve()
       }],
       /**
        * Place Items
        * @see https://tailwindcss.com/docs/place-items
        */
       "place-items": [{
-        "place-items": [...q2(), "baseline"]
+        "place-items": [...J(), "baseline"]
       }],
       /**
        * Place Self
        * @see https://tailwindcss.com/docs/place-self
        */
       "place-self": [{
-        "place-self": ["auto", ...q2()]
+        "place-self": ["auto", ...J()]
       }],
       // Spacing
       /**
@@ -33479,77 +35632,77 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/margin
        */
       m: [{
-        m: A()
+        m: O()
       }],
       /**
        * Margin Inline
        * @see https://tailwindcss.com/docs/margin
        */
       mx: [{
-        mx: A()
+        mx: O()
       }],
       /**
        * Margin Block
        * @see https://tailwindcss.com/docs/margin
        */
       my: [{
-        my: A()
+        my: O()
       }],
       /**
        * Margin Inline Start
        * @see https://tailwindcss.com/docs/margin
        */
       ms: [{
-        ms: A()
+        ms: O()
       }],
       /**
        * Margin Inline End
        * @see https://tailwindcss.com/docs/margin
        */
       me: [{
-        me: A()
+        me: O()
       }],
       /**
        * Margin Block Start
        * @see https://tailwindcss.com/docs/margin
        */
       mbs: [{
-        mbs: A()
+        mbs: O()
       }],
       /**
        * Margin Block End
        * @see https://tailwindcss.com/docs/margin
        */
       mbe: [{
-        mbe: A()
+        mbe: O()
       }],
       /**
        * Margin Top
        * @see https://tailwindcss.com/docs/margin
        */
       mt: [{
-        mt: A()
+        mt: O()
       }],
       /**
        * Margin Right
        * @see https://tailwindcss.com/docs/margin
        */
       mr: [{
-        mr: A()
+        mr: O()
       }],
       /**
        * Margin Bottom
        * @see https://tailwindcss.com/docs/margin
        */
       mb: [{
-        mb: A()
+        mb: O()
       }],
       /**
        * Margin Left
        * @see https://tailwindcss.com/docs/margin
        */
       ml: [{
-        ml: A()
+        ml: O()
       }],
       /**
        * Space Between X
@@ -33583,56 +35736,56 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/width#setting-both-width-and-height
        */
       size: [{
-        size: L()
+        size: K()
       }],
       /**
        * Inline Size
        * @see https://tailwindcss.com/docs/width
        */
       "inline-size": [{
-        inline: ["auto", ...ve()]
+        inline: ["auto", ...ke()]
       }],
       /**
        * Min-Inline Size
        * @see https://tailwindcss.com/docs/min-width
        */
       "min-inline-size": [{
-        "min-inline": ["auto", ...ve()]
+        "min-inline": ["auto", ...ke()]
       }],
       /**
        * Max-Inline Size
        * @see https://tailwindcss.com/docs/max-width
        */
       "max-inline-size": [{
-        "max-inline": ["none", ...ve()]
+        "max-inline": ["none", ...ke()]
       }],
       /**
        * Block Size
        * @see https://tailwindcss.com/docs/height
        */
       "block-size": [{
-        block: ["auto", ...ke()]
+        block: ["auto", ...xe()]
       }],
       /**
        * Min-Block Size
        * @see https://tailwindcss.com/docs/min-height
        */
       "min-block-size": [{
-        "min-block": ["auto", ...ke()]
+        "min-block": ["auto", ...xe()]
       }],
       /**
        * Max-Block Size
        * @see https://tailwindcss.com/docs/max-height
        */
       "max-block-size": [{
-        "max-block": ["none", ...ke()]
+        "max-block": ["none", ...xe()]
       }],
       /**
        * Width
        * @see https://tailwindcss.com/docs/width
        */
       w: [{
-        w: [l, "screen", ...L()]
+        w: [l, "screen", ...K()]
       }],
       /**
        * Min-Width
@@ -33644,7 +35797,7 @@ const go = (e, t) => {
           "screen",
           /** Deprecated. @see https://github.com/tailwindlabs/tailwindcss.com/issues/2027#issuecomment-2620152757 */
           "none",
-          ...L()
+          ...K()
         ]
       }],
       /**
@@ -33662,7 +35815,7 @@ const go = (e, t) => {
           {
             screen: [i]
           },
-          ...L()
+          ...K()
         ]
       }],
       /**
@@ -33670,21 +35823,21 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/height
        */
       h: [{
-        h: ["screen", "lh", ...L()]
+        h: ["screen", "lh", ...K()]
       }],
       /**
        * Min-Height
        * @see https://tailwindcss.com/docs/min-height
        */
       "min-h": [{
-        "min-h": ["screen", "lh", "none", ...L()]
+        "min-h": ["screen", "lh", "none", ...K()]
       }],
       /**
        * Max-Height
        * @see https://tailwindcss.com/docs/max-height
        */
       "max-h": [{
-        "max-h": ["screen", "lh", ...L()]
+        "max-h": ["screen", "lh", ...K()]
       }],
       // ------------------
       // --- Typography ---
@@ -33694,7 +35847,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/font-size
        */
       "font-size": [{
-        text: ["base", o, X$1, K]
+        text: ["base", o, ee$1, B]
       }],
       /**
        * Font Smoothing
@@ -33711,21 +35864,21 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/font-weight
        */
       "font-weight": [{
-        font: [r2, er, Vo]
+        font: [r2, tr, Ho]
       }],
       /**
        * Font Stretch
        * @see https://tailwindcss.com/docs/font-stretch
        */
       "font-stretch": [{
-        "font-stretch": ["ultra-condensed", "extra-condensed", "condensed", "semi-condensed", "normal", "semi-expanded", "expanded", "extra-expanded", "ultra-expanded", je, d]
+        "font-stretch": ["ultra-condensed", "extra-condensed", "condensed", "semi-condensed", "normal", "semi-expanded", "expanded", "extra-expanded", "ultra-expanded", Ce, d]
       }],
       /**
        * Font Family
        * @see https://tailwindcss.com/docs/font-family
        */
       "font-family": [{
-        font: [Yo, Jo, t]
+        font: [Qo, Yo, t]
       }],
       /**
        * Font Feature Settings
@@ -33776,7 +35929,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/line-clamp
        */
       "line-clamp": [{
-        "line-clamp": [b, "none", u, Xe]
+        "line-clamp": [b, "none", u, et$1]
       }],
       /**
        * Line Height
@@ -33842,14 +35995,14 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/text-decoration-style
        */
       "text-decoration-style": [{
-        decoration: [...ne(), "wavy"]
+        decoration: [...se(), "wavy"]
       }],
       /**
        * Text Decoration Thickness
        * @see https://tailwindcss.com/docs/text-decoration-thickness
        */
       "text-decoration-thickness": [{
-        decoration: [b, "from-font", "auto", u, K]
+        decoration: [b, "from-font", "auto", u, B]
       }],
       /**
        * Text Decoration Color
@@ -33960,21 +36113,21 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/background-position
        */
       "bg-position": [{
-        bg: Be()
+        bg: Ue()
       }],
       /**
        * Background Repeat
        * @see https://tailwindcss.com/docs/background-repeat
        */
       "bg-repeat": [{
-        bg: De()
+        bg: Fe()
       }],
       /**
        * Background Size
        * @see https://tailwindcss.com/docs/background-size
        */
       "bg-size": [{
-        bg: Ue()
+        bg: Ge()
       }],
       /**
        * Background Image
@@ -33987,7 +36140,7 @@ const go = (e, t) => {
           }, _, u, d],
           radial: ["", u, d],
           conic: [_, u, d]
-        }, Xo, Ho]
+        }, er, Zo]
       }],
       /**
        * Background Color
@@ -34001,21 +36154,21 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/gradient-color-stops
        */
       "gradient-from-pos": [{
-        from: xe()
+        from: Se()
       }],
       /**
        * Gradient Color Stops Via Position
        * @see https://tailwindcss.com/docs/gradient-color-stops
        */
       "gradient-via-pos": [{
-        via: xe()
+        via: Se()
       }],
       /**
        * Gradient Color Stops To Position
        * @see https://tailwindcss.com/docs/gradient-color-stops
        */
       "gradient-to-pos": [{
-        to: xe()
+        to: Se()
       }],
       /**
        * Gradient Color Stops From
@@ -34046,189 +36199,189 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/border-radius
        */
       rounded: [{
-        rounded: S()
+        rounded: j()
       }],
       /**
        * Border Radius Start
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-s": [{
-        "rounded-s": S()
+        "rounded-s": j()
       }],
       /**
        * Border Radius End
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-e": [{
-        "rounded-e": S()
+        "rounded-e": j()
       }],
       /**
        * Border Radius Top
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-t": [{
-        "rounded-t": S()
+        "rounded-t": j()
       }],
       /**
        * Border Radius Right
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-r": [{
-        "rounded-r": S()
+        "rounded-r": j()
       }],
       /**
        * Border Radius Bottom
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-b": [{
-        "rounded-b": S()
+        "rounded-b": j()
       }],
       /**
        * Border Radius Left
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-l": [{
-        "rounded-l": S()
+        "rounded-l": j()
       }],
       /**
        * Border Radius Start Start
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-ss": [{
-        "rounded-ss": S()
+        "rounded-ss": j()
       }],
       /**
        * Border Radius Start End
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-se": [{
-        "rounded-se": S()
+        "rounded-se": j()
       }],
       /**
        * Border Radius End End
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-ee": [{
-        "rounded-ee": S()
+        "rounded-ee": j()
       }],
       /**
        * Border Radius End Start
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-es": [{
-        "rounded-es": S()
+        "rounded-es": j()
       }],
       /**
        * Border Radius Top Left
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-tl": [{
-        "rounded-tl": S()
+        "rounded-tl": j()
       }],
       /**
        * Border Radius Top Right
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-tr": [{
-        "rounded-tr": S()
+        "rounded-tr": j()
       }],
       /**
        * Border Radius Bottom Right
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-br": [{
-        "rounded-br": S()
+        "rounded-br": j()
       }],
       /**
        * Border Radius Bottom Left
        * @see https://tailwindcss.com/docs/border-radius
        */
       "rounded-bl": [{
-        "rounded-bl": S()
+        "rounded-bl": j()
       }],
       /**
        * Border Width
        * @see https://tailwindcss.com/docs/border-width
        */
       "border-w": [{
-        border: j()
+        border: C()
       }],
       /**
        * Border Width Inline
        * @see https://tailwindcss.com/docs/border-width
        */
       "border-w-x": [{
-        "border-x": j()
+        "border-x": C()
       }],
       /**
        * Border Width Block
        * @see https://tailwindcss.com/docs/border-width
        */
       "border-w-y": [{
-        "border-y": j()
+        "border-y": C()
       }],
       /**
        * Border Width Inline Start
        * @see https://tailwindcss.com/docs/border-width
        */
       "border-w-s": [{
-        "border-s": j()
+        "border-s": C()
       }],
       /**
        * Border Width Inline End
        * @see https://tailwindcss.com/docs/border-width
        */
       "border-w-e": [{
-        "border-e": j()
+        "border-e": C()
       }],
       /**
        * Border Width Block Start
        * @see https://tailwindcss.com/docs/border-width
        */
       "border-w-bs": [{
-        "border-bs": j()
+        "border-bs": C()
       }],
       /**
        * Border Width Block End
        * @see https://tailwindcss.com/docs/border-width
        */
       "border-w-be": [{
-        "border-be": j()
+        "border-be": C()
       }],
       /**
        * Border Width Top
        * @see https://tailwindcss.com/docs/border-width
        */
       "border-w-t": [{
-        "border-t": j()
+        "border-t": C()
       }],
       /**
        * Border Width Right
        * @see https://tailwindcss.com/docs/border-width
        */
       "border-w-r": [{
-        "border-r": j()
+        "border-r": C()
       }],
       /**
        * Border Width Bottom
        * @see https://tailwindcss.com/docs/border-width
        */
       "border-w-b": [{
-        "border-b": j()
+        "border-b": C()
       }],
       /**
        * Border Width Left
        * @see https://tailwindcss.com/docs/border-width
        */
       "border-w-l": [{
-        "border-l": j()
+        "border-l": C()
       }],
       /**
        * Divide Width X
        * @see https://tailwindcss.com/docs/border-width#between-children
        */
       "divide-x": [{
-        "divide-x": j()
+        "divide-x": C()
       }],
       /**
        * Divide Width X Reverse
@@ -34240,7 +36393,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/border-width#between-children
        */
       "divide-y": [{
-        "divide-y": j()
+        "divide-y": C()
       }],
       /**
        * Divide Width Y Reverse
@@ -34252,14 +36405,14 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/border-style
        */
       "border-style": [{
-        border: [...ne(), "hidden", "none"]
+        border: [...se(), "hidden", "none"]
       }],
       /**
        * Divide Style
        * @see https://tailwindcss.com/docs/border-style#setting-the-divider-style
        */
       "divide-style": [{
-        divide: [...ne(), "hidden", "none"]
+        divide: [...se(), "hidden", "none"]
       }],
       /**
        * Border Color
@@ -34350,7 +36503,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/outline-style
        */
       "outline-style": [{
-        outline: [...ne(), "none", "hidden"]
+        outline: [...se(), "none", "hidden"]
       }],
       /**
        * Outline Offset
@@ -34364,7 +36517,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/outline-width
        */
       "outline-w": [{
-        outline: ["", b, X$1, K]
+        outline: ["", b, ee$1, B]
       }],
       /**
        * Outline Color
@@ -34386,8 +36539,8 @@ const go = (e, t) => {
           "",
           "none",
           p,
-          de,
-          ce
+          ue,
+          de
         ]
       }],
       /**
@@ -34402,7 +36555,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/box-shadow#adding-an-inset-shadow
        */
       "inset-shadow": [{
-        "inset-shadow": ["none", g, de, ce]
+        "inset-shadow": ["none", g, ue, de]
       }],
       /**
        * Inset Box Shadow Color
@@ -34416,7 +36569,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/box-shadow#adding-a-ring
        */
       "ring-w": [{
-        ring: j()
+        ring: C()
       }],
       /**
        * Ring Width Inset
@@ -34439,7 +36592,7 @@ const go = (e, t) => {
        * @see https://github.com/tailwindlabs/tailwindcss/blob/v4.0.0/packages/tailwindcss/src/utilities.ts#L4158
        */
       "ring-offset-w": [{
-        "ring-offset": [b, K]
+        "ring-offset": [b, B]
       }],
       /**
        * Ring Offset Color
@@ -34455,7 +36608,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/box-shadow#adding-an-inset-ring
        */
       "inset-ring-w": [{
-        "inset-ring": j()
+        "inset-ring": C()
       }],
       /**
        * Inset Ring Color
@@ -34469,7 +36622,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/text-shadow
        */
       "text-shadow": [{
-        "text-shadow": ["none", w, de, ce]
+        "text-shadow": ["none", y, ue, de]
       }],
       /**
        * Text Shadow Color
@@ -34490,14 +36643,14 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/mix-blend-mode
        */
       "mix-blend": [{
-        "mix-blend": [...Ze(), "plus-darker", "plus-lighter"]
+        "mix-blend": [...qe(), "plus-darker", "plus-lighter"]
       }],
       /**
        * Background Blend Mode
        * @see https://tailwindcss.com/docs/background-blend-mode
        */
       "bg-blend": [{
-        "bg-blend": Ze()
+        "bg-blend": qe()
       }],
       /**
        * Mask Clip
@@ -34629,7 +36782,7 @@ const go = (e, t) => {
         }]
       }],
       "mask-image-radial-pos": [{
-        "mask-radial-at": Z2()
+        "mask-radial-at": q2()
       }],
       "mask-image-conic-pos": [{
         "mask-conic": [b]
@@ -34665,21 +36818,21 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/mask-position
        */
       "mask-position": [{
-        mask: Be()
+        mask: Ue()
       }],
       /**
        * Mask Repeat
        * @see https://tailwindcss.com/docs/mask-repeat
        */
       "mask-repeat": [{
-        mask: De()
+        mask: Fe()
       }],
       /**
        * Mask Size
        * @see https://tailwindcss.com/docs/mask-size
        */
       "mask-size": [{
-        mask: Ue()
+        mask: Ge()
       }],
       /**
        * Mask Type
@@ -34716,7 +36869,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/blur
        */
       blur: [{
-        blur: Ge()
+        blur: Ve()
       }],
       /**
        * Brightness
@@ -34741,9 +36894,9 @@ const go = (e, t) => {
           // Deprecated since Tailwind CSS v4.0.0
           "",
           "none",
-          $,
-          de,
-          ce
+          E,
+          ue,
+          de
         ]
       }],
       /**
@@ -34806,7 +36959,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/backdrop-blur
        */
       "backdrop-blur": [{
-        "backdrop-blur": Ge()
+        "backdrop-blur": Ve()
       }],
       /**
        * Backdrop Brightness
@@ -34938,7 +37091,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/transition-timing-function
        */
       ease: [{
-        ease: ["linear", "initial", I, u, d]
+        ease: ["linear", "initial", A, u, d]
       }],
       /**
        * Transition Delay
@@ -34952,7 +37105,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/animation
        */
       animate: [{
-        animate: ["none", oe, u, d]
+        animate: ["none", re, u, d]
       }],
       // ------------------
       // --- Transforms ---
@@ -34969,70 +37122,70 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/perspective
        */
       perspective: [{
-        perspective: [C, u, d]
+        perspective: [I, u, d]
       }],
       /**
        * Perspective Origin
        * @see https://tailwindcss.com/docs/perspective-origin
        */
       "perspective-origin": [{
-        "perspective-origin": G2()
+        "perspective-origin": V()
       }],
       /**
        * Rotate
        * @see https://tailwindcss.com/docs/rotate
        */
       rotate: [{
-        rotate: se()
+        rotate: ie()
       }],
       /**
        * Rotate X
        * @see https://tailwindcss.com/docs/rotate
        */
       "rotate-x": [{
-        "rotate-x": se()
+        "rotate-x": ie()
       }],
       /**
        * Rotate Y
        * @see https://tailwindcss.com/docs/rotate
        */
       "rotate-y": [{
-        "rotate-y": se()
+        "rotate-y": ie()
       }],
       /**
        * Rotate Z
        * @see https://tailwindcss.com/docs/rotate
        */
       "rotate-z": [{
-        "rotate-z": se()
+        "rotate-z": ie()
       }],
       /**
        * Scale
        * @see https://tailwindcss.com/docs/scale
        */
       scale: [{
-        scale: ie()
+        scale: ae()
       }],
       /**
        * Scale X
        * @see https://tailwindcss.com/docs/scale
        */
       "scale-x": [{
-        "scale-x": ie()
+        "scale-x": ae()
       }],
       /**
        * Scale Y
        * @see https://tailwindcss.com/docs/scale
        */
       "scale-y": [{
-        "scale-y": ie()
+        "scale-y": ae()
       }],
       /**
        * Scale Z
        * @see https://tailwindcss.com/docs/scale
        */
       "scale-z": [{
-        "scale-z": ie()
+        "scale-z": ae()
       }],
       /**
        * Scale 3D
@@ -35044,21 +37197,21 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/skew
        */
       skew: [{
-        skew: Se()
+        skew: je()
       }],
       /**
        * Skew X
        * @see https://tailwindcss.com/docs/skew
        */
       "skew-x": [{
-        "skew-x": Se()
+        "skew-x": je()
       }],
       /**
        * Skew Y
        * @see https://tailwindcss.com/docs/skew
        */
       "skew-y": [{
-        "skew-y": Se()
+        "skew-y": je()
       }],
       /**
        * Transform
@@ -35072,7 +37225,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/transform-origin
        */
       "transform-origin": [{
-        origin: G2()
+        origin: V()
       }],
       /**
        * Transform Style
@@ -35086,28 +37239,28 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/translate
        */
       translate: [{
-        translate: ae()
+        translate: le()
       }],
       /**
        * Translate X
        * @see https://tailwindcss.com/docs/translate
        */
       "translate-x": [{
-        "translate-x": ae()
+        "translate-x": le()
       }],
       /**
        * Translate Y
        * @see https://tailwindcss.com/docs/translate
        */
       "translate-y": [{
-        "translate-y": ae()
+        "translate-y": le()
       }],
       /**
        * Translate Z
        * @see https://tailwindcss.com/docs/translate
        */
       "translate-z": [{
-        "translate-z": ae()
+        "translate-z": le()
       }],
       /**
        * Translate None
@@ -35417,7 +37570,7 @@ const go = (e, t) => {
        * @see https://tailwindcss.com/docs/stroke-width
        */
       "stroke-w": [{
-        stroke: [b, X$1, K, Xe]
+        stroke: [b, ee$1, B, et$1]
       }],
       /**
        * Stroke
@@ -35492,48 +37645,48 @@ const go = (e, t) => {
     },
     orderSensitiveModifiers: ["*", "**", "after", "backdrop", "before", "details-content", "file", "first-letter", "first-line", "marker", "placeholder", "selection"]
   };
-}, rr = /* @__PURE__ */ _o(or);
-function br(...e) {
-  return rr(po(e));
+}, nr = /* @__PURE__ */ _o(rr);
+function hr(...e) {
+  return nr(go(e));
 }
-objectType({
-  url: stringType(),
-  alt: stringType().optional()
+object({
+  url: string(),
+  alt: string().optional()
 }).describe("ui:image-picker");
-const yr = objectType({
-  id: stringType().optional(),
-  anchorId: stringType().optional().describe("ui:text")
-}), wr = objectType({
-  id: stringType().optional()
-}), vr = objectType({
-  id: stringType()
+const wr = object({
+  id: string().optional(),
+  anchorId: string().optional().describe("ui:text")
+}), vr = object({
+  id: string().optional()
+}), kr = object({
+  id: string()
 });
-objectType({
-  paddingTop: enumType(["none", "sm", "md", "lg", "xl", "2xl"]).default("md").describe("ui:select"),
-  paddingBottom: enumType(["none", "sm", "md", "lg", "xl", "2xl"]).default("md").describe("ui:select"),
-  theme: enumType(["dark", "light", "accent"]).default("dark").describe("ui:select"),
-  container: enumType(["boxed", "fluid"]).default("boxed").describe("ui:select")
+object({
+  paddingTop: _enum(["none", "sm", "md", "lg", "xl", "2xl"]).default("md").describe("ui:select"),
+  paddingBottom: _enum(["none", "sm", "md", "lg", "xl", "2xl"]).default("md").describe("ui:select"),
+  theme: _enum(["dark", "light", "accent"]).default("dark").describe("ui:select"),
+  container: _enum(["boxed", "fluid"]).default("boxed").describe("ui:select")
 });
-objectType({
-  id: stringType().optional(),
-  label: stringType().describe("ui:text"),
-  href: stringType().describe("ui:text"),
-  variant: enumType(["primary", "secondary", "accent"]).default("primary").describe("ui:select")
+object({
+  id: string().optional(),
+  label: string().describe("ui:text"),
+  href: string().describe("ui:text"),
+  variant: _enum(["primary", "secondary", "accent"]).default("primary").describe("ui:select")
 });
-const Sr = objectType({
-  recipientEmail: stringType().optional().describe("ui:text")
+const jr = object({
+  recipientEmail: string().optional().describe("ui:text")
 });
-function ot(e) {
+function rt$1(e) {
   const t = e.trim();
   if (!t || t === "/") return "/";
   const r2 = (t.startsWith("/") ? t : `/${t}`).replace(/\/+$/, "");
   return r2.length > 0 ? `${r2}/` : "/";
 }
-function te$1(e) {
+function oe(e) {
   return e.split("/").map((t) => t.trim()).filter(Boolean).join("/");
 }
-function ur(e, t) {
-  const o = te$1(e).split("/").filter(Boolean), r2 = te$1(t).split("/").filter(Boolean);
+function fr(e, t) {
+  const o = oe(e).split("/").filter(Boolean), r2 = oe(t).split("/").filter(Boolean);
   if (o.length !== r2.length) return null;
   const n = {};
   for (let s = 0; s < o.length; s += 1) {
@@ -35546,8 +37699,8 @@ function ur(e, t) {
   }
   return n;
 }
-function Et$1(e, t) {
-  const o = te$1(t) || "home", r2 = e[o];
+function zt(e, t) {
+  const o = oe(t) || "home", r2 = e[o];
   if (r2)
     return {
       page: r2,
@@ -35556,7 +37709,7 @@ function Et$1(e, t) {
       params: {}
     };
   for (const [n, s] of Object.entries(e)) {
-    const i = ur(s.slug || n, o);
+    const i = fr(s.slug || n, o);
     if (i)
       return {
         page: s,
@@ -35634,7 +37787,7 @@ function tt() {
         switch (typeof t.tag == "number" && console.error(
           "Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue."
         ), t.$$typeof) {
-          case S:
+          case S2:
             return "Portal";
           case g:
             return t.displayName || "Context";
@@ -35713,7 +37866,7 @@ function tt() {
     }
     function x2() {
       var t = e(this.type);
-      return O2[t] || (O2[t] = true, console.error(
+      return O[t] || (O[t] = true, console.error(
         "Accessing element.ref was removed in React 19. ref is now a regular prop. It will be removed from the JSX Element type in a future release."
       )), t = this.props.ref, t !== void 0 ? t : null;
     }
@@ -35765,10 +37918,10 @@ function tt() {
         else E(R2);
       if (Y.call(u2, "key")) {
         R2 = e(t);
-        var V2 = Object.keys(u2).filter(function(Oe2) {
+        var V = Object.keys(u2).filter(function(Oe2) {
           return Oe2 !== "key";
         });
-        _2 = 0 < V2.length ? "{key: someKey, " + V2.join(": ..., ") + ": ...}" : "{key: someKey}", W[R2 + _2] || (V2 = 0 < V2.length ? "{" + V2.join(": ..., ") + ": ...}" : "{}", console.error(
+        _2 = 0 < V.length ? "{key: someKey, " + V.join(": ..., ") + ": ...}" : "{key: someKey}", W2[R2 + _2] || (V = 0 < V.length ? "{" + V.join(": ..., ") + ": ...}" : "{}", console.error(
           `A props object containing a "key" prop is being spread into JSX:
   let props = %s;
   <%s {...props} />
@@ -35777,9 +37930,9 @@ React keys must be passed directly to JSX without using spread:
   <%s key={someKey} {...props} />`,
           _2,
           R2,
-          V2,
+          V,
           R2
-        ), W[R2 + _2] = true);
+        ), W2[R2 + _2] = true);
       }
       if (R2 = null, j !== void 0 && (o(j), R2 = "" + j), l(u2) && (o(u2.key), R2 = "" + u2.key), "key" in u2) {
         j = {};
@@ -35804,7 +37957,7 @@ React keys must be passed directly to JSX without using spread:
     function f(t) {
       return typeof t == "object" && t !== null && t.$$typeof === d2;
     }
-    var c = ge$1, d2 = Symbol.for("react.transitional.element"), S = Symbol.for("react.portal"), h = Symbol.for("react.fragment"), C = Symbol.for("react.strict_mode"), A = Symbol.for("react.profiler"), b2 = Symbol.for("react.consumer"), g = Symbol.for("react.context"), m = Symbol.for("react.forward_ref"), w = Symbol.for("react.suspense"), k = Symbol.for("react.suspense_list"), T2 = Symbol.for("react.memo"), P = Symbol.for("react.lazy"), I = Symbol.for("react.activity"), D2 = Symbol.for("react.client.reference"), U2 = c.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, Y = Object.prototype.hasOwnProperty, B2 = Array.isArray, z2 = console.createTask ? console.createTask : function() {
+    var c = ge$1, d2 = Symbol.for("react.transitional.element"), S2 = Symbol.for("react.portal"), h = Symbol.for("react.fragment"), C = Symbol.for("react.strict_mode"), A = Symbol.for("react.profiler"), b2 = Symbol.for("react.consumer"), g = Symbol.for("react.context"), m = Symbol.for("react.forward_ref"), w = Symbol.for("react.suspense"), k = Symbol.for("react.suspense_list"), T2 = Symbol.for("react.memo"), P = Symbol.for("react.lazy"), I = Symbol.for("react.activity"), D2 = Symbol.for("react.client.reference"), U2 = c.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, Y = Object.prototype.hasOwnProperty, B2 = Array.isArray, z = console.createTask ? console.createTask : function() {
       return null;
     };
     c = {
@@ -35812,10 +37965,10 @@ React keys must be passed directly to JSX without using spread:
         return t();
       }
     };
-    var F2, O2 = {}, N2 = c.react_stack_bottom_frame.bind(
+    var F2, O = {}, N2 = c.react_stack_bottom_frame.bind(
       c,
       i
-    )(), H2 = z2(a(i)), W = {};
+    )(), H2 = z(a(i)), W2 = {};
     G.Fragment = h, G.jsx = function(t, u2, j) {
       var _2 = 1e4 > U2.recentlyCreatedOwnerStacks++;
       return p(
@@ -35824,7 +37977,7 @@ React keys must be passed directly to JSX without using spread:
         j,
         false,
         _2 ? Error("react-stack-top-frame") : N2,
-        _2 ? z2(a(t)) : H2
+        _2 ? z(a(t)) : H2
       );
     }, G.jsxs = function(t, u2, j) {
       var _2 = 1e4 > U2.recentlyCreatedOwnerStacks++;
@@ -35834,7 +37987,7 @@ React keys must be passed directly to JSX without using spread:
         j,
         true,
         _2 ? Error("react-stack-top-frame") : N2,
-        _2 ? z2(a(t)) : H2
+        _2 ? z(a(t)) : H2
       );
     };
   })()), G;
@@ -36018,7 +38171,7 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
     {
       "data-jp-section-overlay": true,
       "aria-hidden": true,
-      className: br(
+      className: hr(
         "absolute inset-0 pointer-events-none transition-all duration-200 z-[50]",
         "border-2 border-transparent group-hover:border-blue-400/50 group-hover:border-dashed",
         o && "border-2 border-blue-600 border-solid bg-blue-500/5"
@@ -36026,7 +38179,7 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
       children: /* @__PURE__ */ r.jsxs(
         "div",
         {
-          className: br(
+          className: hr(
             "absolute top-0 right-0 flex flex-nowrap items-center gap-1 pl-1 pr-2 py-1 text-[9px] font-black uppercase tracking-widest transition-opacity pointer-events-auto",
             "bg-blue-600 text-white",
             o || "group-hover:opacity-100 opacity-0"
@@ -36079,7 +38232,7 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
   totalSections: i,
   onReorder: l
 }) => {
-  const { mode: v2 } = it(), { registry: x2, overlayDisabledSectionTypes: y } = at(), p = v2 === "studio", E = p && o === e.id, f = x2[e.type], c = e.type === "header" || e.type === "footer" ? "global" : "local", d2 = Array.isArray(y) ? y.includes(e.type) : false, S = e.type === "header" && typeof e.settings == "object" && e.settings !== null && "sticky" in e.settings && !!e.settings.sticky;
+  const { mode: v2 } = it(), { registry: x2, overlayDisabledSectionTypes: y } = at(), p = v2 === "studio", E = p && o === e.id, f = x2[e.type], c = e.type === "header" || e.type === "footer" ? "global" : "local", d2 = Array.isArray(y) ? y.includes(e.type) : false, S2 = e.type === "header" && typeof e.settings == "object" && e.settings !== null && "sticky" in e.settings && !!e.settings.sticky;
   if (!f)
     return /* @__PURE__ */ r.jsxs("div", { className: "p-6 m-4 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-sm font-mono", children: [
       /* @__PURE__ */ r.jsx("strong", { children: "Missing Component:" }),
@@ -36098,10 +38251,10 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
       "data-section-type": p ? e.type : void 0,
       "data-section-scope": p ? c : void 0,
       ...p && E ? { "data-jp-selected": true } : {},
-      className: br(
+      className: hr(
         "relative w-full",
         p && !d2 && "group cursor-pointer",
-        p && S ? "sticky top-0 z-[60]" : e.type === "header" ? "relative" : "relative z-0",
+        p && S2 ? "sticky top-0 z-[60]" : e.type === "header" ? "relative" : "relative z-0",
         E && "z-[70]"
       ),
       children: [
@@ -36139,7 +38292,7 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
   yt(e.meta);
   const [v2, x2] = reactExports.useState(null), y = reactExports.useRef({}), p = reactExports.useRef(l);
   p.current = l;
-  const E = rt$1(e, n), f = E ? n.header ?? null : null, c = n.footer ?? null, d2 = (b2) => {
+  const E = nt(e, n), f = E ? n.header ?? null : null, c = n.footer ?? null, d2 = (b2) => {
     var g;
     (g = p.current) == null || g.call(p, b2);
   };
@@ -36176,7 +38329,7 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
       w = true, cancelAnimationFrame(k), m.disconnect();
     };
   }, [c, f, e.sections, e["global-header"], E]);
-  const S = (b2, g) => {
+  const S2 = (b2, g) => {
     b2.preventDefault(), b2.dataTransfer.dropEffect = "move", x2(g);
   }, h = () => {
     x2(null);
@@ -36215,7 +38368,7 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
                   backgroundColor: k ? "rgba(59, 130, 246, 0.4)" : "transparent",
                   borderTop: k ? "2px solid rgb(96, 165, 250)" : "2px solid transparent"
                 },
-                onDragOver: (T2) => S(T2, w),
+                onDragOver: (T2) => S2(T2, w),
                 onDragLeave: h,
                 onDrop: (T2) => C(T2, w)
               }
@@ -36224,7 +38377,7 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
               ee,
               {
                 section: m,
-                menu: ct$1(m, o.main ?? []),
+                menu: dt$1(m, o.main ?? []),
                 selectedId: a,
                 reorderable: true,
                 sectionIndex: w,
@@ -36247,7 +38400,7 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
             ee,
             {
               section: m,
-              menu: ct$1(m, o.main ?? []),
+              menu: dt$1(m, o.main ?? []),
               selectedId: a
             }
           )
@@ -36273,7 +38426,7 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
               backgroundColor: w ? "rgba(59, 130, 246, 0.4)" : "transparent",
               borderTop: w ? "2px solid rgb(96, 165, 250)" : "2px solid transparent"
             },
-            onDragOver: (k) => S(k, m),
+            onDragOver: (k) => S2(k, m),
             onDragLeave: h,
             onDrop: (k) => C(k, m)
           },
@@ -36296,7 +38449,7 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
           ee,
           {
             section: f,
-            menu: ct$1(f, o.main ?? []),
+            menu: dt$1(f, o.main ?? []),
             selectedId: a
           }
         )
@@ -36315,7 +38468,7 @@ const bt = ({ type: e, scope: n, isSelected: o, sectionId: a, sectionIndex: s = 
           ee,
           {
             section: c,
-            menu: ct$1(c, o.main ?? []),
+            menu: dt$1(c, o.main ?? []),
             selectedId: a
           }
         )
@@ -36365,13 +38518,13 @@ function isTheme(value) {
   return value === "dark" || value === "light";
 }
 function resolveInitialTheme() {
-  var _a;
+  var _a2;
   if (typeof window === "undefined") return "dark";
   const fromDom = document.documentElement.getAttribute("data-theme");
   if (isTheme(fromDom)) return fromDom;
   const fromStorage = window.localStorage.getItem(STORAGE_KEY);
   if (isTheme(fromStorage)) return fromStorage;
-  const prefersLight = (_a = window.matchMedia) == null ? void 0 : _a.call(window, "(prefers-color-scheme: light)").matches;
+  const prefersLight = (_a2 = window.matchMedia) == null ? void 0 : _a2.call(window, "(prefers-color-scheme: light)").matches;
   return prefersLight ? "light" : "dark";
 }
 function ThemeProvider({ children }) {
@@ -36440,17 +38593,17 @@ function AuthorsListView({ data }) {
     )) })
   ] }) });
 }
-const AutoreSchema = vr.extend({
-  name: stringType().describe("ui:text")
+const AutoreSchema = kr.extend({
+  name: string().describe("ui:text")
 });
-const AutoriCollectionSchema = recordType(stringType(), AutoreSchema);
-const AuthorsListSchema = yr.extend({
-  eyebrow: stringType().optional().describe("ui:text"),
-  title: stringType().describe("ui:text"),
-  description: stringType().optional().describe("ui:textarea"),
-  items: recordType(stringType(), AutoreSchema).describe("ui:collection-ref:autori")
+const AutoriCollectionSchema = record(string(), AutoreSchema);
+const AuthorsListSchema = wr.extend({
+  eyebrow: string().optional().describe("ui:text"),
+  title: string().describe("ui:text"),
+  description: string().optional().describe("ui:textarea"),
+  items: record(string(), AutoreSchema).describe("ui:collection-ref:autori")
 });
-objectType({});
+object({});
 function getAuthorName$1(author) {
   if (typeof author === "object" && author !== null && "name" in author) {
     return String(author.name);
@@ -36487,22 +38640,22 @@ function BookDetailView({ data }) {
     }
   ) });
 }
-const CollectionRefSchema = objectType({
-  $ref: stringType()
+const CollectionRefSchema = object({
+  $ref: string()
 });
-const LibroSchema = vr.extend({
-  title: stringType().describe("ui:text"),
-  author: unionType([AutoreSchema, CollectionRefSchema]).describe("ui:collection-ref:autori"),
-  year: numberType().describe("ui:number"),
-  genre: stringType().describe("ui:text"),
-  summary: stringType().describe("ui:textarea")
+const LibroSchema = kr.extend({
+  title: string().describe("ui:text"),
+  author: union([AutoreSchema, CollectionRefSchema]).describe("ui:collection-ref:autori"),
+  year: number().describe("ui:number"),
+  genre: string().describe("ui:text"),
+  summary: string().describe("ui:textarea")
 });
-const LibriCollectionSchema = recordType(stringType(), LibroSchema);
-const BookDetailSchema = yr.extend({
+const LibriCollectionSchema = record(string(), LibroSchema);
+const BookDetailSchema = wr.extend({
   item: LibroSchema.describe("ui:collection-ref"),
-  backLabel: stringType().default("Torna ai libri").describe("ui:text")
+  backLabel: string().default("Torna ai libri").describe("ui:text")
 });
-objectType({});
+object({});
 function toBooks(items) {
   return Object.values(items ?? {}).sort((a, b2) => a.title.localeCompare(b2.title));
 }
@@ -36513,12 +38666,12 @@ function getAuthorName(author) {
   return "Autore";
 }
 function getAuthorId(author) {
-  var _a;
+  var _a2;
   if (typeof author === "object" && author !== null && "id" in author && typeof author.id === "string") {
     return author.id;
   }
   if (typeof author === "object" && author !== null && "$ref" in author && typeof author.$ref === "string") {
-    const pointer = ((_a = author.$ref.split("#")[1]) == null ? void 0 : _a.replace(/^\//, "")) ?? "";
+    const pointer = ((_a2 = author.$ref.split("#")[1]) == null ? void 0 : _a2.replace(/^\//, "")) ?? "";
     return pointer.split("/")[0] || null;
   }
   return null;
@@ -36646,28 +38799,28 @@ function BooksListView({ data }) {
     ] })
   ] }) });
 }
-const BooksListSchema = yr.extend({
-  eyebrow: stringType().optional().describe("ui:text"),
-  title: stringType().describe("ui:text"),
-  description: stringType().optional().describe("ui:textarea"),
-  items: recordType(stringType(), LibroSchema).describe("ui:collection-ref:libri"),
-  pageSize: numberType().default(10).describe("ui:number")
+const BooksListSchema = wr.extend({
+  eyebrow: string().optional().describe("ui:text"),
+  title: string().describe("ui:text"),
+  description: string().optional().describe("ui:textarea"),
+  items: record(string(), LibroSchema).describe("ui:collection-ref:libri"),
+  pageSize: number().default(10).describe("ui:number")
 });
-objectType({});
+object({});
 function EmptyTenantView({ data }) {
-  var _a, _b;
-  const title = ((_a = data == null ? void 0 : data.title) == null ? void 0 : _a.trim()) || "Your tenant is empty.";
+  var _a2, _b;
+  const title = ((_a2 = data == null ? void 0 : data.title) == null ? void 0 : _a2.trim()) || "Your tenant is empty.";
   const description = ((_b = data == null ? void 0 : data.description) == null ? void 0 : _b.trim()) || "Create your first page to start building your site.";
   return /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "min-h-screen flex items-center justify-center bg-background text-foreground px-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "w-full max-w-xl rounded-xl border border-border bg-card p-8 shadow-sm", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-2xl font-semibold tracking-tight", children: title }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm text-muted-foreground", children: description })
   ] }) });
 }
-const EmptyTenantSchema = yr.extend({
-  title: stringType().optional().describe("ui:text"),
-  description: stringType().optional().describe("ui:textarea")
+const EmptyTenantSchema = wr.extend({
+  title: string().optional().describe("ui:text"),
+  description: string().optional().describe("ui:textarea")
 });
-objectType({});
+object({});
 function FooterView({ data, settings }) {
   const links = data.links ?? [];
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -36717,21 +38870,21 @@ function FooterView({ data, settings }) {
     }
   );
 }
-const FooterLinkSchema = wr.extend({
-  id: stringType(),
-  label: stringType().describe("ui:text"),
-  href: stringType().describe("ui:text"),
-  external: booleanType().optional()
+const FooterLinkSchema = vr.extend({
+  id: string(),
+  label: string().describe("ui:text"),
+  href: string().describe("ui:text"),
+  external: boolean().optional()
 });
-const FooterSchema = yr.extend({
-  brandText: stringType().describe("ui:text"),
-  description: stringType().optional().describe("ui:textarea"),
-  copyright: stringType().describe("ui:text"),
-  links: arrayType(FooterLinkSchema).default([]).describe("ui:list"),
-  designSystemHref: stringType().optional().describe("ui:text")
+const FooterSchema = wr.extend({
+  brandText: string().describe("ui:text"),
+  description: string().optional().describe("ui:textarea"),
+  copyright: string().describe("ui:text"),
+  links: array(FooterLinkSchema).default([]).describe("ui:list"),
+  designSystemHref: string().optional().describe("ui:text")
 });
-objectType({
-  showLogo: booleanType().default(true)
+object({
+  showLogo: boolean().default(true)
 });
 /**
  * @license lucide-react v0.474.0 - ISC
@@ -36739,9 +38892,9 @@ objectType({
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
-const mergeClasses = (...classes) => classes.filter((className, index, array) => {
-  return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index;
+const toKebabCase = (string2) => string2.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+const mergeClasses = (...classes) => classes.filter((className, index, array2) => {
+  return Boolean(className) && className.trim() !== "" && array2.indexOf(className) === index;
 }).join(" ").trim();
 /**
  * @license lucide-react v0.474.0 - ISC
@@ -37006,7 +39159,7 @@ const __vite_import_meta_env__ = { "BASE_URL": "/", "DEV": false, "MODE": "produ
 const cloudPolicy = Ft(
   $t(__vite_import_meta_env__)
 );
-ot("/");
+rt$1("/");
 const missingCloudUrl = !cloudPolicy.apiUrl;
 const hasCloudKey = Boolean(cloudPolicy.apiKey);
 function SetupGuide({ recipientEmail }) {
@@ -37041,8 +39194,8 @@ function SetupGuide({ recipientEmail }) {
   ] });
 }
 function FormDemoView({ data }) {
-  var _a;
-  const formId = ((_a = data.anchorId) == null ? void 0 : _a.trim()) || "form-demo";
+  var _a2;
+  const formId = ((_a2 = data.anchorId) == null ? void 0 : _a2.trim()) || "form-demo";
   const { status, message } = Mt(formId);
   return /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "min-h-screen flex items-center justify-center bg-background text-foreground px-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "w-full max-w-xl rounded-xl border border-border bg-card p-8 shadow-sm space-y-6", children: [
     data.icon && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { "data-jp-field": "icon", className: "mb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { name: data.icon, size: 24 }) }),
@@ -37124,18 +39277,18 @@ function FormDemoView({ data }) {
     )
   ] }) });
 }
-const FormDemoSchema = yr.merge(Sr).extend({
-  icon: stringType().optional().describe("ui:icon-picker"),
-  title: stringType().optional().describe("ui:text"),
-  description: stringType().optional().describe("ui:textarea"),
-  submitLabel: stringType().default("Invia").describe("ui:text"),
-  successMessage: stringType().default("Richiesta inviata con successo.").describe("ui:text")
+const FormDemoSchema = wr.merge(jr).extend({
+  icon: string().optional().describe("ui:icon-picker"),
+  title: string().optional().describe("ui:text"),
+  description: string().optional().describe("ui:textarea"),
+  submitLabel: string().default("Invia").describe("ui:text"),
+  successMessage: string().default("Richiesta inviata con successo.").describe("ui:text")
 });
-objectType({});
-objectType({
-  name: stringType().min(1).describe("Full name of the person submitting the form"),
-  email: stringType().email().describe("Contact email address where we will reply"),
-  message: stringType().min(1).describe("Free-form message body")
+object({});
+object({
+  name: string().min(1).describe("Full name of the person submitting the form"),
+  email: email().describe("Contact email address where we will reply"),
+  message: string().min(1).describe("Free-form message body")
 });
 const ComponentRegistry = {
   "authors-list": AuthorsListView,
@@ -37264,10 +39417,10 @@ const __vite_glob_0_1$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.d
   neuromancer
 }, Symbol.toStringTag, { value: "Module" }));
 function collectionSourceFromPath(filePath) {
-  var _a;
+  var _a2;
   const normalizedPath = filePath.replace(/\\/g, "/");
   const match = normalizedPath.match(/\/data\/collections\/([^/]+)\/[^/]+\.json$/i);
-  return ((_a = match == null ? void 0 : match[1]) == null ? void 0 : _a.trim()) || null;
+  return ((_a2 = match == null ? void 0 : match[1]) == null ? void 0 : _a2.trim()) || null;
 }
 function getFileCollections() {
   const glob = /* @__PURE__ */ Object.assign({ "/src/data/collections/autori/autori.json": __vite_glob_0_0$1, "/src/data/collections/libri/libri.json": __vite_glob_0_1$1 });
@@ -37414,10 +39567,10 @@ const __vite_glob_0_5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.def
   slug
 }, Symbol.toStringTag, { value: "Module" }));
 function slugFromPath(filePath) {
-  var _a;
+  var _a2;
   const normalizedPath = filePath.replace(/\\/g, "/");
   const match = normalizedPath.match(/\/data\/pages\/(.+)\.json$/i);
-  const rawSlug = (match == null ? void 0 : match[1]) ?? ((_a = normalizedPath.split("/").pop()) == null ? void 0 : _a.replace(/\.json$/i, "")) ?? "";
+  const rawSlug = (match == null ? void 0 : match[1]) ?? ((_a2 = normalizedPath.split("/").pop()) == null ? void 0 : _a2.replace(/\.json$/i, "")) ?? "";
   const canonical = rawSlug.split("/").map((segment) => segment.trim()).filter(Boolean).join("/");
   return canonical || "home";
 }
@@ -37440,12 +39593,12 @@ function getFilePages() {
   const slugs = Array.from(bySlug.keys()).sort(
     (a, b2) => a === "home" ? -1 : b2 === "home" ? 1 : a.localeCompare(b2)
   );
-  const record = {};
+  const record2 = {};
   for (const slug2 of slugs) {
-    const config = bySlug.get(slug2);
-    if (config) record[slug2] = config;
+    const config2 = bySlug.get(slug2);
+    if (config2) record2[slug2] = config2;
   }
-  return record;
+  return record2;
 }
 const identity = { "title": "OlonJS", "logoUrl": "/brand/mark/olon-mark-dark.svg" };
 const header = { "id": "global-header", "type": "header", "data": { "logoText": "Olon", "badge": "JS", "links": [{ "label": "Why", "href": "#Why" }, { "label": "Architecture", "href": "#Architecture" }, { "label": "Example", "href": "#Example" }, { "label": "Get started", "href": "#Getstarted" }, { "label": "GitHub", "href": "https://github.com/olonjs/core" }], "ctaLabel": "", "ctaHref": "", "signinHref": "" } };
@@ -37490,7 +39643,7 @@ function getSortedSlugs() {
 }
 function resolvePage(slug2) {
   const normalized = normalizeSlug(slug2);
-  const pageMatch = Et$1(pages, normalized);
+  const pageMatch = zt(pages, normalized);
   if (pageMatch) {
     return {
       slug: normalized || pageMatch.registrySlug,
@@ -37508,7 +39661,7 @@ function resolvePage(slug2) {
   return { slug: fallbackSlug, registrySlug: fallbackSlug, page: pages[fallbackSlug], params: {} };
 }
 function buildThemeCssFromSot(theme) {
-  const mappings = Yt(theme);
+  const mappings = Qt(theme);
   const entries = Object.entries(mappings);
   if (entries.length === 0) return "";
   const serialized = entries.map(([name2, value]) => `${name2}:${value}`).join(";");
@@ -37533,8 +39686,8 @@ function resolveTenantId() {
 function render(slug2) {
   const resolved = resolvePage(slug2);
   const location = resolved.slug === "home" ? "/" : `/${resolved.slug}`;
-  const collectionContext = mr.resolveCollectionContext(resolved.page, resolved.params, collections);
-  const resolvedRuntime = Ee$1({
+  const collectionContext = pr.resolveCollectionContext(resolved.page, resolved.params, collections);
+  const resolvedRuntime = ze({
     pages: { [resolved.registrySlug]: resolved.page },
     siteConfig,
     themeConfig,

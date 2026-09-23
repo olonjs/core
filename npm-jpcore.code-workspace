@@ -32,6 +32,9 @@
 		},
 		{
 			"path": "../temp/next-templates"
+		},
+		{
+			"path": "../temp/next-dev-portoflio"
 		}
 	],
 	"settings": {
