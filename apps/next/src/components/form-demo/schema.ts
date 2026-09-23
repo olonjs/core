@@ -16,6 +16,6 @@ export const FormDemoSettingsSchema = z.object({});
  */
 export const FormDemoSubmissionSchema = z.object({
   name: z.string().min(1).describe('Full name of the person submitting the form'),
-  email: z.string().email().describe('Contact email address where we will reply'),
+  email: z.email().describe('Contact email address where we will reply'),
   message: z.string().min(1).describe('Free-form message body'),
 });
