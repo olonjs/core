@@ -1817,9 +1817,9 @@ cat << 'END_OF_FILE_CONTENT' > "package.json"
     "@tiptap/extension-link": "^2.11.5",
     "@tiptap/react": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
-    "@olonjs/core": "^1.1.31",
-    "@olonjs/react": "^0.1.14",
-    "@olonjs/studio": "^0.1.14",
+    "@olonjs/core": "^2.0.0",
+    "@olonjs/react": "^0.2.0",
+    "@olonjs/studio": "^0.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.474.0",
@@ -1833,7 +1833,7 @@ cat << 'END_OF_FILE_CONTENT' > "package.json"
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.0.1",
     "tiptap-markdown": "^0.8.10",
-    "zod": "^3.24.1"
+    "zod": "^4.6.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
@@ -3040,6 +3040,8 @@ import { createRequire } from 'module';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
 const baseUrl = process.env.WEBMCP_BASE_URL ?? 'http://127.0.0.1:4173';
+const UPDATE_TOOL_NAME = 'update-section';
+const SAVE_TOOL_NAME = 'save';
 
 function pageFilePathFromSlug(slug) {
   return path.resolve(rootDir, 'src', 'data', 'pages', `${slug}.json`);
@@ -3142,12 +3144,15 @@ async function selectTarget() {
       ? pageContract.sectionInstances.filter((section) => section?.scope === 'local')
       : [];
     const tools = Array.isArray(pageManifest.tools) ? pageManifest.tools : [];
+    // Manifest tools are page-level (`update-section`, `save`); targets come from the
+    // contract's local section instances + their schemas.
+    const updateTool = tools.find((tool) => tool?.name === UPDATE_TOOL_NAME);
+    const saveTool = tools.find((tool) => tool?.name === SAVE_TOOL_NAME);
+    if (!updateTool || !saveTool) continue;
 
-    for (const tool of tools) {
-      const sectionType = tool?.sectionType;
-      if (typeof tool?.name !== 'string' || typeof sectionType !== 'string') continue;
-      const targetInstance = localInstances.find((section) => section?.type === sectionType);
-      if (!targetInstance?.id) continue;
+    for (const targetInstance of localInstances) {
+      const sectionType = targetInstance?.type;
+      if (!targetInstance?.id || typeof sectionType !== 'string') continue;
       const targetFieldKey = findTopLevelStringField(pageContract.sectionSchemas?.[sectionType]);
       if (!targetFieldKey) continue;
       const pageState = await readPageJson(pageEntry.slug);
@@ -3161,8 +3166,10 @@ async function selectTarget() {
         slug: pageEntry.slug,
         manifestHref: pageEntry.manifestHref,
         contractHref: pageEntry.contractHref,
-        toolName: tool.name,
+        toolName: UPDATE_TOOL_NAME,
+        saveToolName: SAVE_TOOL_NAME,
         sectionId: targetInstance.id,
+        sectionType,
         fieldKey: targetFieldKey,
         originalValue,
         originalState: pageState,
@@ -3195,30 +3202,46 @@ async function main() {
     consoleEvents.push(`[pageerror] ${error.message}`);
   });
 
+  /** update-section mutates the Studio draft only; save persists. Returns raw update result. */
+  const runUpdateThenSave = async (value) => {
+    const rawUpdate = await page.evaluate(
+      async ({ toolName, slug, sectionId, sectionType, fieldKey, value: nextValue }) => {
+        const runtime = document.modelContextProtocol;
+        if (!runtime?.executeTool) {
+          throw new Error('document.modelContextProtocol.executeTool is unavailable.');
+        }
+        return runtime.executeTool(
+          toolName,
+          JSON.stringify({ slug, sectionId, sectionType, fieldKey, value: nextValue })
+        );
+      },
+      {
+        toolName: target.toolName,
+        slug: target.slug,
+        sectionId: target.sectionId,
+        sectionType: target.sectionType,
+        fieldKey: target.fieldKey,
+        value,
+      }
+    );
+    const parsedUpdate = JSON.parse(rawUpdate);
+    if (parsedUpdate?.isError) {
+      throw new Error(`WebMCP ${target.toolName} returned an error: ${rawUpdate}`);
+    }
+    const rawSave = await page.evaluate(
+      async ({ saveToolName }) => document.modelContextProtocol.executeTool(saveToolName, '{}'),
+      { saveToolName: target.saveToolName }
+    );
+    const parsedSave = JSON.parse(rawSave);
+    if (parsedSave?.isError) {
+      throw new Error(`WebMCP ${target.saveToolName} returned an error: ${rawSave}`);
+    }
+    return rawUpdate;
+  };
+
   const restoreOriginal = async () => {
     try {
-      await page.evaluate(
-        async ({ toolName, slug, sectionId, fieldKey, value }) => {
-          const runtime = document.modelContextTesting;
-          if (!runtime?.executeTool) return;
-          await runtime.executeTool(
-            toolName,
-            JSON.stringify({
-              slug,
-              sectionId,
-              fieldKey,
-              value,
-            })
-          );
-        },
-        {
-          toolName: target.toolName,
-          slug: target.slug,
-          sectionId: target.sectionId,
-          fieldKey: target.fieldKey,
-          value: target.originalValue,
-        }
-      );
+      await runUpdateThenSave(target.originalValue);
       await waitForFileFieldValue(target.slug, target.sectionId, target.fieldKey, target.originalValue);
     } catch {
       await fs.writeFile(target.originalState.pageFilePath, target.originalState.raw, 'utf8');
@@ -3231,7 +3254,7 @@ async function main() {
       throw new Error(`Manifest does not expose ${target.toolName}.`);
     }
 
-    const pageContract = await fetchJson(target.contractHref, `Contract request for ${target.slug}`);
+    const pageContract = await fetchJson(target.contractHref, `Page contract request for ${target.slug}`);
     if (!Array.isArray(pageContract.tools) || !pageContract.tools.some((tool) => tool?.name === target.toolName)) {
       throw new Error(`Page contract does not expose ${target.toolName}.`);
     }
@@ -3265,44 +3288,17 @@ async function main() {
     }
 
     const toolNames = await page.evaluate(() => {
-      const runtime = document.modelContextTesting;
+      const runtime = document.modelContextProtocol;
       return runtime?.listTools?.().map((tool) => tool.name) ?? [];
     });
-    if (!toolNames.includes(target.toolName)) {
-      throw new Error(`Runtime did not register ${target.toolName}. Found: ${toolNames.join(', ')}`);
-    }
-
-    const rawResult = await page.evaluate(
-      async ({ toolName, slug, sectionId, fieldKey, value }) => {
-        const runtime = document.modelContextTesting;
-        if (!runtime?.executeTool) {
-          throw new Error('document.modelContextTesting.executeTool is unavailable.');
-        }
-        return runtime.executeTool(
-          toolName,
-          JSON.stringify({
-            slug,
-            sectionId,
-            fieldKey,
-            value,
-          })
-        );
-      },
-      {
-        toolName: target.toolName,
-        slug: target.slug,
-        sectionId: target.sectionId,
-        fieldKey: target.fieldKey,
-        value: nextValue,
+    for (const required of [target.toolName, target.saveToolName]) {
+      if (!toolNames.includes(required)) {
+        throw new Error(`Runtime did not register ${required}. Found: ${toolNames.join(', ')}`);
       }
-    );
-
-    const parsedResult = JSON.parse(rawResult);
-    if (parsedResult?.isError) {
-      throw new Error(`WebMCP tool returned an error: ${rawResult}`);
     }
 
     mutationApplied = true;
+    await runUpdateThenSave(nextValue);
     await waitForFileFieldValue(target.slug, target.sectionId, target.fieldKey, nextValue);
     await page.frameLocator('iframe').getByText(nextValue, { exact: true }).waitFor({ state: 'attached' });
 
@@ -3313,7 +3309,9 @@ async function main() {
         manifestHref: target.manifestHref,
         contractHref: target.contractHref,
         toolName: target.toolName,
+        saveToolName: target.saveToolName,
         sectionId: target.sectionId,
+        sectionType: target.sectionType,
         fieldKey: target.fieldKey,
         toolNames,
       })
@@ -4669,7 +4667,7 @@ export const FormDemoSettingsSchema = z.object({});
  */
 export const FormDemoSubmissionSchema = z.object({
   name: z.string().min(1).describe('Full name of the person submitting the form'),
-  email: z.string().email().describe('Contact email address where we will reply'),
+  email: z.email().describe('Contact email address where we will reply'),
   message: z.string().min(1).describe('Free-form message body'),
 });
 

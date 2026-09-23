@@ -18,6 +18,7 @@ import {
 } from '@olonjs/core';
 import { loadVisitorPage } from '@olonjs/next/server';
 import { EmptyTenantView } from '@/components/empty-tenant';
+import { WebMcpVisitorRuntime } from '@/components/webmcp/WebMcpVisitorRuntime';
 import { CollectionRegistry } from '@/lib/CollectionRegistry';
 import { buildVisitorWebPageJsonLd } from '@/lib/buildVisitorWebPageJsonLd';
 import { getFileCollections } from '@/lib/loaders/getFileCollections';
@@ -68,8 +69,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * Public visitor catch-all — RSC only.
- * Must not import @olonjs/studio or JsonPagesEngine (ADR-0017).
+ * Public visitor catch-all — RSC + thin WebMCP client island (ADR-0017).
+ * Must not import @olonjs/studio or JsonPagesEngine.
  */
 export default async function VisitorCatchAllPage({ params, searchParams }: PageProps) {
   const { slug: segments } = await params;
@@ -122,6 +123,7 @@ export default async function VisitorCatchAllPage({ params, searchParams }: Page
 
   return (
     <>
+      <WebMcpVisitorRuntime />
       <link rel="mcp-manifest" href={buildPageManifestHref(requestSlug)} />
       <link rel="olon-contract" href={buildPageContractHref(requestSlug)} />
       <script
@@ -206,6 +208,61 @@ export async function GET() {
 }
 
 END_OF_FILE_CONTENT
+mkdir -p "app/api/public-collection"
+mkdir -p "app/api/public-collection/[source]"
+mkdir -p "app/api/public-collection/[source]/[file]"
+echo "Creating app/api/public-collection/[source]/[file]/route.ts..."
+cat << 'END_OF_FILE_CONTENT' > "app/api/public-collection/[source]/[file]/route.ts"
+import { NextResponse } from 'next/server';
+import { resolvePublicCollectionDocument } from '@/lib/loaders/publishedContent';
+import { loadRuntimeSurfaceForSite } from '@/lib/webmcp/runtime/loadRuntimeSurface';
+
+export const dynamic = 'force-dynamic';
+
+/** GET /collections/{source}/{source}.json (rewrite) — collection document, runtime. */
+export async function GET(_request: Request, context: { params: Promise<{ source: string; file: string }> }) {
+  try {
+    const { source, file } = await context.params;
+    const { bundle } = loadRuntimeSurfaceForSite();
+    const doc = resolvePublicCollectionDocument(bundle, decodeURIComponent(source), decodeURIComponent(file));
+    if (!doc) return NextResponse.json({ error: 'Collection not found' }, { status: 404 });
+    return NextResponse.json(doc);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Collection JSON failed' },
+      { status: 500 },
+    );
+  }
+}
+
+END_OF_FILE_CONTENT
+mkdir -p "app/api/public-config"
+mkdir -p "app/api/public-config/[file]"
+echo "Creating app/api/public-config/[file]/route.ts..."
+cat << 'END_OF_FILE_CONTENT' > "app/api/public-config/[file]/route.ts"
+import { NextResponse } from 'next/server';
+import { resolvePublicConfigDocument } from '@/lib/loaders/publishedContent';
+import { loadRuntimeSurfaceForSite } from '@/lib/webmcp/runtime/loadRuntimeSurface';
+
+export const dynamic = 'force-dynamic';
+
+/** GET /config/{site|menu|theme}.json (rewrite) — JSP config document, runtime. */
+export async function GET(_request: Request, context: { params: Promise<{ file: string }> }) {
+  try {
+    const { file } = await context.params;
+    const { bundle } = loadRuntimeSurfaceForSite();
+    const doc = resolvePublicConfigDocument(bundle, decodeURIComponent(file));
+    if (doc == null) return NextResponse.json({ error: 'Config document not found' }, { status: 404 });
+    return NextResponse.json(doc);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Config JSON failed' },
+      { status: 500 },
+    );
+  }
+}
+
+END_OF_FILE_CONTENT
 mkdir -p "app/api/public-page"
 mkdir -p "app/api/public-page/[...slug]"
 echo "Creating app/api/public-page/[...slug]/route.ts..."
@@ -280,6 +337,46 @@ export async function POST(request: Request) {
 }
 
 END_OF_FILE_CONTENT
+mkdir -p "app/api/seo"
+mkdir -p "app/api/seo/robots"
+echo "Creating app/api/seo/robots/route.ts..."
+cat << 'END_OF_FILE_CONTENT' > "app/api/seo/robots/route.ts"
+import { buildRobotsTxt } from '@/lib/webmcp/runtime/agenticSurface';
+import { resolvePublicBaseUrl } from '@/lib/webmcp/runtime/loadRuntimeSurface';
+
+export const dynamic = 'force-dynamic';
+
+/** GET /robots.txt (rewrite) — computed per request. */
+export async function GET(request: Request) {
+  return new Response(buildRobotsTxt(resolvePublicBaseUrl(request)), {
+    headers: { 'content-type': 'text/plain; charset=utf-8' },
+  });
+}
+
+END_OF_FILE_CONTENT
+mkdir -p "app/api/seo/sitemap"
+echo "Creating app/api/seo/sitemap/route.ts..."
+cat << 'END_OF_FILE_CONTENT' > "app/api/seo/sitemap/route.ts"
+import { buildSitemapXml, expandDynamicPageSlugs } from '@/lib/webmcp/runtime/agenticSurface';
+import { loadRuntimeSurfaceForSite, resolvePublicBaseUrl } from '@/lib/webmcp/runtime/loadRuntimeSurface';
+
+export const dynamic = 'force-dynamic';
+
+/** GET /sitemap.xml (rewrite) — computed per request. */
+export async function GET(request: Request) {
+  try {
+    const { bundle } = loadRuntimeSurfaceForSite();
+    const xml = buildSitemapXml({
+      baseUrl: resolvePublicBaseUrl(request),
+      slugs: expandDynamicPageSlugs(bundle.pages, bundle.collections),
+    });
+    return new Response(xml, { headers: { 'content-type': 'application/xml; charset=utf-8' } });
+  } catch (error) {
+    return new Response(error instanceof Error ? error.message : 'sitemap failed', { status: 500 });
+  }
+}
+
+END_OF_FILE_CONTENT
 mkdir -p "app/api/upload-asset"
 echo "Creating app/api/upload-asset/route.ts..."
 cat << 'END_OF_FILE_CONTENT' > "app/api/upload-asset/route.ts"
@@ -309,6 +406,139 @@ export async function POST(request: Request) {
     const message = error instanceof Error ? error.message : 'Upload failed';
     const status = message.includes('too large') ? 413 : message.includes('Invalid file') ? 400 : 500;
     return NextResponse.json({ error: message }, { status });
+  }
+}
+
+END_OF_FILE_CONTENT
+mkdir -p "app/api/webmcp"
+mkdir -p "app/api/webmcp/collection-contract"
+mkdir -p "app/api/webmcp/collection-contract/[source]"
+echo "Creating app/api/webmcp/collection-contract/[source]/route.ts..."
+cat << 'END_OF_FILE_CONTENT' > "app/api/webmcp/collection-contract/[source]/route.ts"
+import { NextResponse } from 'next/server';
+import { buildRuntimeCollectionContract, stripSchemaJsonSuffix } from '@/lib/webmcp/runtime/agenticSurface';
+import { loadRuntimeSurfaceForSite } from '@/lib/webmcp/runtime/loadRuntimeSurface';
+
+export const dynamic = 'force-dynamic';
+
+/** GET /schemas/collections/{source}.schema.json (rewrite) — collection contract. */
+export async function GET(_request: Request, context: { params: Promise<{ source: string }> }) {
+  try {
+    const { source: raw } = await context.params;
+    const source = stripSchemaJsonSuffix([raw]);
+    const { bundle } = loadRuntimeSurfaceForSite();
+    const contract = buildRuntimeCollectionContract({ collectionSchemas: bundle.collectionSchemas, source });
+    if (!contract) {
+      return NextResponse.json({ error: 'Collection contract not found' }, { status: 404 });
+    }
+    return NextResponse.json(contract);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Collection contract failed' },
+      { status: 500 },
+    );
+  }
+}
+
+END_OF_FILE_CONTENT
+mkdir -p "app/api/webmcp/llms"
+echo "Creating app/api/webmcp/llms/route.ts..."
+cat << 'END_OF_FILE_CONTENT' > "app/api/webmcp/llms/route.ts"
+import { buildRuntimeLlmsTxt } from '@/lib/webmcp/runtime/agenticSurface';
+import { loadRuntimeSurfaceForSite } from '@/lib/webmcp/runtime/loadRuntimeSurface';
+
+export const dynamic = 'force-dynamic';
+
+/** GET /llms.txt (rewrite) — computed per request. */
+export async function GET() {
+  try {
+    return new Response(`${buildRuntimeLlmsTxt(loadRuntimeSurfaceForSite())}\n`, {
+      headers: { 'content-type': 'text/plain; charset=utf-8' },
+    });
+  } catch (error) {
+    return new Response(error instanceof Error ? error.message : 'llms.txt failed', { status: 500 });
+  }
+}
+
+END_OF_FILE_CONTENT
+mkdir -p "app/api/webmcp/page-contract"
+mkdir -p "app/api/webmcp/page-contract/[...slug]"
+echo "Creating app/api/webmcp/page-contract/[...slug]/route.ts..."
+cat << 'END_OF_FILE_CONTENT' > "app/api/webmcp/page-contract/[...slug]/route.ts"
+import { NextResponse } from 'next/server';
+import { buildRuntimePageContract, stripSchemaJsonSuffix } from '@/lib/webmcp/runtime/agenticSurface';
+import { loadRuntimeSurfaceForSlug } from '@/lib/webmcp/runtime/loadRuntimeSurface';
+
+export const dynamic = 'force-dynamic';
+
+/** GET /schemas/{slug}.schema.json (rewrite) — page contract, computed per request. */
+export async function GET(request: Request, context: { params: Promise<{ slug?: string[] }> }) {
+  try {
+    const { slug: parts } = await context.params;
+    const slug = stripSchemaJsonSuffix(parts ?? []);
+    const surface = await loadRuntimeSurfaceForSlug({ slug, requestUrl: request.url });
+    const contract = buildRuntimePageContract({ ...surface, slug });
+    if (!contract) {
+      return NextResponse.json({ error: 'Page contract not found' }, { status: 404 });
+    }
+    return NextResponse.json(contract);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Page contract failed' },
+      { status: 500 },
+    );
+  }
+}
+
+END_OF_FILE_CONTENT
+mkdir -p "app/api/webmcp/page-manifest"
+mkdir -p "app/api/webmcp/page-manifest/[...slug]"
+echo "Creating app/api/webmcp/page-manifest/[...slug]/route.ts..."
+cat << 'END_OF_FILE_CONTENT' > "app/api/webmcp/page-manifest/[...slug]/route.ts"
+import { NextResponse } from 'next/server';
+import { buildRuntimePageManifest, stripJsonSuffix } from '@/lib/webmcp/runtime/agenticSurface';
+import { loadRuntimeSurfaceForSlug } from '@/lib/webmcp/runtime/loadRuntimeSurface';
+
+export const dynamic = 'force-dynamic';
+
+/** GET /mcp-manifests/{slug}.json (rewrite) — page manifest, computed per request. */
+export async function GET(request: Request, context: { params: Promise<{ slug?: string[] }> }) {
+  try {
+    const { slug: parts } = await context.params;
+    const slug = stripJsonSuffix(parts ?? []);
+    const surface = await loadRuntimeSurfaceForSlug({ slug, requestUrl: request.url });
+    const manifest = buildRuntimePageManifest({ ...surface, slug });
+    if (!manifest) {
+      return NextResponse.json({ error: 'Page manifest not found' }, { status: 404 });
+    }
+    return NextResponse.json(manifest);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Page manifest failed' },
+      { status: 500 },
+    );
+  }
+}
+
+END_OF_FILE_CONTENT
+mkdir -p "app/api/webmcp/site-manifest"
+echo "Creating app/api/webmcp/site-manifest/route.ts..."
+cat << 'END_OF_FILE_CONTENT' > "app/api/webmcp/site-manifest/route.ts"
+import { NextResponse } from 'next/server';
+import { buildRuntimeSiteManifest } from '@/lib/webmcp/runtime/agenticSurface';
+import { loadRuntimeSurfaceForSite } from '@/lib/webmcp/runtime/loadRuntimeSurface';
+
+export const dynamic = 'force-dynamic';
+
+/** GET /mcp-manifest.json (rewrite) — site manifest index, computed per request. */
+export async function GET() {
+  try {
+    return NextResponse.json(buildRuntimeSiteManifest(loadRuntimeSurfaceForSite()));
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Site manifest failed' },
+      { status: 500 },
+    );
   }
 }
 
@@ -456,9 +686,29 @@ import type { NextConfig } from 'next';
 /**
  * Keep rewrites inline — next.config is loaded via Node/CJS and cannot reliably
  * import `@olonjs/next/server` (exports are ESM `import`-only).
- * Contract guarded by `buildPublicPageJsonRewrites` unit tests in the package.
+ * Public-page contract guarded by `buildPublicPageJsonRewrites` unit tests in the
+ * package; the WebMCP/SEO runtime rewrites below are guarded by
+ * `src/lib/webmcp/runtime/nextConfigRewrites.test.ts`.
+ *
+ * Order matters: explicit agentic hrefs first, generic `/:path*.json` last.
  */
-const publicPageJsonRewrites = [
+export const webmcpRuntimeRewrites = [
+  { source: '/mcp-manifest.json', destination: '/api/webmcp/site-manifest' },
+  { source: '/mcp-manifests/:path*.json', destination: '/api/webmcp/page-manifest/:path*' },
+  { source: '/schemas/collections/:source.schema.json', destination: '/api/webmcp/collection-contract/:source' },
+  { source: '/schemas/:path*.schema.json', destination: '/api/webmcp/page-contract/:path*' },
+  { source: '/llms.txt', destination: '/api/webmcp/llms' },
+  { source: '/robots.txt', destination: '/api/seo/robots' },
+  { source: '/sitemap.xml', destination: '/api/seo/sitemap' },
+];
+
+/** JSP published documents (formerly copied into public/ by sync-pages-to-public). */
+export const publishedContentRewrites = [
+  { source: '/collections/:source/:file.json', destination: '/api/public-collection/:source/:file' },
+  { source: '/config/:file.json', destination: '/api/public-config/:file' },
+];
+
+export const publicPageJsonRewrites = [
   {
     source: '/pages/:path*.json',
     destination: '/api/public-page/:path*',
@@ -482,7 +732,7 @@ const nextConfig: NextConfig = {
     '/*': ['./src/data/**/*'],
   },
   async rewrites() {
-    return publicPageJsonRewrites;
+    return [...webmcpRuntimeRewrites, ...publishedContentRewrites, ...publicPageJsonRewrites];
   },
 };
 
@@ -501,7 +751,6 @@ cat << 'END_OF_FILE_CONTENT' > "package.json"
   },
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/sync-pages-to-public.mjs && node scripts/generate-llms-txt.mjs && node scripts/bake.mjs && node scripts/sitemap.mjs && node scripts/robots.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -512,10 +761,10 @@ cat << 'END_OF_FILE_CONTENT' > "package.json"
     "dist:dna": "npm run dist"
   },
   "dependencies": {
-    "@olonjs/core": "^1.1.31",
-    "@olonjs/next": "^0.0.11",
-    "@olonjs/react": "^0.1.14",
-    "@olonjs/studio": "^0.1.14",
+    "@olonjs/core": "^2.0.0",
+    "@olonjs/next": "^0.0.12",
+    "@olonjs/react": "^0.2.0",
+    "@olonjs/studio": "^0.2.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.474.0",
     "next": "^15.5.0",
@@ -523,7 +772,7 @@ cat << 'END_OF_FILE_CONTENT' > "package.json"
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.29.0",
     "tailwind-merge": "^3.0.1",
-    "zod": "^3.24.1"
+    "zod": "^4.6.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
@@ -531,7 +780,6 @@ cat << 'END_OF_FILE_CONTENT' > "package.json"
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "tailwindcss": "^4.0.0",
-    "tsx": "^4.20.5",
     "typescript": "^5.7.3",
     "vitest": "^3.0.0"
   }
@@ -551,266 +799,6 @@ export default config;
 
 END_OF_FILE_CONTENT
 mkdir -p "scripts"
-echo "Creating scripts/bake.mjs..."
-cat << 'END_OF_FILE_CONTENT' > "scripts/bake.mjs"
-/**
- * Next bake entry — agentic WebMCP artifacts only (no Vite / no HTML SSG).
- * Runs scripts/bake.ts via tsx so SECTION_SCHEMAS can be imported from the tenant.
- */
-import { spawnSync } from 'node:child_process';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(__dirname, '..');
-const bakeTs = path.join(__dirname, 'bake.ts');
-
-const result = spawnSync(
-  process.platform === 'win32' ? 'npx.cmd' : 'npx',
-  ['tsx', '--tsconfig', 'tsconfig.json', bakeTs],
-  {
-    cwd: rootDir,
-    stdio: 'inherit',
-    env: process.env,
-    shell: process.platform === 'win32',
-  },
-);
-
-process.exit(result.status ?? 1);
-
-END_OF_FILE_CONTENT
-echo "Creating scripts/bake.ts..."
-cat << 'END_OF_FILE_CONTENT' > "scripts/bake.ts"
-/**
- * Next bake — agentic WebMCP artifacts only (no Vite / no HTML SSG).
- * Invoked by scripts/bake.mjs via tsx.
- */
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import {
-  resolvePageMatchFromRegistry,
-  resolvePublicPageDocument,
-  webmcp,
-} from '@olonjs/core';
-import { CollectionRegistry } from '../src/lib/CollectionRegistry';
-import { SECTION_SCHEMAS, SECTION_SUBMISSION_SCHEMAS } from '../src/lib/schemas';
-import { getFileCollections } from '../src/lib/loaders/getFileCollections';
-import { getFilePages } from '../src/lib/loaders/getFilePages';
-import { getFileSiteBundle } from '../src/lib/loaders/getFileSiteConfig';
-
-const {
-  assertCollectionRecordKeys,
-  buildCollectionContract,
-  buildCollectionContractHref,
-  buildPageContract,
-  buildPageManifest,
-  buildPageManifestHref,
-  buildSiteManifest,
-  buildLlmsTxt,
-} = webmcp;
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(__dirname, '..');
-const publicDir = path.join(root, 'public');
-const pagesDir = path.join(root, 'src', 'data', 'pages');
-const collectionsDir = path.join(root, 'src', 'data', 'collections');
-
-async function writePublic(relativePath: string, content: string): Promise<void> {
-  const target = path.join(publicDir, relativePath);
-  await fs.mkdir(path.dirname(target), { recursive: true });
-  await fs.writeFile(target, content, 'utf-8');
-}
-
-async function writePublicJson(relativePath: string, value: unknown): Promise<void> {
-  await writePublic(relativePath, `${JSON.stringify(value, null, 2)}\n`);
-}
-
-async function readJsonFile(filePath: string): Promise<unknown> {
-  return JSON.parse(await fs.readFile(filePath, 'utf-8'));
-}
-
-async function listJsonFilesRecursive(dir: string): Promise<string[]> {
-  const items = await fs.readdir(dir, { withFileTypes: true });
-  const files: string[] = [];
-  for (const item of items) {
-    const fullPath = path.join(dir, item.name);
-    if (item.isDirectory()) {
-      files.push(...(await listJsonFilesRecursive(fullPath)));
-      continue;
-    }
-    if (item.isFile() && item.name.toLowerCase().endsWith('.json')) files.push(fullPath);
-  }
-  return files;
-}
-
-function toCanonicalSlug(relativeJsonPath: string): string {
-  const slug = relativeJsonPath.replace(/\\/g, '/').replace(/\.json$/i, '').replace(/^\/+|\/+$/g, '');
-  if (!slug) throw new Error('[bake] Invalid page slug: empty path segment');
-  return slug;
-}
-
-async function expandCollectionTarget(slug: string, pageFilePath: string): Promise<string[]> {
-  let pageConfig: Record<string, unknown>;
-  try {
-    pageConfig = (await readJsonFile(pageFilePath)) as Record<string, unknown>;
-  } catch {
-    return [slug];
-  }
-
-  const binding = pageConfig?.collection as { source?: string; paramKey?: string } | undefined;
-  if (!binding || typeof binding.source !== 'string' || typeof binding.paramKey !== 'string') {
-    return [slug];
-  }
-
-  const token = `[${binding.paramKey}]`;
-  const authoredSlug =
-    typeof pageConfig.slug === 'string'
-      ? String(pageConfig.slug).replace(/\\/g, '/').replace(/^\/+|\/+$/g, '')
-      : '';
-  const routePattern =
-    authoredSlug.includes(token) ? authoredSlug : slug.includes(token) ? slug : '';
-  if (!routePattern) return [slug];
-
-  const collectionPath = path.resolve(collectionsDir, binding.source, `${binding.source}.json`);
-  let collection: Record<string, unknown>;
-  try {
-    collection = (await readJsonFile(collectionPath)) as Record<string, unknown>;
-  } catch {
-    return [slug];
-  }
-
-  if (!collection || typeof collection !== 'object' || Array.isArray(collection)) return [slug];
-  const itemIds = Object.keys(collection).sort((a, b) => a.localeCompare(b));
-  return itemIds.length > 0
-    ? itemIds.map((itemId) => routePattern.replace(token, itemId))
-    : [slug];
-}
-
-async function discoverSlugs(): Promise<string[]> {
-  let files: string[] = [];
-  try {
-    files = await listJsonFilesRecursive(pagesDir);
-  } catch {
-    files = [];
-  }
-
-  const rawSlugs = (
-    await Promise.all(
-      files.map(async (fullPath) => {
-        const slug = toCanonicalSlug(path.relative(pagesDir, fullPath));
-        return expandCollectionTarget(slug, fullPath);
-      }),
-    )
-  ).flat();
-
-  return Array.from(new Set(rawSlugs)).sort((a, b) => a.localeCompare(b));
-}
-
-async function main(): Promise<void> {
-  console.log('\n[bake] Next agentic artifacts (no Vite SSG)...');
-
-  const pages = getFilePages(root);
-  const collections = getFileCollections(root);
-  const { siteConfig, themeConfig, menuConfig } = getFileSiteBundle(root);
-  const collectionSchemas = CollectionRegistry as unknown as Record<string, unknown>;
-  const schemas = SECTION_SCHEMAS as unknown as Record<string, unknown>;
-  const submissionSchemas = SECTION_SUBMISSION_SCHEMAS as unknown as Record<string, unknown>;
-  const refDocuments = {
-    'menu.json': menuConfig,
-    'config/menu.json': menuConfig,
-    'src/data/config/menu.json': menuConfig,
-  };
-
-  const slugs = await discoverSlugs();
-  if (slugs.length === 0) {
-    throw new Error('[bake] No pages discovered under src/data/pages');
-  }
-  console.log(`[bake] Targets: ${slugs.join(', ')}`);
-
-  const pagesForManifest: Record<string, (typeof pages)[string]> = { ...pages };
-
-  for (const slug of slugs) {
-    const pageConfig = resolvePageMatchFromRegistry(pages, slug)?.page;
-    if (!pageConfig) continue;
-
-    const resolvedPageDocument = resolvePublicPageDocument({
-      slug,
-      pages,
-      siteConfig,
-      themeConfig,
-      menuConfig,
-      collections,
-      collectionSchemas: collectionSchemas as never,
-      refDocuments,
-    });
-    const publicPageConfig = resolvedPageDocument?.page ?? pageConfig;
-    pagesForManifest[slug] = publicPageConfig;
-
-    await writePublicJson(`pages/${slug}.json`, publicPageConfig);
-
-    const contract = buildPageContract({
-      slug,
-      pageConfig: publicPageConfig,
-      schemas: schemas as never,
-      submissionSchemas: submissionSchemas as never,
-      siteConfig,
-    });
-    await writePublicJson(`schemas/${slug}.schema.json`, contract);
-
-    const pageManifest = buildPageManifest({
-      slug,
-      pageConfig: publicPageConfig,
-      schemas: schemas as never,
-      siteConfig,
-    });
-    await writePublicJson(buildPageManifestHref(slug).replace(/^\//, ''), pageManifest);
-  }
-
-  await writePublicJson('config/site.json', siteConfig);
-
-  // Emit collection contracts and validate keyed-object invariant
-  for (const [source, schema] of Object.entries(collectionSchemas)) {
-    const collectionPath = path.resolve(collectionsDir, source, `${source}.json`);
-    try {
-      const collectionData = (await readJsonFile(collectionPath)) as Record<string, unknown>;
-      assertCollectionRecordKeys(source, collectionData);
-      console.log(`[bake] Collection "${source}" keyed-object invariant OK`);
-    } catch (err) {
-      throw new Error(`[bake] Collection key invariant failed: ${(err as Error).message}`);
-    }
-
-    const contract = buildCollectionContract({ source, schema: schema as never });
-    const contractRelPath = buildCollectionContractHref(source).replace(/^\//, '');
-    await writePublicJson(contractRelPath, contract);
-    console.log(`[bake] Collection contract emitted: ${contractRelPath}`);
-  }
-
-  const mcpManifest = buildSiteManifest({
-    pages: pagesForManifest,
-    schemas: schemas as never,
-    siteConfig,
-    collectionSchemas: collectionSchemas as never,
-  });
-  await writePublicJson('mcp-manifest.json', mcpManifest);
-
-  const llmsTxtContent = buildLlmsTxt({
-    pages: pagesForManifest,
-    schemas: schemas as never,
-    siteConfig,
-  });
-  await writePublic('llms.txt', `${llmsTxtContent}\n`);
-
-  console.log('[bake] Wrote public/mcp-manifest.json, mcp-manifests/, schemas/, pages/, llms.txt, config/site.json');
-  console.log('[bake] OK\n');
-}
-
-main().catch((error) => {
-  console.error(error instanceof Error ? error.stack ?? error.message : String(error));
-  process.exit(1);
-});
-
-END_OF_FILE_CONTENT
 echo "Creating scripts/generate-SystemsArchitect-next.test.mjs..."
 cat << 'END_OF_FILE_CONTENT' > "scripts/generate-SystemsArchitect-next.test.mjs"
 /**
@@ -961,192 +949,46 @@ describe('generate_inkwell_next.sh harness gates', () => {
   });
 });
 
-END_OF_FILE_CONTENT
-echo "Creating scripts/generate-llms-txt.mjs..."
-cat << 'END_OF_FILE_CONTENT' > "scripts/generate-llms-txt.mjs"
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { webmcp } from '@olonjs/core';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(__dirname, '..');
-const { buildLlmsTxt } = webmcp;
-
-const pagesDir = path.join(rootDir, 'src', 'data', 'pages');
-const siteConfig = JSON.parse(fs.readFileSync(path.join(rootDir, 'src', 'data', 'config', 'site.json'), 'utf-8'));
-
-function listJsonFilesRecursive(dir) {
-  const items = fs.readdirSync(dir, { withFileTypes: true });
-  const files = [];
-  for (const item of items) {
-    const fullPath = path.join(dir, item.name);
-    if (item.isDirectory()) {
-      files.push(...listJsonFilesRecursive(fullPath));
-      continue;
-    }
-    if (item.isFile() && item.name.toLowerCase().endsWith('.json')) files.push(fullPath);
-  }
-  return files;
-}
-
-const pages = {};
-for (const fullPath of listJsonFilesRecursive(pagesDir)) {
-  const slug = path.relative(pagesDir, fullPath).replace(/\\/g, '/').replace(/\.json$/i, '');
-  pages[slug] = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
-}
-
-const llmsTxt = buildLlmsTxt({ pages, schemas: {}, siteConfig });
-
-const outPath = path.join(rootDir, 'public', 'llms.txt');
-fs.writeFileSync(outPath, llmsTxt, 'utf-8');
-console.log('[generate-llms-txt] Written -> public/llms.txt');
-
-END_OF_FILE_CONTENT
-echo "Creating scripts/prebuild-bake.test.mjs..."
-cat << 'END_OF_FILE_CONTENT' > "scripts/prebuild-bake.test.mjs"
-/**
- * Gates for bake.mjs (Task 4 — plan 001). Agentic artifacts only; no Vite SSG.
- * Run: node --test scripts/prebuild-bake.test.mjs
- */
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { describe, it } from 'node:test';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
-const SCRIPT = path.join(__dirname, 'bake.mjs');
-
-describe('next bake.mjs (agentic artifacts)', () => {
-  it('exists and does not import vite / write HTML SSG', () => {
-    assert.ok(fs.existsSync(SCRIPT), `missing ${SCRIPT}`);
-    const src = fs.readFileSync(SCRIPT, 'utf8');
-    assert.doesNotMatch(src, /from ['"]vite['"]/);
-    assert.doesNotMatch(src, /vite\.build|entry-ssg/);
-    // May spawn tsx helper — check companion if present
-    const impl = path.join(__dirname, 'bake.ts');
-    if (fs.existsSync(impl)) {
-      const implSrc = fs.readFileSync(impl, 'utf8');
-      assert.doesNotMatch(implSrc, /from ['"]vite['"]/);
-      assert.doesNotMatch(implSrc, /entry-ssg/);
-    }
+describe('generate_inkwell_next.sh collection-ref model', () => {
+  it('emits posts tag-refs helper', () => {
+    const src = readScript();
+    assert.match(src, /cat > src\/collections\/posts\/tag-refs\.ts/);
+    assert.match(src, /export function resolveTagId/);
+    assert.match(src, /export function postHasTag/);
   });
 
-  it('writes reachable public agentic artifacts', () => {
-    const result = spawnSync(process.execPath, [SCRIPT], {
-      cwd: ROOT,
-      encoding: 'utf8',
-      env: { ...process.env },
-    });
-    assert.equal(result.status, 0, result.stderr || result.stdout);
-
-    assert.ok(fs.existsSync(path.join(ROOT, 'public', 'mcp-manifest.json')));
-    assert.ok(fs.existsSync(path.join(ROOT, 'public', 'llms.txt')));
-    assert.ok(fs.existsSync(path.join(ROOT, 'public', 'schemas', 'home.schema.json')));
-    assert.ok(fs.existsSync(path.join(ROOT, 'public', 'mcp-manifests', 'home.json')));
-    assert.ok(fs.existsSync(path.join(ROOT, 'public', 'config', 'site.json')));
-
-    const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'public', 'mcp-manifest.json'), 'utf8'));
-    assert.equal(manifest.kind, 'olonjs-mcp-manifest-index');
-    assert.ok(Array.isArray(manifest.pages));
-  });
-});
-
-END_OF_FILE_CONTENT
-echo "Creating scripts/prebuild-generate-llms-txt.test.mjs..."
-cat << 'END_OF_FILE_CONTENT' > "scripts/prebuild-generate-llms-txt.test.mjs"
-/**
- * Gates for generate-llms-txt.mjs (Task 2 — plan 001).
- * Run: node --test scripts/prebuild-generate-llms-txt.test.mjs
- */
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { describe, it } from 'node:test';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
-const SCRIPT = path.join(__dirname, 'generate-llms-txt.mjs');
-
-describe('next prebuild generate-llms-txt', () => {
-  it('script exists and uses @olonjs/core webmcp', () => {
-    assert.ok(fs.existsSync(SCRIPT), `missing ${SCRIPT}`);
-    const src = fs.readFileSync(SCRIPT, 'utf8');
-    assert.match(src, /@olonjs\/core/);
-    assert.match(src, /buildLlmsTxt|webmcp/);
-    assert.match(src, /public\/llms\.txt|llms\.txt/);
+  it('uses ui:collection-ref:tags on posts schema (not string ui:list tags)', () => {
+    const src = readScript();
+    assert.match(src, /ui:collection-ref:tags/);
+    assert.match(src, /CollectionPointerSchema/);
+    // posts schema must not regress to string-only tags list widget
+    assert.doesNotMatch(
+      src,
+      /tags: z\.array\(z\.string\(\)\)\.describe\('ui:list'\)/,
+    );
   });
 
-  it('writes public/llms.txt when run', () => {
-    const out = path.join(ROOT, 'public', 'llms.txt');
-    if (fs.existsSync(out)) fs.unlinkSync(out);
-
-    const result = spawnSync(process.execPath, [SCRIPT], { cwd: ROOT, encoding: 'utf8' });
-    assert.equal(result.status, 0, result.stderr || result.stdout);
-    assert.ok(fs.existsSync(out));
-    const body = fs.readFileSync(out, 'utf8');
-    assert.ok(body.trim().length > 0);
-  });
-});
-
-END_OF_FILE_CONTENT
-echo "Creating scripts/prebuild-robots-sitemap.test.mjs..."
-cat << 'END_OF_FILE_CONTENT' > "scripts/prebuild-robots-sitemap.test.mjs"
-/**
- * Static + smoke gates for robots.mjs / sitemap.mjs (Task 1 — plan 001).
- * Run: node --test scripts/prebuild-robots-sitemap.test.mjs
- */
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { describe, it } from 'node:test';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
-const ROBOTS = path.join(__dirname, 'robots.mjs');
-const SITEMAP = path.join(__dirname, 'sitemap.mjs');
-
-describe('next prebuild robots + sitemap', () => {
-  it('scripts exist', () => {
-    assert.ok(fs.existsSync(ROBOTS), `missing ${ROBOTS}`);
-    assert.ok(fs.existsSync(SITEMAP), `missing ${SITEMAP}`);
+  it('authors post tags as \$ref pointers in posts.json', () => {
+    const src = readScript();
+    assert.match(src, /"\$ref": "\.\.\/tags\/tags\.json#\//);
   });
 
-  it('defaults to Next localhost:3000 (not Vite 5173)', () => {
-    const robots = fs.readFileSync(ROBOTS, 'utf8');
-    const sitemap = fs.readFileSync(SITEMAP, 'utf8');
-    assert.match(robots, /localhost:3000/);
-    assert.match(sitemap, /localhost:3000/);
-    assert.doesNotMatch(robots, /localhost:5173/);
-    assert.doesNotMatch(sitemap, /localhost:5173/);
+  it('emits nested dynamic page paths posts/[slug] and tags/[slug]', () => {
+    const src = readScript();
+    assert.match(src, /cat > src\/data\/pages\/posts\/\[slug\]\.json/);
+    assert.match(src, /cat > src\/data\/pages\/tags\/\[slug\]\.json/);
+    assert.doesNotMatch(src, /cat > src\/data\/pages\/post-detail\.json/);
+    assert.doesNotMatch(src, /cat > src\/data\/pages\/tag-detail\.json/);
+    assert.match(src, /src\/data\/pages\/posts \\/);
+    assert.match(src, /src\/data\/pages\/tags \\/);
   });
 
-  it('writes public/robots.txt and public/sitemap.xml when run', () => {
-    const robotsOut = path.join(ROOT, 'public', 'robots.txt');
-    const sitemapOut = path.join(ROOT, 'public', 'sitemap.xml');
-    for (const p of [robotsOut, sitemapOut]) {
-      if (fs.existsSync(p)) fs.unlinkSync(p);
-    }
-
-    const r1 = spawnSync(process.execPath, [ROBOTS], { cwd: ROOT, encoding: 'utf8' });
-    assert.equal(r1.status, 0, r1.stderr || r1.stdout);
-    const r2 = spawnSync(process.execPath, [SITEMAP], { cwd: ROOT, encoding: 'utf8' });
-    assert.equal(r2.status, 0, r2.stderr || r2.stdout);
-
-    assert.ok(fs.existsSync(robotsOut));
-    assert.ok(fs.existsSync(sitemapOut));
-    const robotsTxt = fs.readFileSync(robotsOut, 'utf8');
-    const sitemapXml = fs.readFileSync(sitemapOut, 'utf8');
-    assert.match(robotsTxt, /Sitemap: http:\/\/localhost:3000\/sitemap\.xml/);
-    assert.match(sitemapXml, /<urlset/);
-    assert.match(sitemapXml, /\/home\.json|PAGE: HOME|loc>http:\/\/localhost:3000\/</);
+  it('wires relation Views through tag-refs helpers', () => {
+    const src = readScript();
+    assert.match(src, /from '@\/collections\/posts\/tag-refs'/);
+    assert.match(src, /resolveTagId/);
+    assert.match(src, /isResolvedTag/);
+    assert.match(src, /postHasTag/);
   });
 });
 
@@ -1169,263 +1011,22 @@ const SCRIPT = path.join(__dirname, 'webmcp-feature-check.mjs');
 const PKG = path.join(ROOT, 'package.json');
 
 describe('next verify:webmcp script', () => {
-  it('exists and uses document.modelContextTesting only', () => {
+  it('probes document.modelContextProtocol (the surface ensureWebMcpRuntime assigns)', () => {
     assert.ok(fs.existsSync(SCRIPT), `missing ${SCRIPT}`);
     const src = fs.readFileSync(SCRIPT, 'utf8');
-    assert.match(src, /document\.modelContextTesting/);
-    assert.doesNotMatch(src, /navigator\.modelContextTesting/);
-    assert.doesNotMatch(src, /navigator\.modelContext(?!Testing)/);
+    assert.match(src, /document\.modelContextProtocol/);
+    // modelContextTesting is never assigned by the runtime — probing it is a false negative.
+    assert.doesNotMatch(src, /modelContextTesting/);
+    assert.doesNotMatch(src, /navigator\.modelContext/);
   });
 
-  it('is wired as verify:webmcp and not in prebuild', () => {
+  it('is wired as verify:webmcp; Next has no prebuild (everything is runtime)', () => {
     const pkg = JSON.parse(fs.readFileSync(PKG, 'utf8'));
     assert.equal(pkg.scripts?.['verify:webmcp'], 'node scripts/webmcp-feature-check.mjs');
-    assert.ok(pkg.scripts?.prebuild);
-    assert.doesNotMatch(pkg.scripts.prebuild, /webmcp-feature-check/);
+    assert.equal(pkg.scripts?.prebuild, undefined);
+    assert.doesNotMatch(pkg.scripts?.build ?? '', /webmcp-feature-check|sync-pages-to-public|bake/);
   });
 });
-
-END_OF_FILE_CONTENT
-echo "Creating scripts/prebuild-wire.test.mjs..."
-cat << 'END_OF_FILE_CONTENT' > "scripts/prebuild-wire.test.mjs"
-/**
- * Gates for package.json prebuild wiring (Task 5 — plan 001).
- * Run: node --test scripts/prebuild-wire.test.mjs
- */
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { describe, it } from 'node:test';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PKG = path.resolve(__dirname, '../package.json');
-
-describe('next prebuild wiring', () => {
-  it('runs sync → llms → bake → sitemap → robots (alpha order)', () => {
-    const pkg = JSON.parse(fs.readFileSync(PKG, 'utf8'));
-    const prebuild = pkg.scripts?.prebuild ?? '';
-    assert.match(prebuild, /sync-pages-to-public\.mjs/);
-    assert.match(prebuild, /generate-llms-txt\.mjs/);
-    assert.match(prebuild, /bake\.mjs/);
-    assert.match(prebuild, /sitemap\.mjs/);
-    assert.match(prebuild, /robots\.mjs/);
-    assert.doesNotMatch(prebuild, /webmcp-feature-check/);
-
-    const order = ['sync-pages-to-public', 'generate-llms-txt', 'bake', 'sitemap', 'robots'].map((name) =>
-      prebuild.indexOf(name),
-    );
-    for (let i = 1; i < order.length; i += 1) {
-      assert.ok(order[i] > order[i - 1], `expected ${i} after previous in: ${prebuild}`);
-    }
-  });
-
-  it('dist DNA includes scripts/', () => {
-    const pkg = JSON.parse(fs.readFileSync(PKG, 'utf8'));
-    assert.match(pkg.scripts?.dist ?? '', /\bscripts\b/);
-  });
-});
-
-END_OF_FILE_CONTENT
-echo "Creating scripts/robots.mjs..."
-cat << 'END_OF_FILE_CONTENT' > "scripts/robots.mjs"
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(__dirname, '..');
-
-const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : 'http://localhost:3000';
-
-const robotsTxt = `User-agent: *
-Allow: /
-Disallow: /api/
-
-User-agent: GPTBot
-User-agent: ChatGPT-User
-User-agent: ClaudeBot
-User-agent: Claude-Web
-User-agent: PerplexityBot
-User-agent: OAI-SearchBot
-Allow: /
-Allow: /*.json
-Allow: /schemas/
-Allow: /llms.txt
-Allow: /mcp-manifest.json
-Disallow: /api/
-
-Sitemap: ${baseUrl}/sitemap.xml
-`;
-
-const outPath = path.join(rootDir, 'public', 'robots.txt');
-fs.mkdirSync(path.dirname(outPath), { recursive: true });
-fs.writeFileSync(outPath, robotsTxt, 'utf-8');
-console.log('[robots] Written -> public/robots.txt');
-
-END_OF_FILE_CONTENT
-echo "Creating scripts/sitemap.mjs..."
-cat << 'END_OF_FILE_CONTENT' > "scripts/sitemap.mjs"
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(__dirname, '..');
-
-const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : 'http://localhost:3000';
-
-function listJsonFilesRecursive(dir) {
-  const items = fs.readdirSync(dir, { withFileTypes: true });
-  const files = [];
-  for (const item of items) {
-    const fullPath = path.join(dir, item.name);
-    if (item.isDirectory()) {
-      files.push(...listJsonFilesRecursive(fullPath));
-      continue;
-    }
-    if (item.isFile() && item.name.toLowerCase().endsWith('.json')) files.push(fullPath);
-  }
-  return files;
-}
-
-function toW3CDate(date) {
-  return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
-}
-
-function urlEntry({ loc, lastmod, changefreq, priority, comment }) {
-  const lines = [];
-  if (comment) lines.push(`  <!-- ${comment} -->`);
-  lines.push(`  <url>`);
-  lines.push(`    <loc>${loc}</loc>`);
-  lines.push(`    <lastmod>${lastmod}</lastmod>`);
-  lines.push(`    <changefreq>${changefreq}</changefreq>`);
-  lines.push(`    <priority>${priority}</priority>`);
-  lines.push(`  </url>`);
-  return lines.join('\n');
-}
-
-function sectionComment(label) {
-  const bar = '='.repeat(42);
-  return [
-    `  <!-- ${bar} -->`,
-    `  <!-- ${label.padEnd(42)} -->`,
-    `  <!-- ${bar} -->`,
-  ].join('\n');
-}
-
-const pagesDir = path.join(rootDir, 'src', 'data', 'pages');
-const buildTime = toW3CDate(new Date());
-
-const pageFiles = listJsonFilesRecursive(pagesDir);
-const pages = pageFiles.map((fullPath) => {
-  const slug = path
-    .relative(pagesDir, fullPath)
-    .replace(/\\/g, '/')
-    .replace(/\.json$/i, '');
-  const lastmod = toW3CDate(fs.statSync(fullPath).mtime);
-  return { slug, lastmod };
-});
-
-const entries = [];
-
-entries.push(sectionComment('GLOBAL AGENT DISCOVERY NODES'));
-entries.push(
-  urlEntry({ loc: `${baseUrl}/llms.txt`, lastmod: buildTime, changefreq: 'weekly', priority: '1.0' }),
-);
-entries.push(
-  urlEntry({ loc: `${baseUrl}/mcp-manifest.json`, lastmod: buildTime, changefreq: 'weekly', priority: '1.0' }),
-);
-
-for (const { slug, lastmod } of pages) {
-  const humanPath = slug === 'home' ? '/' : `/${slug}`;
-  const label = `PAGE: ${slug.toUpperCase()}`;
-
-  entries.push(sectionComment(label));
-  entries.push(
-    urlEntry({ loc: `${baseUrl}${humanPath}`, lastmod, changefreq: 'daily', priority: '0.9', comment: 'Human UI' }),
-  );
-  entries.push(
-    urlEntry({ loc: `${baseUrl}/${slug}.json`, lastmod, changefreq: 'daily', priority: '0.9', comment: 'Machine Payload' }),
-  );
-  entries.push(
-    urlEntry({
-      loc: `${baseUrl}/schemas/${slug}.schema.json`,
-      lastmod: buildTime,
-      changefreq: 'weekly',
-      priority: '0.8',
-      comment: 'Machine Contract (Schema)',
-    }),
-  );
-}
-
-const xml = [
-  `<?xml version="1.0" encoding="UTF-8"?>`,
-  `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
-  ``,
-  entries.join('\n'),
-  ``,
-  `</urlset>`,
-].join('\n');
-
-const outPath = path.join(rootDir, 'public', 'sitemap.xml');
-fs.mkdirSync(path.dirname(outPath), { recursive: true });
-fs.writeFileSync(outPath, xml, 'utf-8');
-console.log('[sitemap] Written -> public/sitemap.xml');
-
-END_OF_FILE_CONTENT
-echo "Creating scripts/sync-pages-to-public.mjs..."
-cat << 'END_OF_FILE_CONTENT' > "scripts/sync-pages-to-public.mjs"
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-/**
- * Mirror Vite/alpha Save2Repo publish surface:
- * src/data/pages → public/pages
- * src/data/collections → public/collections
- * src/data/config/site.json → public/config/site.json
- *
- * Required so static boot can HTTP-fetch same-origin published JSON without
- * hitting the /*.json → /api/public-page rewrite loop (afterFiles only skips
- * when a real file exists under public/).
- */
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const rootDir = path.resolve(__dirname, '..');
-const sourceDir = path.join(rootDir, 'src', 'data', 'pages');
-const targetDir = path.join(rootDir, 'public', 'pages');
-const sourceCollectionsDir = path.join(rootDir, 'src', 'data', 'collections');
-const targetCollectionsDir = path.join(rootDir, 'public', 'collections');
-const sourceSiteConfigPath = path.join(rootDir, 'src', 'data', 'config', 'site.json');
-const targetConfigDir = path.join(rootDir, 'public', 'config');
-const targetSiteConfigPath = path.join(targetConfigDir, 'site.json');
-
-if (!fs.existsSync(sourceDir)) {
-  console.warn('[sync-pages-to-public] Source directory not found:', sourceDir);
-  process.exit(0);
-}
-
-fs.rmSync(targetDir, { recursive: true, force: true });
-fs.mkdirSync(targetDir, { recursive: true });
-fs.cpSync(sourceDir, targetDir, { recursive: true });
-
-fs.rmSync(targetCollectionsDir, { recursive: true, force: true });
-if (fs.existsSync(sourceCollectionsDir)) {
-  fs.mkdirSync(targetCollectionsDir, { recursive: true });
-  fs.cpSync(sourceCollectionsDir, targetCollectionsDir, { recursive: true });
-}
-
-if (fs.existsSync(sourceSiteConfigPath)) {
-  fs.mkdirSync(targetConfigDir, { recursive: true });
-  fs.cpSync(sourceSiteConfigPath, targetSiteConfigPath);
-}
-
-console.log('[sync-pages-to-public] Synced pages, collections, and site config to public/');
 
 END_OF_FILE_CONTENT
 echo "Creating scripts/webmcp-feature-check.mjs..."
@@ -1438,6 +1039,8 @@ import { createRequire } from 'module';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
 const baseUrl = process.env.WEBMCP_BASE_URL ?? 'http://127.0.0.1:3000';
+const UPDATE_TOOL_NAME = 'update-section';
+const SAVE_TOOL_NAME = 'save';
 
 function pageFilePathFromSlug(slug) {
   return path.resolve(rootDir, 'src', 'data', 'pages', `${slug}.json`);
@@ -1540,12 +1143,15 @@ async function selectTarget() {
       ? pageContract.sectionInstances.filter((section) => section?.scope === 'local')
       : [];
     const tools = Array.isArray(pageManifest.tools) ? pageManifest.tools : [];
+    // Manifest tools are page-level (`update-section`, `save`); targets come from the
+    // contract's local section instances + their schemas.
+    const updateTool = tools.find((tool) => tool?.name === UPDATE_TOOL_NAME);
+    const saveTool = tools.find((tool) => tool?.name === SAVE_TOOL_NAME);
+    if (!updateTool || !saveTool) continue;
 
-    for (const tool of tools) {
-      const sectionType = tool?.sectionType;
-      if (typeof tool?.name !== 'string' || typeof sectionType !== 'string') continue;
-      const targetInstance = localInstances.find((section) => section?.type === sectionType);
-      if (!targetInstance?.id) continue;
+    for (const targetInstance of localInstances) {
+      const sectionType = targetInstance?.type;
+      if (!targetInstance?.id || typeof sectionType !== 'string') continue;
       const targetFieldKey = findTopLevelStringField(pageContract.sectionSchemas?.[sectionType]);
       if (!targetFieldKey) continue;
       const pageState = await readPageJson(pageEntry.slug);
@@ -1559,8 +1165,10 @@ async function selectTarget() {
         slug: pageEntry.slug,
         manifestHref: pageEntry.manifestHref,
         contractHref: pageEntry.contractHref,
-        toolName: tool.name,
+        toolName: UPDATE_TOOL_NAME,
+        saveToolName: SAVE_TOOL_NAME,
         sectionId: targetInstance.id,
+        sectionType,
         fieldKey: targetFieldKey,
         originalValue,
         originalState: pageState,
@@ -1593,30 +1201,46 @@ async function main() {
     consoleEvents.push(`[pageerror] ${error.message}`);
   });
 
+  /** update-section mutates the Studio draft only; save persists. Returns raw update result. */
+  const runUpdateThenSave = async (value) => {
+    const rawUpdate = await page.evaluate(
+      async ({ toolName, slug, sectionId, sectionType, fieldKey, value: nextValue }) => {
+        const runtime = document.modelContextProtocol;
+        if (!runtime?.executeTool) {
+          throw new Error('document.modelContextProtocol.executeTool is unavailable.');
+        }
+        return runtime.executeTool(
+          toolName,
+          JSON.stringify({ slug, sectionId, sectionType, fieldKey, value: nextValue })
+        );
+      },
+      {
+        toolName: target.toolName,
+        slug: target.slug,
+        sectionId: target.sectionId,
+        sectionType: target.sectionType,
+        fieldKey: target.fieldKey,
+        value,
+      }
+    );
+    const parsedUpdate = JSON.parse(rawUpdate);
+    if (parsedUpdate?.isError) {
+      throw new Error(`WebMCP ${target.toolName} returned an error: ${rawUpdate}`);
+    }
+    const rawSave = await page.evaluate(
+      async ({ saveToolName }) => document.modelContextProtocol.executeTool(saveToolName, '{}'),
+      { saveToolName: target.saveToolName }
+    );
+    const parsedSave = JSON.parse(rawSave);
+    if (parsedSave?.isError) {
+      throw new Error(`WebMCP ${target.saveToolName} returned an error: ${rawSave}`);
+    }
+    return rawUpdate;
+  };
+
   const restoreOriginal = async () => {
     try {
-      await page.evaluate(
-        async ({ toolName, slug, sectionId, fieldKey, value }) => {
-          const runtime = document.modelContextTesting;
-          if (!runtime?.executeTool) return;
-          await runtime.executeTool(
-            toolName,
-            JSON.stringify({
-              slug,
-              sectionId,
-              fieldKey,
-              value,
-            })
-          );
-        },
-        {
-          toolName: target.toolName,
-          slug: target.slug,
-          sectionId: target.sectionId,
-          fieldKey: target.fieldKey,
-          value: target.originalValue,
-        }
-      );
+      await runUpdateThenSave(target.originalValue);
       await waitForFileFieldValue(target.slug, target.sectionId, target.fieldKey, target.originalValue);
     } catch {
       await fs.writeFile(target.originalState.pageFilePath, target.originalState.raw, 'utf8');
@@ -1663,44 +1287,17 @@ async function main() {
     }
 
     const toolNames = await page.evaluate(() => {
-      const runtime = document.modelContextTesting;
+      const runtime = document.modelContextProtocol;
       return runtime?.listTools?.().map((tool) => tool.name) ?? [];
     });
-    if (!toolNames.includes(target.toolName)) {
-      throw new Error(`Runtime did not register ${target.toolName}. Found: ${toolNames.join(', ')}`);
-    }
-
-    const rawResult = await page.evaluate(
-      async ({ toolName, slug, sectionId, fieldKey, value }) => {
-        const runtime = document.modelContextTesting;
-        if (!runtime?.executeTool) {
-          throw new Error('document.modelContextTesting.executeTool is unavailable.');
-        }
-        return runtime.executeTool(
-          toolName,
-          JSON.stringify({
-            slug,
-            sectionId,
-            fieldKey,
-            value,
-          })
-        );
-      },
-      {
-        toolName: target.toolName,
-        slug: target.slug,
-        sectionId: target.sectionId,
-        fieldKey: target.fieldKey,
-        value: nextValue,
+    for (const required of [target.toolName, target.saveToolName]) {
+      if (!toolNames.includes(required)) {
+        throw new Error(`Runtime did not register ${required}. Found: ${toolNames.join(', ')}`);
       }
-    );
-
-    const parsedResult = JSON.parse(rawResult);
-    if (parsedResult?.isError) {
-      throw new Error(`WebMCP tool returned an error: ${rawResult}`);
     }
 
     mutationApplied = true;
+    await runUpdateThenSave(nextValue);
     await waitForFileFieldValue(target.slug, target.sectionId, target.fieldKey, nextValue);
     await page.frameLocator('iframe').getByText(nextValue, { exact: true }).waitFor({ state: 'attached' });
 
@@ -1711,7 +1308,9 @@ async function main() {
         manifestHref: target.manifestHref,
         contractHref: target.contractHref,
         toolName: target.toolName,
+        saveToolName: target.saveToolName,
         sectionId: target.sectionId,
+        sectionType: target.sectionType,
         fieldKey: target.fieldKey,
         toolNames,
       })
@@ -1820,6 +1419,7 @@ import { CollectionRegistry } from '@/lib/CollectionRegistry';
 import { ComponentRegistry } from '@/lib/ComponentRegistry';
 import { iconMap } from '@/lib/IconResolver';
 import { SECTION_SCHEMAS } from '@/lib/schemas';
+import { buildEnabledWebMcpConfig } from '@/lib/webmcp/buildEnabledWebMcpConfig';
 
 export type AdminStudioClientProps = {
   tenantId?: string;
@@ -1907,6 +1507,7 @@ export function AdminStudioClient({
       themeCss: { tenant: '' },
       iconRegistry: iconMap,
       addSection: addSectionConfig,
+      webmcp: buildEnabledWebMcpConfig(),
       persistence: {
         saveToFile,
         ...(coldSave ? { coldSave } : {}),
@@ -1968,29 +1569,32 @@ echo "Creating src/components/admin/AdminStudioWithCloud.tsx..."
 cat << 'END_OF_FILE_CONTENT' > "src/components/admin/AdminStudioWithCloud.tsx"
 'use client';
 
-import { lazy, Suspense, useCallback } from 'react';
+import { lazy, Suspense, useCallback, useMemo } from 'react';
 import type {
-  JsonPagesConfig,
-  MenuConfig,
-  PageConfig,
-  ProjectState,
-  SiteConfig,
-  ThemeConfig,
+	JsonPagesConfig,
+	MenuConfig,
+	PageConfig,
+	ProjectState,
+	SiteConfig,
+	ThemeConfig,
 } from '@olonjs/core';
 import { AdminStudioClient } from '@/components/admin/AdminStudioClient';
-import { useCloudSave } from '@/lib/admin/useCloudSave';
+import {
+	type CloudSaveBaseline,
+	useCloudSave,
+} from '@/lib/admin/useCloudSave';
 import { getCloudPolicy, TENANT_ID } from '@/lib/env/tenantEnv';
 
 const ColdSaveDrawer = lazy(() =>
-  import('@/components/admin/ColdSaveDrawer').then((m) => ({ default: m.ColdSaveDrawer })),
+	import('@/components/admin/ColdSaveDrawer').then((m) => ({ default: m.ColdSaveDrawer })),
 );
 
 export type AdminStudioWithCloudProps = {
-  initialPages: Record<string, PageConfig>;
-  initialSiteConfig: SiteConfig;
-  initialMenuConfig: MenuConfig;
-  initialThemeConfig: ThemeConfig;
-  initialCollections: NonNullable<JsonPagesConfig['collections']>;
+	initialPages: Record<string, PageConfig>;
+	initialSiteConfig: SiteConfig;
+	initialMenuConfig: MenuConfig;
+	initialThemeConfig: ThemeConfig;
+	initialCollections: NonNullable<JsonPagesConfig['collections']>;
 };
 
 /**
@@ -1998,47 +1602,63 @@ export type AdminStudioWithCloudProps = {
  * Local save when cloud credentials are absent; cold save when Save2Repo is enabled.
  */
 export function AdminStudioWithCloud(props: AdminStudioWithCloudProps) {
-  const cloudPolicy = getCloudPolicy();
-  const { cloudSaveUi, runCloudSave, closeCloudDrawer, retryCloudSave } = useCloudSave({
-    apiUrl: cloudPolicy.apiUrl,
-    apiKey: cloudPolicy.apiKey,
-  });
+	const cloudPolicy = getCloudPolicy();
+	const baseline = useMemo<CloudSaveBaseline>(
+		() => ({
+			pages: props.initialPages,
+			site: props.initialSiteConfig,
+			menu: props.initialMenuConfig,
+			collections: props.initialCollections,
+		}),
+		[
+			props.initialPages,
+			props.initialSiteConfig,
+			props.initialMenuConfig,
+			props.initialCollections,
+		],
+	);
 
-  const coldSave = useCallback(
-    async (state: ProjectState, slug: string) => {
-      await runCloudSave({ state, slug }, true);
-    },
-    [runCloudSave],
-  );
+	const { cloudSaveUi, runCloudSave, closeCloudDrawer, retryCloudSave } = useCloudSave({
+		apiUrl: cloudPolicy.apiUrl,
+		apiKey: cloudPolicy.apiKey,
+		baseline,
+	});
 
-  const mountDrawer =
-    cloudPolicy.showColdSave && (cloudSaveUi.isOpen || cloudSaveUi.phase !== 'idle');
+	const coldSave = useCallback(
+		async (state: ProjectState, slug: string) => {
+			await runCloudSave({ state, slug }, true);
+		},
+		[runCloudSave],
+	);
 
-  return (
-    <AdminStudioClient
-      tenantId={TENANT_ID}
-      {...props}
-      showLocalSave={cloudPolicy.showLocalSave}
-      showColdSave={cloudPolicy.showColdSave}
-      coldSave={cloudPolicy.showColdSave ? coldSave : undefined}
-    >
-      {mountDrawer ? (
-        <Suspense fallback={null}>
-          <ColdSaveDrawer
-            isOpen={cloudSaveUi.isOpen}
-            phase={cloudSaveUi.phase}
-            currentStepId={cloudSaveUi.currentStepId}
-            doneSteps={cloudSaveUi.doneSteps}
-            progress={cloudSaveUi.progress}
-            errorMessage={cloudSaveUi.errorMessage}
-            deployUrl={cloudSaveUi.deployUrl}
-            onClose={closeCloudDrawer}
-            onRetry={retryCloudSave}
-          />
-        </Suspense>
-      ) : null}
-    </AdminStudioClient>
-  );
+	const mountDrawer =
+		cloudPolicy.showColdSave && (cloudSaveUi.isOpen || cloudSaveUi.phase !== 'idle');
+
+	return (
+		<AdminStudioClient
+			tenantId={TENANT_ID}
+			{...props}
+			showLocalSave={cloudPolicy.showLocalSave}
+			showColdSave={cloudPolicy.showColdSave}
+			coldSave={cloudPolicy.showColdSave ? coldSave : undefined}
+		>
+			{mountDrawer ? (
+				<Suspense fallback={null}>
+					<ColdSaveDrawer
+						isOpen={cloudSaveUi.isOpen}
+						phase={cloudSaveUi.phase}
+						currentStepId={cloudSaveUi.currentStepId}
+						doneSteps={cloudSaveUi.doneSteps}
+						progress={cloudSaveUi.progress}
+						errorMessage={cloudSaveUi.errorMessage}
+						deployUrl={cloudSaveUi.deployUrl}
+						onClose={closeCloudDrawer}
+						onRetry={retryCloudSave}
+					/>
+				</Suspense>
+			) : null}
+		</AdminStudioClient>
+	);
 }
 
 END_OF_FILE_CONTENT
@@ -2938,7 +2558,7 @@ export const FormDemoSettingsSchema = z.object({});
  */
 export const FormDemoSubmissionSchema = z.object({
   name: z.string().min(1).describe('Full name of the person submitting the form'),
-  email: z.string().email().describe('Contact email address where we will reply'),
+  email: z.email().describe('Contact email address where we will reply'),
   message: z.string().min(1).describe('Free-form message body'),
 });
 
@@ -3040,6 +2660,27 @@ import { HeaderSchema, HeaderSettingsSchema } from './schema';
 
 export type HeaderData = z.infer<typeof HeaderSchema>;
 export type HeaderSettings = z.infer<typeof HeaderSettingsSchema>;
+
+END_OF_FILE_CONTENT
+mkdir -p "src/components/webmcp"
+echo "Creating src/components/webmcp/WebMcpVisitorRuntime.tsx..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/webmcp/WebMcpVisitorRuntime.tsx"
+'use client';
+
+import { useEffect } from 'react';
+import { bootstrapVisitorWebMcpRuntime } from '@/lib/webmcp/bootstrapVisitorWebMcpRuntime';
+
+/**
+ * Client island: WebMCP imperative API on public pages (readResource / listTools empty).
+ * Must not import @olonjs/studio.
+ */
+export function WebMcpVisitorRuntime() {
+  useEffect(() => {
+    bootstrapVisitorWebMcpRuntime();
+  }, []);
+
+  return null;
+}
 
 END_OF_FILE_CONTENT
 mkdir -p "src/data"
@@ -3847,7 +3488,7 @@ cat << 'END_OF_FILE_CONTENT' > "src/data/pages/home.json"
       "data": {
         "anchorId": "catalogo-libri",
         "eyebrow": "Collection demo",
-        "title": "Collections",
+        "title": "welcome",
         "description": "Una pagina collection con 30 titoli, paginazione lato componente e link alle schede dinamiche.",
         "items": {
           "$ref": "../collections/libri/libri.json"
@@ -4177,6 +3818,129 @@ export function hydrateLocalProjectState({
 }
 
 END_OF_FILE_CONTENT
+echo "Creating src/lib/admin/useCloudSave.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/admin/useCloudSave.test.ts"
+import { describe, expect, it } from 'vitest';
+import type { ProjectState } from '@olonjs/core';
+import {
+	buildCloudSaveStreamPlan,
+	type CloudSaveBaseline,
+} from './useCloudSave';
+
+const baseline: CloudSaveBaseline = {
+	pages: {
+		home: {
+			id: 'home-page',
+			slug: 'home',
+			sections: [],
+		},
+		'posts/[slug]': {
+			id: 'post-detail-page',
+			slug: 'posts/[slug]',
+			collection: { source: 'posts', paramKey: 'slug' },
+			sections: [
+				{
+					id: 'post-detail-body',
+					type: 'post-detail',
+					data: { item: { $ref: 'collection:current' } },
+				},
+			],
+		},
+	},
+	site: { identity: { title: 'Inkwell' } },
+	menu: { main: [] },
+	collections: {
+		posts: {
+			'designing-with-constraints': {
+				id: 'designing-with-constraints',
+				title: 'Designing with constraints',
+				tags: [{ $ref: '../tags/tags.json#/design' }],
+			},
+		},
+		tags: {
+			design: { id: 'design', name: 'Design' },
+			engineering: { id: 'engineering', name: 'Engineering' },
+		},
+	},
+};
+
+function collectionBoundState(postsDoc: Record<string, unknown>): ProjectState {
+	return {
+		page: {
+			id: 'post-detail-page',
+			slug: 'posts/[slug]',
+			collection: { source: 'posts', paramKey: 'slug' },
+			sections: [
+				{
+					id: 'post-detail-body',
+					type: 'post-detail',
+					data: { item: { $ref: 'collection:current' } },
+				},
+			],
+		},
+		site: baseline.site as ProjectState['site'],
+		menu: baseline.menu as ProjectState['menu'],
+		theme: {} as ProjectState['theme'],
+		collections: {
+			posts: postsDoc,
+			tags: baseline.collections.tags,
+		},
+	};
+}
+
+describe('buildCloudSaveStreamPlan', () => {
+	it('sends only the changed collection document when tags are edited', () => {
+		const nextPosts = {
+			'designing-with-constraints': {
+				id: 'designing-with-constraints',
+				title: 'Designing with constraints',
+				tags: [
+					{ $ref: '../tags/tags.json#/design' },
+					{ $ref: '../tags/tags.json#/engineering' },
+				],
+			},
+		};
+
+		const plan = buildCloudSaveStreamPlan({
+			state: collectionBoundState(nextPosts),
+			slug: 'posts/designing-with-constraints',
+			baseline,
+		});
+
+		expect(plan.path).toBe('src/data/collections/posts/posts.json');
+		expect(plan.content).toEqual(nextPosts);
+		expect(plan.additionalFiles).toEqual([]);
+		expect(plan.changedScopes).toEqual([]);
+		expect(plan.message).toContain('posts');
+		expect(plan.message).not.toContain('home');
+	});
+
+	it('includes page/site/menu only when they differ from baseline', () => {
+		const state: ProjectState = {
+			page: {
+				id: 'home-page',
+				slug: 'home',
+				sections: [{ id: 'hero', type: 'hero', data: { title: 'Changed' } }],
+			},
+			site: baseline.site as ProjectState['site'],
+			menu: baseline.menu as ProjectState['menu'],
+			theme: {} as ProjectState['theme'],
+			collections: baseline.collections,
+		};
+
+		const plan = buildCloudSaveStreamPlan({
+			state,
+			slug: 'home',
+			baseline,
+		});
+
+		expect(plan.path).toBe('src/data/pages/home.json');
+		expect(plan.additionalFiles).toEqual([]);
+		expect(plan.changedScopes).toEqual(['page']);
+	});
+});
+
+END_OF_FILE_CONTENT
 echo "Creating src/lib/admin/useCloudSave.ts..."
 cat << 'END_OF_FILE_CONTENT' > "src/lib/admin/useCloudSave.ts"
 'use client';
@@ -4186,245 +3950,484 @@ import type { DeployPhase, ProjectState, StepId } from '@olonjs/core';
 import { DEPLOY_STEPS, startCloudSaveStream } from '@olonjs/core';
 
 export interface CloudSaveUiState {
-  isOpen: boolean;
-  phase: DeployPhase;
-  currentStepId: StepId | null;
-  doneSteps: StepId[];
-  progress: number;
-  errorMessage?: string;
-  deployUrl?: string;
+	isOpen: boolean;
+	phase: DeployPhase;
+	currentStepId: StepId | null;
+	doneSteps: StepId[];
+	progress: number;
+	errorMessage?: string;
+	deployUrl?: string;
 }
 
+export type CloudSaveBaseline = {
+	pages: Record<string, unknown>;
+	site: unknown;
+	menu: unknown;
+	collections: Record<string, unknown>;
+};
+
+type SaveScope = 'page' | 'site' | 'menu' | 'collections';
+
+type SaveCandidate = {
+	path: string;
+	content: unknown;
+	scope: SaveScope;
+};
+
+export type CloudSaveStreamPlan = {
+	path: string;
+	content: unknown;
+	additionalFiles: Array<{ path: string; content: unknown }>;
+	changedScopes: Array<'page' | 'site' | 'menu'>;
+	message: string;
+};
+
 function getInitialCloudSaveUiState(): CloudSaveUiState {
-  return {
-    isOpen: false,
-    phase: 'idle',
-    currentStepId: null,
-    doneSteps: [],
-    progress: 0,
-  };
+	return {
+		isOpen: false,
+		phase: 'idle',
+		currentStepId: null,
+		doneSteps: [],
+		progress: 0,
+	};
 }
 
 function stepProgress(doneSteps: StepId[]): number {
-  return Math.round((doneSteps.length / DEPLOY_STEPS.length) * 100);
+	return Math.round((doneSteps.length / DEPLOY_STEPS.length) * 100);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+	return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function cloneJson<T>(value: T): T {
-  return JSON.parse(JSON.stringify(value)) as T;
+	return JSON.parse(JSON.stringify(value)) as T;
+}
+
+function stableStringify(value: unknown): string {
+	return JSON.stringify(value);
+}
+
+function contentEquals(left: unknown, right: unknown): boolean {
+	return stableStringify(left) === stableStringify(right);
 }
 
 function normalizePathSegments(value: string): string {
-  return value
-    .split('/')
-    .map((segment) => segment.trim())
-    .filter(Boolean)
-    .join('/');
+	return value
+		.split('/')
+		.map((segment) => segment.trim())
+		.filter(Boolean)
+		.join('/');
 }
 
 function resolveAdminContentSlug(basePath = '/'): string | null {
-  if (typeof window === 'undefined') return null;
+	if (typeof window === 'undefined') return null;
 
-  const normalizedBase = basePath.replace(/\/+$/, '');
-  let path = window.location.pathname;
-  if (normalizedBase && normalizedBase !== '/' && path.startsWith(normalizedBase)) {
-    path = path.slice(normalizedBase.length) || '/';
-  }
+	const normalizedBase = basePath.replace(/\/+$/, '');
+	let path = window.location.pathname;
+	if (normalizedBase && normalizedBase !== '/' && path.startsWith(normalizedBase)) {
+		path = path.slice(normalizedBase.length) || '/';
+	}
 
-  const slug = normalizePathSegments(path.replace(/^\/admin\/?/, ''));
-  return slug || null;
+	const slug = normalizePathSegments(path.replace(/^\/admin\/?/, ''));
+	return slug || null;
 }
 
-function resolveTemplateParamValue(templateSlug: string, concreteSlug: string, paramKey: string): string | null {
-  const templateSegments = normalizePathSegments(templateSlug).split('/').filter(Boolean);
-  const concreteSegments = normalizePathSegments(concreteSlug).split('/').filter(Boolean);
-  if (templateSegments.length !== concreteSegments.length) return null;
+function resolveTemplateParamValue(
+	templateSlug: string,
+	concreteSlug: string,
+	paramKey: string,
+): string | null {
+	const templateSegments = normalizePathSegments(templateSlug).split('/').filter(Boolean);
+	const concreteSegments = normalizePathSegments(concreteSlug).split('/').filter(Boolean);
+	if (templateSegments.length !== concreteSegments.length) return null;
 
-  for (let index = 0; index < templateSegments.length; index += 1) {
-    const templateSegment = templateSegments[index];
-    const concreteSegment = concreteSegments[index];
-    const paramMatch = templateSegment.match(/^\[([A-Za-z0-9_-]+)\]$/);
-    if (paramMatch?.[1] === paramKey) return concreteSegment;
-    if (!paramMatch && templateSegment !== concreteSegment) return null;
-  }
+	for (let index = 0; index < templateSegments.length; index += 1) {
+		const templateSegment = templateSegments[index];
+		const concreteSegment = concreteSegments[index];
+		const paramMatch = templateSegment.match(/^\[([A-Za-z0-9_-]+)\]$/);
+		if (paramMatch?.[1] === paramKey) return concreteSegment;
+		if (!paramMatch && templateSegment !== concreteSegment) return null;
+	}
 
-  return null;
+	return null;
 }
 
 function hasCollectionCurrentRef(value: unknown): boolean {
-  if (Array.isArray(value)) return value.some(hasCollectionCurrentRef);
-  if (!isRecord(value)) return false;
-  if (value.$ref === 'collection:current') return true;
-  return Object.values(value).some(hasCollectionCurrentRef);
+	if (Array.isArray(value)) return value.some(hasCollectionCurrentRef);
+	if (!isRecord(value)) return false;
+	if (value.$ref === 'collection:current') return true;
+	return Object.values(value).some(hasCollectionCurrentRef);
 }
 
 function replaceCollectionCurrentRefs(value: unknown, currentItem: unknown): unknown {
-  if (Array.isArray(value)) return value.map((item) => replaceCollectionCurrentRefs(item, currentItem));
-  if (!isRecord(value)) return value;
-  if (value.$ref === 'collection:current') return cloneJson(currentItem);
-  return Object.fromEntries(
-    Object.entries(value).map(([key, entryValue]) => [key, replaceCollectionCurrentRefs(entryValue, currentItem)]),
-  );
+	if (Array.isArray(value)) {
+		return value.map((item) => replaceCollectionCurrentRefs(item, currentItem));
+	}
+	if (!isRecord(value)) return value;
+	if (value.$ref === 'collection:current') return cloneJson(currentItem);
+	return Object.fromEntries(
+		Object.entries(value).map(([key, entryValue]) => [
+			key,
+			replaceCollectionCurrentRefs(entryValue, currentItem),
+		]),
+	);
 }
 
-function buildSaveStreamPagePayload(state: ProjectState, fallbackSlug: string): { slug: string; page: ProjectState['page'] } {
-  const page = state.page;
-  const collection = page.collection;
-  if (!collection || !hasCollectionCurrentRef(page)) {
-    return { slug: fallbackSlug, page };
-  }
+export function buildSaveStreamPagePayload(
+	state: ProjectState,
+	fallbackSlug: string,
+): { slug: string; page: ProjectState['page'] } {
+	const page = state.page;
+	const collection = page.collection;
+	if (!collection || !hasCollectionCurrentRef(page)) {
+		return { slug: fallbackSlug, page };
+	}
 
-  const concreteSlug = resolveAdminContentSlug();
-  if (!concreteSlug) {
-    throw new Error('Cannot resolve concrete admin route for collection page save.');
-  }
+	const concreteSlug = resolveAdminContentSlug();
+	if (!concreteSlug) {
+		throw new Error('Cannot resolve concrete admin route for collection page save.');
+	}
 
-  const paramValue = resolveTemplateParamValue(page.slug, concreteSlug, collection.paramKey);
-  if (!paramValue) {
-    throw new Error(`Cannot resolve collection param "${collection.paramKey}" from route "${concreteSlug}".`);
-  }
+	const paramValue = resolveTemplateParamValue(page.slug, concreteSlug, collection.paramKey);
+	if (!paramValue) {
+		throw new Error(
+			`Cannot resolve collection param "${collection.paramKey}" from route "${concreteSlug}".`,
+		);
+	}
 
-  const collectionDocument = state.collections?.[collection.source];
-  const currentItem = isRecord(collectionDocument) ? collectionDocument[paramValue] : undefined;
-  if (!currentItem) {
-    throw new Error(`Cannot resolve collection item "${collection.source}/${paramValue}" for save.`);
-  }
+	const collectionDocument = state.collections?.[collection.source];
+	const currentItem = isRecord(collectionDocument)
+		? collectionDocument[paramValue]
+		: undefined;
+	if (!currentItem) {
+		throw new Error(
+			`Cannot resolve collection item "${collection.source}/${paramValue}" for save.`,
+		);
+	}
 
-  const resolvedPage = replaceCollectionCurrentRefs(page, currentItem) as ProjectState['page'];
-  return {
-    slug: concreteSlug,
-    page: {
-      ...resolvedPage,
-      slug: concreteSlug,
-    },
-  };
+	const resolvedPage = replaceCollectionCurrentRefs(page, currentItem) as ProjectState['page'];
+	return {
+		slug: concreteSlug,
+		page: {
+			...resolvedPage,
+			slug: concreteSlug,
+		},
+	};
+}
+
+function buildCollectionCandidates(
+	collections: ProjectState['collections'],
+): SaveCandidate[] {
+	if (!collections) return [];
+	return Object.entries(collections).flatMap(([source, content]) => {
+		const sourceSlug = String(source).replace(/[^a-zA-Z0-9-_]/g, '_');
+		if (!sourceSlug) return [];
+		return [
+			{
+				path: `src/data/collections/${sourceSlug}/${sourceSlug}.json`,
+				content,
+				scope: 'collections' as const,
+			},
+		];
+	});
+}
+
+function pageKeyFromPath(filePath: string): string {
+	return filePath.replace(/^src\/data\/pages\//, '').replace(/\.json$/, '');
+}
+
+function collectionSourceFromPath(filePath: string): string | null {
+	const match = filePath.match(
+		/^src\/data\/collections\/([^/]+)\/\1\.json$/,
+	);
+	return match?.[1] ?? null;
+}
+
+/**
+ * Builds the save-stream file bundle.
+ * When `baseline` is provided, only files that differ are included
+ * (collection edits → collections/*.json only).
+ */
+export function buildCloudSaveStreamPlan(input: {
+	state: ProjectState;
+	slug: string;
+	baseline?: CloudSaveBaseline | null;
+}): CloudSaveStreamPlan {
+	const { state, slug, baseline } = input;
+	const isCollectionBoundPage = Boolean(
+		state.page.collection && hasCollectionCurrentRef(state.page),
+	);
+
+	const candidates: SaveCandidate[] = [...buildCollectionCandidates(state.collections)];
+
+	if (isCollectionBoundPage) {
+		// Item SOT is the collection document; keep the authored template page
+		// (with collection:current) rather than inlining a concrete page file.
+		const templateSlug = normalizePathSegments(state.page.slug);
+		candidates.push({
+			path: `src/data/pages/${templateSlug}.json`,
+			content: state.page,
+			scope: 'page',
+		});
+	} else {
+		const savePage = buildSaveStreamPagePayload(state, slug);
+		candidates.push({
+			path: `src/data/pages/${savePage.slug}.json`,
+			content: savePage.page,
+			scope: 'page',
+		});
+	}
+
+	candidates.push(
+		{ path: 'src/data/config/site.json', content: state.site, scope: 'site' },
+		{ path: 'src/data/config/menu.json', content: state.menu, scope: 'menu' },
+	);
+
+	const selected = candidates.filter((candidate) => {
+		if (!baseline) return true;
+
+		if (candidate.scope === 'collections') {
+			const source = collectionSourceFromPath(candidate.path);
+			if (!source) return true;
+			return !contentEquals(candidate.content, baseline.collections?.[source]);
+		}
+		if (candidate.scope === 'site') {
+			return !contentEquals(candidate.content, baseline.site);
+		}
+		if (candidate.scope === 'menu') {
+			return !contentEquals(candidate.content, baseline.menu);
+		}
+		const pageKey = pageKeyFromPath(candidate.path);
+		return !contentEquals(candidate.content, baseline.pages?.[pageKey]);
+	});
+
+	if (selected.length === 0) {
+		throw new Error('Nothing to save — no changes detected.');
+	}
+
+	const primary =
+		selected.find((candidate) => candidate.scope === 'collections') ??
+		selected.find((candidate) => candidate.scope === 'page') ??
+		selected[0];
+
+	const additionalFiles = selected
+		.filter((candidate) => candidate !== primary)
+		.map(({ path, content }) => ({ path, content }));
+
+	const changedScopes = [
+		...new Set(
+			selected
+				.map((candidate) => candidate.scope)
+				.filter((scope): scope is 'page' | 'site' | 'menu' =>
+					scope === 'page' || scope === 'site' || scope === 'menu',
+				),
+		),
+	];
+
+	const labels = selected.map((candidate) => {
+		if (candidate.scope === 'collections') {
+			return collectionSourceFromPath(candidate.path) ?? 'collections';
+		}
+		if (candidate.scope === 'page') return pageKeyFromPath(candidate.path);
+		return candidate.scope;
+	});
+
+	return {
+		path: primary.path,
+		content: primary.content,
+		additionalFiles,
+		changedScopes,
+		message: `Content update for ${labels.join(', ')} via Visual Editor`,
+	};
+}
+
+export function applySuccessfulSaveToBaseline(
+	baseline: CloudSaveBaseline,
+	state: ProjectState,
+	savedPaths: string[],
+): CloudSaveBaseline {
+	const next: CloudSaveBaseline = {
+		pages: { ...baseline.pages },
+		site: baseline.site,
+		menu: baseline.menu,
+		collections: { ...baseline.collections },
+	};
+
+	for (const filePath of savedPaths) {
+		if (filePath === 'src/data/config/site.json') {
+			next.site = cloneJson(state.site);
+			continue;
+		}
+		if (filePath === 'src/data/config/menu.json') {
+			next.menu = cloneJson(state.menu);
+			continue;
+		}
+		const collectionSource = collectionSourceFromPath(filePath);
+		if (collectionSource && state.collections?.[collectionSource] != null) {
+			next.collections[collectionSource] = cloneJson(
+				state.collections[collectionSource],
+			);
+			continue;
+		}
+		if (filePath.startsWith('src/data/pages/')) {
+			const pageKey = pageKeyFromPath(filePath);
+			if (isCollectionBoundPageState(state) && pageKey === normalizePathSegments(state.page.slug)) {
+				next.pages[pageKey] = cloneJson(state.page);
+			} else if (!isCollectionBoundPageState(state)) {
+				next.pages[pageKey] = cloneJson(state.page);
+			}
+		}
+	}
+
+	return next;
+}
+
+function isCollectionBoundPageState(state: ProjectState): boolean {
+	return Boolean(state.page.collection && hasCollectionCurrentRef(state.page));
 }
 
 export type UseCloudSaveOptions = {
-  apiUrl: string;
-  apiKey: string;
+	apiUrl: string;
+	apiKey: string;
+	/** Authored snapshot used to send only changed files. */
+	baseline?: CloudSaveBaseline | null;
 };
 
 /**
  * Slim Save2Repo cold-save hook (alpha useCloudSave pattern).
  * HotSave is intentionally not included.
  */
-export function useCloudSave({ apiUrl, apiKey }: UseCloudSaveOptions) {
-  const [cloudSaveUi, setCloudSaveUi] = useState<CloudSaveUiState>(getInitialCloudSaveUiState);
-  const activeCloudSaveController = useRef<AbortController | null>(null);
-  const pendingCloudSave = useRef<{ state: ProjectState; slug: string } | null>(null);
+export function useCloudSave({ apiUrl, apiKey, baseline = null }: UseCloudSaveOptions) {
+	const [cloudSaveUi, setCloudSaveUi] = useState<CloudSaveUiState>(getInitialCloudSaveUiState);
+	const activeCloudSaveController = useRef<AbortController | null>(null);
+	const pendingCloudSave = useRef<{ state: ProjectState; slug: string } | null>(null);
+	const baselineRef = useRef<CloudSaveBaseline | null>(
+		baseline ? cloneJson(baseline) : null,
+	);
 
-  useEffect(() => {
-    return () => {
-      activeCloudSaveController.current?.abort();
-    };
-  }, []);
+	useEffect(() => {
+		return () => {
+			activeCloudSaveController.current?.abort();
+		};
+	}, []);
 
-  const runCloudSave = useCallback(
-    async (payload: { state: ProjectState; slug: string }, rejectOnError: boolean): Promise<void> => {
-      if (!apiUrl || !apiKey) {
-        const noCloudError = new Error('Cloud mode is not configured.');
-        if (rejectOnError) throw noCloudError;
-        return;
-      }
+	const runCloudSave = useCallback(
+		async (payload: { state: ProjectState; slug: string }, rejectOnError: boolean): Promise<void> => {
+			if (!apiUrl || !apiKey) {
+				const noCloudError = new Error('Cloud mode is not configured.');
+				if (rejectOnError) throw noCloudError;
+				return;
+			}
 
-      pendingCloudSave.current = payload;
-      activeCloudSaveController.current?.abort();
-      const controller = new AbortController();
-      activeCloudSaveController.current = controller;
+			pendingCloudSave.current = payload;
+			activeCloudSaveController.current?.abort();
+			const controller = new AbortController();
+			activeCloudSaveController.current = controller;
 
-      setCloudSaveUi({
-        isOpen: true,
-        phase: 'running',
-        currentStepId: null,
-        doneSteps: [],
-        progress: 0,
-      });
+			setCloudSaveUi({
+				isOpen: true,
+				phase: 'running',
+				currentStepId: null,
+				doneSteps: [],
+				progress: 0,
+			});
 
-      try {
-        const savePage = buildSaveStreamPagePayload(payload.state, payload.slug);
-        await startCloudSaveStream({
-          apiBaseUrl: apiUrl,
-          apiKey,
-          path: `src/data/pages/${savePage.slug}.json`,
-          content: savePage.page,
-          additionalFiles: [
-            { path: 'src/data/config/site.json', content: payload.state.site },
-            { path: 'src/data/config/menu.json', content: payload.state.menu },
-          ],
-          changedScopes: ['page', 'site', 'menu'],
-          message: `Content update for ${savePage.slug} via Visual Editor`,
-          signal: controller.signal,
-          onStep: (event) => {
-            setCloudSaveUi((prev) => {
-              if (event.status === 'running') {
-                return {
-                  ...prev,
-                  isOpen: true,
-                  phase: 'running',
-                  currentStepId: event.id,
-                  errorMessage: undefined,
-                };
-              }
+			try {
+				const plan = buildCloudSaveStreamPlan({
+					state: payload.state,
+					slug: payload.slug,
+					baseline: baselineRef.current,
+				});
 
-              if (prev.doneSteps.includes(event.id)) {
-                return prev;
-              }
+				await startCloudSaveStream({
+					apiBaseUrl: apiUrl,
+					apiKey,
+					path: plan.path,
+					content: plan.content,
+					additionalFiles: plan.additionalFiles,
+					changedScopes: plan.changedScopes,
+					message: plan.message,
+					signal: controller.signal,
+					onStep: (event) => {
+						setCloudSaveUi((prev) => {
+							if (event.status === 'running') {
+								return {
+									...prev,
+									isOpen: true,
+									phase: 'running',
+									currentStepId: event.id,
+									errorMessage: undefined,
+								};
+							}
 
-              const nextDone = [...prev.doneSteps, event.id];
-              return {
-                ...prev,
-                isOpen: true,
-                phase: 'running',
-                currentStepId: event.id,
-                doneSteps: nextDone,
-                progress: stepProgress(nextDone),
-              };
-            });
-          },
-          onDone: (event) => {
-            const completed = DEPLOY_STEPS.map((step) => step.id);
-            setCloudSaveUi({
-              isOpen: true,
-              phase: 'done',
-              currentStepId: 'live',
-              doneSteps: completed,
-              progress: 100,
-              deployUrl: event.deployUrl,
-            });
-          },
-        });
-      } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Cloud save failed.';
-        setCloudSaveUi((prev) => ({
-          ...prev,
-          isOpen: true,
-          phase: 'error',
-          errorMessage: message,
-        }));
-        if (rejectOnError) throw new Error(message);
-      } finally {
-        if (activeCloudSaveController.current === controller) {
-          activeCloudSaveController.current = null;
-        }
-      }
-    },
-    [apiUrl, apiKey],
-  );
+							if (prev.doneSteps.includes(event.id)) {
+								return prev;
+							}
 
-  const closeCloudDrawer = useCallback(() => {
-    setCloudSaveUi(getInitialCloudSaveUiState());
-  }, []);
+							const nextDone = [...prev.doneSteps, event.id];
+							return {
+								...prev,
+								isOpen: true,
+								phase: 'running',
+								currentStepId: event.id,
+								doneSteps: nextDone,
+								progress: stepProgress(nextDone),
+							};
+						});
+					},
+					onDone: (event) => {
+						const savedPaths = [
+							plan.path,
+							...plan.additionalFiles.map((file) => file.path),
+						];
+						if (baselineRef.current) {
+							baselineRef.current = applySuccessfulSaveToBaseline(
+								baselineRef.current,
+								payload.state,
+								savedPaths,
+							);
+						}
 
-  const retryCloudSave = useCallback(() => {
-    if (!pendingCloudSave.current) return;
-    void runCloudSave(pendingCloudSave.current, false);
-  }, [runCloudSave]);
+						const completed = DEPLOY_STEPS.map((step) => step.id);
+						setCloudSaveUi({
+							isOpen: true,
+							phase: 'done',
+							currentStepId: 'live',
+							doneSteps: completed,
+							progress: 100,
+							deployUrl: event.deployUrl,
+						});
+					},
+				});
+			} catch (error: unknown) {
+				const message = error instanceof Error ? error.message : 'Cloud save failed.';
+				setCloudSaveUi((prev) => ({
+					...prev,
+					isOpen: true,
+					phase: 'error',
+					errorMessage: message,
+				}));
+				if (rejectOnError) throw new Error(message);
+			} finally {
+				if (activeCloudSaveController.current === controller) {
+					activeCloudSaveController.current = null;
+				}
+			}
+		},
+		[apiUrl, apiKey],
+	);
 
-  return { cloudSaveUi, runCloudSave, closeCloudDrawer, retryCloudSave };
+	const closeCloudDrawer = useCallback(() => {
+		setCloudSaveUi(getInitialCloudSaveUiState());
+	}, []);
+
+	const retryCloudSave = useCallback(() => {
+		if (!pendingCloudSave.current) return;
+		void runCloudSave(pendingCloudSave.current, false);
+	}, [runCloudSave]);
+
+	return { cloudSaveUi, runCloudSave, closeCloudDrawer, retryCloudSave };
 }
 
 END_OF_FILE_CONTENT
@@ -5088,15 +5091,6 @@ vi.mock('./loadLocalPublicPageBundle', () => ({
   })),
 }));
 
-vi.mock('./loadStaticPublicPageBundle', () => ({
-  loadStaticPublicPageBundle: vi.fn(async () => ({
-    pages: { home: { id: 'static', slug: 'home', meta: { title: 'Static' }, sections: [] } },
-    siteConfig: { identity: { title: 'S' } },
-    themeConfig: {},
-    menuConfig: {},
-  })),
-}));
-
 vi.mock('./loadLivePublicPageBundle', () => ({
   loadLivePublicPageBundle: vi.fn(async () => ({
     pages: { home: { id: 'live', slug: 'home', meta: { title: 'Live' }, sections: [] } },
@@ -5107,7 +5101,6 @@ vi.mock('./loadLivePublicPageBundle', () => ({
 }));
 
 import { loadLocalPublicPageBundle } from './loadLocalPublicPageBundle';
-import { loadStaticPublicPageBundle } from './loadStaticPublicPageBundle';
 import { loadLivePublicPageBundle } from './loadLivePublicPageBundle';
 import { loadPublicPageBundleForRequest } from './loadPublicPageBundleForRequest';
 
@@ -5123,20 +5116,21 @@ describe('loadPublicPageBundleForRequest', () => {
     });
     expect(bundle.pages.home?.meta?.title).toBe('Local');
     expect(loadLocalPublicPageBundle).toHaveBeenCalled();
-    expect(loadStaticPublicPageBundle).not.toHaveBeenCalled();
     expect(loadLivePublicPageBundle).not.toHaveBeenCalled();
   });
 
-  it('selects Static when bootSource is static', async () => {
+  it('static (Save2Repo) reads the deployed repo from disk and never self-fetches', async () => {
+    const fetchImpl = vi.fn();
     const bundle = await loadPublicPageBundleForRequest({
       bootSource: 'static',
       slug: 'home',
       requestUrl: 'http://localhost:3000/home.json',
       appRoot,
-      fetchImpl: vi.fn() as unknown as typeof fetch,
+      fetchImpl: fetchImpl as unknown as typeof fetch,
     });
-    expect(bundle.pages.home?.meta?.title).toBe('Static');
-    expect(loadStaticPublicPageBundle).toHaveBeenCalled();
+    expect(bundle.pages.home?.meta?.title).toBe('Local');
+    expect(fetchImpl).not.toHaveBeenCalled();
+    expect(loadLivePublicPageBundle).not.toHaveBeenCalled();
   });
 
   it('selects Live when bootSource is live', async () => {
@@ -5164,12 +5158,11 @@ import {
 } from '@/lib/env/serverCloudPolicy';
 import { loadLivePublicPageBundle } from './loadLivePublicPageBundle';
 import { loadLocalPublicPageBundle } from './loadLocalPublicPageBundle';
-import { loadStaticPublicPageBundle } from './loadStaticPublicPageBundle';
 
 export type LoadPublicPageBundleForRequestInput = {
   bootSource: ServerCloudBootSource;
   slug: string;
-  /** Absolute request URL (used for Static same-origin base). */
+  /** Absolute request URL (kept for signature parity with route handlers). */
   requestUrl: string;
   appRoot?: string;
   apiUrl?: string;
@@ -5178,21 +5171,18 @@ export type LoadPublicPageBundleForRequestInput = {
 };
 
 /**
- * Select Local / Static / Live content bundle from server cloud policy bootSource.
+ * Select the content bundle from the server cloud policy bootSource.
+ *
+ * - `local`  → tenant DNA on disk (`src/data`).
+ * - `static` → Save2Repo: the published content *is* the deployed repo, so it is the
+ *              same filesystem read. No same-origin HTTP self-fetch (that looped back
+ *              into `/api/public-page` via the `/pages/:path*.json` rewrite).
+ * - `live`   → hot-save cloud render for the requested slug.
  */
 export async function loadPublicPageBundleForRequest(
   input: LoadPublicPageBundleForRequestInput,
 ): Promise<PublicPageContentBundle> {
   const appRoot = input.appRoot ?? process.cwd();
-
-  if (input.bootSource === 'static') {
-    const origin = new URL(input.requestUrl).origin;
-    return loadStaticPublicPageBundle({
-      baseUrl: `${origin}/`,
-      appRoot,
-      fetchImpl: input.fetchImpl,
-    });
-  }
 
   if (input.bootSource === 'live') {
     const apiUrl = (input.apiUrl ?? '').trim();
@@ -5213,94 +5203,85 @@ export async function loadPublicPageBundleForRequest(
 }
 
 END_OF_FILE_CONTENT
-echo "Creating src/lib/loaders/loadStaticPublicPageBundle.test.ts..."
-cat << 'END_OF_FILE_CONTENT' > "src/lib/loaders/loadStaticPublicPageBundle.test.ts"
-import path from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
-import { resolvePublicPageJson } from '@olonjs/next/server';
-import { loadStaticPublicPageBundle } from './loadStaticPublicPageBundle';
+echo "Creating src/lib/loaders/publishedContent.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/loaders/publishedContent.test.ts"
+import { describe, expect, it } from 'vitest';
+import type { PublicPageContentBundle } from '@olonjs/next/server';
+import { resolvePublicCollectionDocument, resolvePublicConfigDocument } from './publishedContent';
 
-describe('loadStaticPublicPageBundle', () => {
-  const appRoot = path.resolve(__dirname, '../../..');
+const bundle = {
+  pages: {},
+  siteConfig: { identity: { title: 'S' } },
+  themeConfig: { name: 'default', tokens: {} },
+  menuConfig: { main: { items: [] } },
+  collections: { libri: { dune: { id: 'dune', title: 'Dune' } } },
+} as unknown as PublicPageContentBundle;
 
-  it('builds a resolveable bundle from mocked published static content', async () => {
-    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
-      const url = String(input);
-      if (url.endsWith('/config/site.json')) {
-        return new Response(
-          JSON.stringify({
-            identity: { title: 'Static Site' },
-            footer: { id: 'footer', type: 'footer', data: { brandText: 'S' } },
-          }),
-          { status: 200 },
-        );
-      }
-      if (url.includes('/pages/') && url.endsWith('.json')) {
-        return new Response(
-          JSON.stringify({
-            id: 'home-page',
-            slug: 'home',
-            meta: { title: 'Static Home' },
-            sections: [],
-          }),
-          { status: 200 },
-        );
-      }
-      return new Response('no', { status: 404 });
-    });
+describe('resolvePublicCollectionDocument', () => {
+  it('serves /collections/{source}/{source}.json from the runtime bundle', () => {
+    expect(resolvePublicCollectionDocument(bundle, 'libri', 'libri.json')).toEqual(bundle.collections!.libri);
+    expect(resolvePublicCollectionDocument(bundle, 'libri', 'libri')).toEqual(bundle.collections!.libri);
+  });
 
-    const bundle = await loadStaticPublicPageBundle({
-      appRoot,
-      baseUrl: 'https://static.example/',
-      fetchImpl: fetchImpl as typeof fetch,
-    });
+  it('rejects unknown sources and file names that do not match the source', () => {
+    expect(resolvePublicCollectionDocument(bundle, 'nope', 'nope.json')).toBeNull();
+    expect(resolvePublicCollectionDocument(bundle, 'libri', 'autori.json')).toBeNull();
+    expect(resolvePublicCollectionDocument({ ...bundle, collections: undefined }, 'libri', 'libri.json')).toBeNull();
+  });
+});
 
-    expect(bundle.siteConfig).toMatchObject({ identity: { title: 'Static Site' } });
-    const resolved = resolvePublicPageJson({ slug: 'home.json', bundle });
-    expect(resolved?.page.meta?.title).toBe('Static Home');
+describe('resolvePublicConfigDocument', () => {
+  it('serves /config/{site|menu|theme}.json from the runtime bundle', () => {
+    expect(resolvePublicConfigDocument(bundle, 'site.json')).toBe(bundle.siteConfig);
+    expect(resolvePublicConfigDocument(bundle, 'menu')).toBe(bundle.menuConfig);
+    expect(resolvePublicConfigDocument(bundle, 'theme.json')).toBe(bundle.themeConfig);
+  });
+
+  it('rejects anything outside the JSP config allowlist', () => {
+    expect(resolvePublicConfigDocument(bundle, 'secrets.json')).toBeNull();
+    expect(resolvePublicConfigDocument(bundle, '../site.json')).toBeNull();
   });
 });
 
 END_OF_FILE_CONTENT
-echo "Creating src/lib/loaders/loadStaticPublicPageBundle.ts..."
-cat << 'END_OF_FILE_CONTENT' > "src/lib/loaders/loadStaticPublicPageBundle.ts"
+echo "Creating src/lib/loaders/publishedContent.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/loaders/publishedContent.ts"
 import type { PublicPageContentBundle } from '@olonjs/next/server';
-import { loadPublishedStaticContent } from '@olonjs/next/server';
-import { CollectionRegistry } from '@/lib/CollectionRegistry';
-import { getFileCollections } from './getFileCollections';
-import { getFilePages } from './getFilePages';
-import { getFileSiteBundle } from './getFileSiteConfig';
 
 /**
- * Static (Save2Repo) public-page bundle: published pages + site from baseUrl,
- * menu/theme/collections from local seeds (alpha bootStatic parity).
+ * Published JSON documents served at runtime (JSP paths):
+ *   /collections/{source}/{source}.json  and  /config/{site|menu|theme}.json
+ * Replaces the prebuild copy of src/data into public/.
  */
-export async function loadStaticPublicPageBundle(input: {
-  baseUrl: string;
-  appRoot?: string;
-  fetchImpl?: typeof fetch;
-}): Promise<PublicPageContentBundle> {
-  const appRoot = input.appRoot ?? process.cwd();
-  const knownSlugs = Object.keys(getFilePages(appRoot));
-  const { pages, siteConfig } = await loadPublishedStaticContent({
-    knownSlugs,
-    baseUrl: input.baseUrl,
-    fetchImpl: input.fetchImpl,
-  });
-  const { menuConfig, themeConfig } = getFileSiteBundle(appRoot);
-  return {
-    pages,
-    siteConfig,
-    themeConfig,
-    menuConfig,
-    collections: getFileCollections(appRoot),
-    collectionSchemas: CollectionRegistry as PublicPageContentBundle['collectionSchemas'],
-    refDocuments: {
-      'menu.json': menuConfig,
-      'config/menu.json': menuConfig,
-      'src/data/config/menu.json': menuConfig,
-    },
-  };
+
+function stripJson(name: string): string {
+  return name.replace(/\.json$/i, '');
+}
+
+export function resolvePublicCollectionDocument(
+  bundle: Pick<PublicPageContentBundle, 'collections'>,
+  source: string,
+  file: string,
+): Record<string, unknown> | null {
+  if (!source || stripJson(file) !== source) return null;
+  const doc = bundle.collections?.[source];
+  if (!doc || typeof doc !== 'object' || Array.isArray(doc)) return null;
+  return doc as Record<string, unknown>;
+}
+
+const CONFIG_DOCUMENTS = {
+  site: 'siteConfig',
+  menu: 'menuConfig',
+  theme: 'themeConfig',
+} as const satisfies Record<string, keyof PublicPageContentBundle>;
+
+export function resolvePublicConfigDocument(
+  bundle: Pick<PublicPageContentBundle, 'siteConfig' | 'menuConfig' | 'themeConfig'>,
+  file: string,
+): unknown | null {
+  const name = stripJson(file);
+  if (!Object.prototype.hasOwnProperty.call(CONFIG_DOCUMENTS, name)) return null;
+  return bundle[CONFIG_DOCUMENTS[name as keyof typeof CONFIG_DOCUMENTS]] ?? null;
 }
 
 END_OF_FILE_CONTENT
@@ -5436,6 +5417,625 @@ export const VISITOR_SURFACE = {
   mode: 'rsc' as const,
   loadsStudio: false,
 };
+
+END_OF_FILE_CONTENT
+mkdir -p "src/lib/webmcp"
+echo "Creating src/lib/webmcp/bootstrapVisitorWebMcpRuntime.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/bootstrapVisitorWebMcpRuntime.test.ts"
+import { describe, expect, it, vi } from 'vitest';
+import { bootstrapVisitorWebMcpRuntime } from './bootstrapVisitorWebMcpRuntime';
+
+describe('bootstrapVisitorWebMcpRuntime', () => {
+  it('calls ensureWebMcpRuntime once (polyfill only — no tool registration)', () => {
+    const ensureWebMcpRuntime = vi.fn();
+    bootstrapVisitorWebMcpRuntime({ ensureWebMcpRuntime });
+    expect(ensureWebMcpRuntime).toHaveBeenCalledTimes(1);
+  });
+});
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/bootstrapVisitorWebMcpRuntime.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/bootstrapVisitorWebMcpRuntime.ts"
+import { ensureWebMcpRuntime } from '@olonjs/core';
+
+export type VisitorWebMcpRuntimeDeps = {
+  ensureWebMcpRuntime: () => void;
+};
+
+/**
+ * Visitor bootstrap: install document.modelContext / readResource polyfill.
+ * Does not register mutation tools (Studio-only, parity with Vite VisitorRoute).
+ */
+export function bootstrapVisitorWebMcpRuntime(
+  deps: VisitorWebMcpRuntimeDeps = { ensureWebMcpRuntime },
+): void {
+  deps.ensureWebMcpRuntime();
+}
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/buildEnabledWebMcpConfig.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/buildEnabledWebMcpConfig.test.ts"
+import { describe, expect, it } from 'vitest';
+import { buildEnabledWebMcpConfig } from './buildEnabledWebMcpConfig';
+
+describe('buildEnabledWebMcpConfig', () => {
+  it('enables WebMCP with empty namespace when window is unavailable', () => {
+    expect(buildEnabledWebMcpConfig()).toEqual({
+      enabled: true,
+      namespace: '',
+    });
+  });
+
+  it('uses window.location.href as namespace when provided', () => {
+    expect(buildEnabledWebMcpConfig('http://127.0.0.1:3000/admin')).toEqual({
+      enabled: true,
+      namespace: 'http://127.0.0.1:3000/admin',
+    });
+  });
+});
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/buildEnabledWebMcpConfig.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/buildEnabledWebMcpConfig.ts"
+/**
+ * Shared WebMCP enablement shape for Next admin (and any surface that opts in).
+ * Mirrors apps/tenant-alpha App.tsx — enabled + namespace; no tool registration here.
+ */
+export function buildEnabledWebMcpConfig(namespace?: string): {
+  enabled: true;
+  namespace: string;
+} {
+  const resolvedNamespace =
+    namespace ??
+    (typeof window !== 'undefined' && typeof window.location?.href === 'string'
+      ? window.location.href
+      : '');
+
+  return {
+    enabled: true,
+    namespace: resolvedNamespace,
+  };
+}
+
+END_OF_FILE_CONTENT
+mkdir -p "src/lib/webmcp/runtime"
+echo "Creating src/lib/webmcp/runtime/agenticSurface.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/runtime/agenticSurface.test.ts"
+import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
+import type { PublicPageContentBundle } from '@olonjs/next/server';
+import type { PageConfig, SiteConfig } from '@olonjs/core';
+import {
+  buildRobotsTxt,
+  buildRuntimeCollectionContract,
+  buildRuntimeLlmsTxt,
+  buildRuntimePageContract,
+  buildRuntimePageManifest,
+  buildRuntimeSiteManifest,
+  buildSitemapXml,
+  expandDynamicPageSlugs,
+  stripJsonSuffix,
+  stripSchemaJsonSuffix,
+} from './agenticSurface';
+
+const BooksListSchema = z.object({
+  data: z.object({
+    title: z.string(),
+    items: z.record(z.string(), z.object({ id: z.string(), title: z.string() })),
+  }),
+  settings: z.object({}).optional(),
+});
+const BookDetailSchema = z.object({
+  data: z.object({ item: z.object({ id: z.string(), title: z.string() }) }),
+  settings: z.object({}).optional(),
+});
+const LibroSchema = z.object({ id: z.string(), title: z.string() });
+
+const schemas = { 'books-list': BooksListSchema, 'book-detail': BookDetailSchema } as never;
+const collectionSchemas = { libri: z.record(z.string(), LibroSchema) } as never;
+
+const pages: Record<string, PageConfig> = {
+  home: {
+    id: 'home-page',
+    slug: 'home',
+    meta: { title: 'Libri', description: 'Catalogo' },
+    sections: [
+      {
+        id: 'books-list-1',
+        type: 'books-list',
+        data: { title: 'Collections', items: { $ref: '../collections/libri/libri.json' } },
+      },
+    ],
+  } as unknown as PageConfig,
+  'libri/[slug]': {
+    id: 'libro-detail-page',
+    slug: 'libri/[slug]',
+    meta: { title: 'Dettaglio libro', description: 'Dinamica' },
+    sections: [{ id: 'book-detail-1', type: 'book-detail', data: { item: { $ref: 'collection:current' } } }],
+    collection: { source: 'libri', paramKey: 'slug' },
+  } as unknown as PageConfig,
+};
+
+const bundle: PublicPageContentBundle = {
+  pages,
+  siteConfig: { identity: { title: 'Libri' } } as unknown as SiteConfig,
+  themeConfig: { name: 'default', tokens: {} } as never,
+  menuConfig: {},
+  collections: { libri: { dune: { id: 'dune', title: 'Dune' }, '1984': { id: '1984', title: '1984' } } },
+  collectionSchemas,
+};
+
+describe('suffix helpers', () => {
+  it('strips .json and .schema.json from catch-all segments', () => {
+    expect(stripJsonSuffix(['home.json'])).toBe('home');
+    expect(stripJsonSuffix(['libri', 'dune.json'])).toBe('libri/dune');
+    expect(stripSchemaJsonSuffix(['home.schema.json'])).toBe('home');
+    expect(stripSchemaJsonSuffix(['authors', '[authorId]', 'libri.schema.json'])).toBe('authors/[authorId]/libri');
+  });
+});
+
+describe('expandDynamicPageSlugs', () => {
+  it('replaces collection-bound pattern pages with one concrete slug per record', () => {
+    const slugs = expandDynamicPageSlugs(pages, bundle.collections);
+    expect(slugs).toEqual(['home', 'libri/1984', 'libri/dune']);
+  });
+
+  it('keeps the pattern when the collection is missing', () => {
+    expect(expandDynamicPageSlugs(pages, {})).toEqual(['home', 'libri/[slug]']);
+  });
+});
+
+describe('runtime agentic surface', () => {
+  it('builds the site manifest index with concrete slugs and collections', () => {
+    const manifest = buildRuntimeSiteManifest({ bundle, schemas });
+    expect(manifest.kind).toBe('olonjs-mcp-manifest-index');
+    expect(manifest.pages.map((p) => p.slug)).toEqual(['home', 'libri/1984', 'libri/dune']);
+    expect(manifest.pages[0].manifestHref).toBe('/mcp-manifests/home.json');
+    expect(manifest.pages[0].contractHref).toBe('/schemas/home.schema.json');
+    expect(manifest.collections?.[0]).toEqual({
+      source: 'libri',
+      dataHref: '/collections/libri/libri.json',
+      contractHref: '/schemas/collections/libri.schema.json',
+    });
+  });
+
+  it('builds a page manifest for a concrete dynamic slug', () => {
+    const manifest = buildRuntimePageManifest({ bundle, schemas, slug: 'libri/dune' });
+    expect(manifest?.slug).toBe('libri/dune');
+    expect(manifest?.sectionTypes).toEqual(['book-detail']);
+    expect(manifest?.tools.map((t) => t.name)).toEqual(['update-section', 'save']);
+  });
+
+  it('returns null for unknown slugs', () => {
+    expect(buildRuntimePageManifest({ bundle, schemas, slug: 'nope' })).toBeNull();
+    expect(buildRuntimePageContract({ bundle, schemas, slug: 'nope' })).toBeNull();
+  });
+
+  it('builds a page contract exposing section instances and schemas', () => {
+    const contract = buildRuntimePageContract({ bundle, schemas, slug: 'home' });
+    expect(contract?.kind).toBe('olonjs-page-contract');
+    expect(contract?.sectionInstances.some((s) => s.id === 'books-list-1')).toBe(true);
+    expect(contract?.sectionSchemas['books-list']).toBeDefined();
+  });
+
+  it('builds a collection contract or null for unknown sources', () => {
+    expect(buildRuntimeCollectionContract({ collectionSchemas, source: 'libri' })?.source).toBe('libri');
+    expect(buildRuntimeCollectionContract({ collectionSchemas, source: 'nope' })).toBeNull();
+  });
+
+  it('builds llms.txt referencing manifests and contracts', () => {
+    const txt = buildRuntimeLlmsTxt({ bundle, schemas });
+    expect(txt).toContain('/mcp-manifests/home.json');
+    expect(txt).toContain('/schemas/home.schema.json');
+  });
+});
+
+describe('robots + sitemap', () => {
+  it('robots allows agent surfaces and points to the sitemap', () => {
+    const txt = buildRobotsTxt('https://example.com');
+    expect(txt).toContain('User-agent: GPTBot');
+    expect(txt).toContain('Allow: /mcp-manifest.json');
+    expect(txt).toContain('Disallow: /api/');
+    expect(txt).toContain('Sitemap: https://example.com/sitemap.xml');
+  });
+
+  it('sitemap lists discovery nodes, human, payload and contract URLs per slug', () => {
+    const xml = buildSitemapXml({
+      baseUrl: 'https://example.com',
+      slugs: ['home', 'libri/dune'],
+      now: new Date('2026-09-10T10:00:00.000Z'),
+    });
+    expect(xml).toContain('<loc>https://example.com/llms.txt</loc>');
+    expect(xml).toContain('<loc>https://example.com/mcp-manifest.json</loc>');
+    expect(xml).toContain('<loc>https://example.com/</loc>');
+    expect(xml).toContain('<loc>https://example.com/home.json</loc>');
+    expect(xml).toContain('<loc>https://example.com/schemas/home.schema.json</loc>');
+    expect(xml).toContain('<loc>https://example.com/libri/dune</loc>');
+    expect(xml).toContain('<lastmod>2026-09-10T10:00:00Z</lastmod>');
+  });
+});
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/runtime/agenticSurface.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/runtime/agenticSurface.ts"
+/**
+ * Runtime agentic surface for Next — computed per request, never baked.
+ *
+ * Same `webmcp.*` builders as the Vite bake, fed by the runtime content bundle.
+ * Route handlers under app/api/webmcp/* and app/api/seo/* call these; next.config
+ * rewrites map the public hrefs (/mcp-manifest.json, /mcp-manifests/*, /schemas/*,
+ * /llms.txt, /robots.txt, /sitemap.xml) onto them.
+ */
+import {
+  resolvePageMatchFromRegistry,
+  resolvePublicPageDocument,
+  webmcp,
+  type JsonPagesConfig,
+  type PageConfig,
+} from '@olonjs/core';
+import type { PublicPageContentBundle } from '@olonjs/next/server';
+
+const {
+  buildCollectionContract,
+  buildLlmsTxt,
+  buildPageContract,
+  buildPageContractHref,
+  buildPageManifest,
+  buildSiteManifest,
+} = webmcp;
+
+export type RuntimeSurfaceInput = {
+  bundle: PublicPageContentBundle;
+  schemas: JsonPagesConfig['schemas'];
+  submissionSchemas?: JsonPagesConfig['submissionSchemas'];
+};
+
+function joinSegments(segments: readonly string[]): string {
+  return segments.map((s) => decodeURIComponent(s)).join('/');
+}
+
+/** `['libri','dune.json']` → `libri/dune` */
+export function stripJsonSuffix(segments: readonly string[]): string {
+  return joinSegments(segments).replace(/\.json$/i, '');
+}
+
+/** `['home.schema.json']` → `home` */
+export function stripSchemaJsonSuffix(segments: readonly string[]): string {
+  return joinSegments(segments).replace(/\.schema\.json$/i, '');
+}
+
+type CollectionBinding = { source: string; paramKey: string };
+
+function readCollectionBinding(page: PageConfig): CollectionBinding | null {
+  const binding = (page as { collection?: unknown }).collection;
+  if (!binding || typeof binding !== 'object') return null;
+  const { source, paramKey } = binding as Partial<CollectionBinding>;
+  if (typeof source !== 'string' || typeof paramKey !== 'string') return null;
+  return { source, paramKey };
+}
+
+/**
+ * Registry slugs with collection-bound pattern pages (`libri/[slug]`) expanded into
+ * one concrete slug per collection record. Pattern is kept when its collection is absent.
+ */
+export function expandDynamicPageSlugs(
+  pages: Record<string, PageConfig>,
+  collections: JsonPagesConfig['collections'] | undefined,
+): string[] {
+  const out = new Set<string>();
+  for (const [registrySlug, page] of Object.entries(pages)) {
+    const binding = readCollectionBinding(page);
+    const token = binding ? `[${binding.paramKey}]` : null;
+    const collection = binding ? collections?.[binding.source] : undefined;
+    if (!binding || !token || !registrySlug.includes(token) || !collection || typeof collection !== 'object') {
+      out.add(registrySlug);
+      continue;
+    }
+    const ids = Object.keys(collection);
+    if (ids.length === 0) {
+      out.add(registrySlug);
+      continue;
+    }
+    for (const id of ids) out.add(registrySlug.replace(token, id));
+  }
+  return Array.from(out).sort((a, b) => a.localeCompare(b));
+}
+
+function resolvePublicPage(input: RuntimeSurfaceInput, slug: string): PageConfig | null {
+  const { bundle } = input;
+  const match = resolvePageMatchFromRegistry(bundle.pages, slug);
+  if (!match) return null;
+  const resolved = resolvePublicPageDocument({
+    slug,
+    pages: bundle.pages,
+    siteConfig: bundle.siteConfig,
+    themeConfig: bundle.themeConfig,
+    menuConfig: bundle.menuConfig,
+    collections: bundle.collections,
+    collectionSchemas: bundle.collectionSchemas,
+    refDocuments: bundle.refDocuments,
+  });
+  return resolved?.page ?? match.page;
+}
+
+function resolveAllPublicPages(input: RuntimeSurfaceInput): Record<string, PageConfig> {
+  const slugs = expandDynamicPageSlugs(input.bundle.pages, input.bundle.collections);
+  const out: Record<string, PageConfig> = {};
+  for (const slug of slugs) {
+    const page = resolvePublicPage(input, slug);
+    if (page) out[slug] = page;
+  }
+  return out;
+}
+
+export function buildRuntimeSiteManifest(input: RuntimeSurfaceInput) {
+  return buildSiteManifest({
+    pages: resolveAllPublicPages(input),
+    schemas: input.schemas,
+    submissionSchemas: input.submissionSchemas,
+    siteConfig: input.bundle.siteConfig,
+    // Bundle carries SchemaLike; the manifest builder expects the Zod registry (same objects).
+    collectionSchemas: input.bundle.collectionSchemas as never,
+  });
+}
+
+export function buildRuntimePageManifest(input: RuntimeSurfaceInput & { slug: string }) {
+  const pageConfig = resolvePublicPage(input, input.slug);
+  if (!pageConfig) return null;
+  return buildPageManifest({
+    slug: input.slug,
+    pageConfig,
+    schemas: input.schemas,
+    submissionSchemas: input.submissionSchemas,
+    siteConfig: input.bundle.siteConfig,
+  });
+}
+
+export function buildRuntimePageContract(input: RuntimeSurfaceInput & { slug: string }) {
+  const pageConfig = resolvePublicPage(input, input.slug);
+  if (!pageConfig) return null;
+  return buildPageContract({
+    slug: input.slug,
+    pageConfig,
+    schemas: input.schemas,
+    submissionSchemas: input.submissionSchemas,
+    siteConfig: input.bundle.siteConfig,
+  });
+}
+
+export function buildRuntimeCollectionContract(input: {
+  collectionSchemas: JsonPagesConfig['collectionSchemas'] | undefined;
+  source: string;
+}) {
+  const schema = input.collectionSchemas?.[input.source];
+  if (!schema) return null;
+  return buildCollectionContract({ source: input.source, schema: schema as never });
+}
+
+export function buildRuntimeLlmsTxt(input: RuntimeSurfaceInput): string {
+  return buildLlmsTxt({
+    pages: resolveAllPublicPages(input),
+    schemas: input.schemas,
+    submissionSchemas: input.submissionSchemas,
+    siteConfig: input.bundle.siteConfig,
+  });
+}
+
+export function buildRobotsTxt(baseUrl: string): string {
+  return `User-agent: *
+Allow: /
+Disallow: /api/
+
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: PerplexityBot
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /*.json
+Allow: /schemas/
+Allow: /llms.txt
+Allow: /mcp-manifest.json
+Disallow: /api/
+
+Sitemap: ${baseUrl}/sitemap.xml
+`;
+}
+
+function toW3CDate(date: Date): string {
+  return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
+function urlEntry(entry: {
+  loc: string;
+  lastmod: string;
+  changefreq: string;
+  priority: string;
+  comment?: string;
+}): string {
+  const lines: string[] = [];
+  if (entry.comment) lines.push(`  <!-- ${entry.comment} -->`);
+  lines.push('  <url>');
+  lines.push(`    <loc>${entry.loc}</loc>`);
+  lines.push(`    <lastmod>${entry.lastmod}</lastmod>`);
+  lines.push(`    <changefreq>${entry.changefreq}</changefreq>`);
+  lines.push(`    <priority>${entry.priority}</priority>`);
+  lines.push('  </url>');
+  return lines.join('\n');
+}
+
+function sectionComment(label: string): string {
+  const bar = '='.repeat(42);
+  return [`  <!-- ${bar} -->`, `  <!-- ${label.padEnd(42)} -->`, `  <!-- ${bar} -->`].join('\n');
+}
+
+export function buildSitemapXml(input: { baseUrl: string; slugs: readonly string[]; now?: Date }): string {
+  const { baseUrl } = input;
+  const stamp = toW3CDate(input.now ?? new Date());
+  const entries: string[] = [];
+
+  entries.push(sectionComment('GLOBAL AGENT DISCOVERY NODES'));
+  entries.push(urlEntry({ loc: `${baseUrl}/llms.txt`, lastmod: stamp, changefreq: 'weekly', priority: '1.0' }));
+  entries.push(
+    urlEntry({ loc: `${baseUrl}/mcp-manifest.json`, lastmod: stamp, changefreq: 'weekly', priority: '1.0' }),
+  );
+
+  for (const slug of input.slugs) {
+    const humanPath = slug === 'home' ? '/' : `/${slug}`;
+    entries.push(sectionComment(`PAGE: ${slug.toUpperCase()}`));
+    entries.push(
+      urlEntry({ loc: `${baseUrl}${humanPath}`, lastmod: stamp, changefreq: 'daily', priority: '0.9', comment: 'Human UI' }),
+    );
+    entries.push(
+      urlEntry({
+        loc: `${baseUrl}/${slug}.json`,
+        lastmod: stamp,
+        changefreq: 'daily',
+        priority: '0.9',
+        comment: 'Machine Payload',
+      }),
+    );
+    entries.push(
+      urlEntry({
+        loc: `${baseUrl}${buildPageContractHref(slug)}`,
+        lastmod: stamp,
+        changefreq: 'weekly',
+        priority: '0.8',
+        comment: 'Machine Contract (Schema)',
+      }),
+    );
+  }
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    '',
+    entries.join('\n'),
+    '',
+    '</urlset>',
+    '',
+  ].join('\n');
+}
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/runtime/loadRuntimeSurface.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/runtime/loadRuntimeSurface.ts"
+import path from 'node:path';
+import type { JsonPagesConfig } from '@olonjs/core';
+import { readServerCloudPolicy } from '@/lib/env/serverCloudPolicy';
+import { loadLocalPublicPageBundle } from '@/lib/loaders/loadLocalPublicPageBundle';
+import { loadPublicPageBundleForRequest } from '@/lib/loaders/loadPublicPageBundleForRequest';
+import { SECTION_SCHEMAS, SECTION_SUBMISSION_SCHEMAS } from '@/lib/schemas';
+import type { RuntimeSurfaceInput } from './agenticSurface';
+
+const schemas = SECTION_SCHEMAS as unknown as JsonPagesConfig['schemas'];
+const submissionSchemas = SECTION_SUBMISSION_SCHEMAS as unknown as JsonPagesConfig['submissionSchemas'];
+
+/**
+ * Per-slug surface (page manifest / contract): follows the server cloud policy
+ * (local / static / live) exactly like `/api/public-page`.
+ */
+export async function loadRuntimeSurfaceForSlug(input: {
+  slug: string;
+  requestUrl: string;
+}): Promise<RuntimeSurfaceInput> {
+  const policy = readServerCloudPolicy();
+  const bundle = await loadPublicPageBundleForRequest({
+    bootSource: policy.bootSource,
+    slug: input.slug,
+    requestUrl: input.requestUrl,
+    appRoot: path.resolve(process.cwd()),
+    apiUrl: policy.apiUrl,
+    apiKey: policy.apiKey,
+  });
+  return { bundle, schemas, submissionSchemas };
+}
+
+/**
+ * Site-wide surface (index, llms.txt, sitemap): page registry + collections from the
+ * tenant DNA on disk. Live cloud content is per-page and does not change the registry.
+ */
+export function loadRuntimeSurfaceForSite(): RuntimeSurfaceInput {
+  const bundle = loadLocalPublicPageBundle(path.resolve(process.cwd()));
+  return { bundle, schemas, submissionSchemas };
+}
+
+/** Public base URL for absolute links (robots/sitemap). */
+export function resolvePublicBaseUrl(request: Request): string {
+  const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  if (vercelHost) return `https://${vercelHost}`;
+  const forwardedHost = request.headers.get('x-forwarded-host');
+  const host = forwardedHost ?? request.headers.get('host');
+  if (host) {
+    const proto = request.headers.get('x-forwarded-proto') ?? new URL(request.url).protocol.replace(':', '');
+    return `${proto}://${host}`;
+  }
+  return new URL(request.url).origin;
+}
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/runtime/nextConfigRewrites.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/runtime/nextConfigRewrites.test.ts"
+import { describe, expect, it } from 'vitest';
+import nextConfig, {
+  publicPageJsonRewrites,
+  publishedContentRewrites,
+  webmcpRuntimeRewrites,
+} from '../../../../next.config';
+
+describe('next.config rewrites — runtime agentic surface', () => {
+  it('maps every public agentic href onto a runtime route handler', () => {
+    const bySource = Object.fromEntries(webmcpRuntimeRewrites.map((r) => [r.source, r.destination]));
+    expect(bySource['/mcp-manifest.json']).toBe('/api/webmcp/site-manifest');
+    expect(bySource['/mcp-manifests/:path*.json']).toBe('/api/webmcp/page-manifest/:path*');
+    expect(bySource['/schemas/collections/:source.schema.json']).toBe('/api/webmcp/collection-contract/:source');
+    expect(bySource['/schemas/:path*.schema.json']).toBe('/api/webmcp/page-contract/:path*');
+    expect(bySource['/llms.txt']).toBe('/api/webmcp/llms');
+    expect(bySource['/robots.txt']).toBe('/api/seo/robots');
+    expect(bySource['/sitemap.xml']).toBe('/api/seo/sitemap');
+  });
+
+  it('maps JSP published documents (collections, config) onto runtime route handlers', () => {
+    const bySource = Object.fromEntries(publishedContentRewrites.map((r) => [r.source, r.destination]));
+    expect(bySource['/collections/:source/:file.json']).toBe('/api/public-collection/:source/:file');
+    expect(bySource['/config/:file.json']).toBe('/api/public-config/:file');
+  });
+
+  it('places collection contracts before page contracts and all agentic rewrites before /:path*.json', async () => {
+    const all = await nextConfig.rewrites!();
+    const list = Array.isArray(all) ? all : [...all.beforeFiles, ...all.afterFiles, ...all.fallback];
+    const sources = list.map((r) => r.source);
+
+    expect(sources.indexOf('/schemas/collections/:source.schema.json')).toBeLessThan(
+      sources.indexOf('/schemas/:path*.schema.json'),
+    );
+    const catchAll = sources.indexOf('/:path*.json');
+    for (const r of [...webmcpRuntimeRewrites, ...publishedContentRewrites]) {
+      expect(sources.indexOf(r.source)).toBeLessThan(catchAll);
+    }
+    expect(sources.slice(-publicPageJsonRewrites.length)).toEqual(publicPageJsonRewrites.map((r) => r.source));
+  });
+});
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/visitorPageWebMcpWiring.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/visitorPageWebMcpWiring.test.ts"
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const visitorPagePath = path.join(root, 'app', '[[...slug]]', 'page.tsx');
+
+describe('visitor page WebMCP wiring', () => {
+  it('mounts WebMcpVisitorRuntime on the public catch-all', () => {
+    const source = readFileSync(visitorPagePath, 'utf8');
+    expect(source).toContain("from '@/components/webmcp/WebMcpVisitorRuntime'");
+    expect(source).toContain('<WebMcpVisitorRuntime');
+  });
+});
 
 END_OF_FILE_CONTENT
 echo "Creating src/types.ts..."
@@ -8159,8 +8759,8 @@ echo "  INKWELL JOURNAL — OlonJS Next harness generator"
 echo "  CWD = tenant root ($(pwd))"
 echo "  No ThemeProvider — light/dark via document.documentElement.dataset.theme"
 echo "  Collections + cross-collection relations demo"
-echo "  posts -> tags  (post.tags = tag keys)"
-echo "  tags  -> posts (resolved at render by filtering posts)"
+echo "  posts -> tags  (post.tags = \$ref pointers / ui:collection-ref:tags)"
+echo "  tags  -> posts (resolved at render via tag-refs helpers)"
 echo "=============================================================="
 
 # -----------------------------------------------------------------------------
@@ -8320,6 +8920,8 @@ mkdir -p src/components/header \
          src/collections/tags \
          src/data/config \
          src/data/pages \
+         src/data/pages/posts \
+         src/data/pages/tags \
          src/data/collections/posts \
          src/data/collections/tags \
          src/lib
@@ -8516,6 +9118,12 @@ echo "-- Writing collection contract: posts..."
 cat > src/collections/posts/schema.ts << 'EOF'
 import { z } from 'zod';
 import { BaseCollectionItem, ImageSelectionSchema } from '@olonjs/core';
+import { TagSchema } from '@/collections/tags/schema';
+
+/** Authored collection pointer; bake/runtime expand to the target Tag. */
+const CollectionPointerSchema = z.object({
+  $ref: z.string(),
+});
 
 export const PostSchema = BaseCollectionItem.extend({
   title: z.string().describe('ui:text'),
@@ -8525,10 +9133,11 @@ export const PostSchema = BaseCollectionItem.extend({
   date: z.string().describe('ui:text'),
   author: z.string().describe('ui:text'),
   readingTime: z.string().describe('ui:text'),
-  // Relation posts -> tags: each string is a key of the `tags` collection.
-  // The relation lives ONLY on the post side (single source of truth);
-  // the inverse (tags -> posts) is computed at render time by filtering.
-  tags: z.array(z.string()).describe('ui:list'),
+  // Relation posts -> tags via $ref pointers (SOT on the post side).
+  // Authored: { $ref: "../tags/tags.json#/<id>" }; after resolve: Tag objects.
+  // Inverse (tags -> posts) is computed at render time by filtering.
+  // Studio: ui:collection-ref:tags → one dropdown per relation (multi-ref).
+  tags: z.array(z.union([TagSchema, CollectionPointerSchema])).describe('ui:collection-ref:tags'),
 });
 
 export const PostsCollectionSchema = z.record(z.string(), PostSchema);
@@ -8546,6 +9155,49 @@ cat > src/collections/posts/index.ts << 'EOF'
 export { PostSchema, PostsCollectionSchema } from './schema';
 export type { Post, PostsCollection } from './types';
 EOF
+echo "-- Writing src/collections/posts/tag-refs.ts..."
+cat > src/collections/posts/tag-refs.ts << 'EOF'
+import type { Tag } from '@/collections/tags';
+
+type CollectionPointer = { $ref: string };
+
+export function isResolvedTag(value: unknown): value is Tag {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !('$ref' in value) &&
+    typeof (value as Tag).id === 'string'
+  );
+}
+
+export function isCollectionPointer(value: unknown): value is CollectionPointer {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as CollectionPointer).$ref === 'string'
+  );
+}
+
+/** Tag id from a resolved Tag, authored $ref, or legacy string key. */
+export function resolveTagId(value: unknown): string | null {
+  if (typeof value === 'string' && value.length > 0) return value;
+  if (isResolvedTag(value) && value.id) return value.id;
+  if (isCollectionPointer(value)) {
+    const hash = value.$ref.split('#/')[1];
+    return hash || null;
+  }
+  return null;
+}
+
+export function postHasTag(
+  tags: unknown[] | undefined,
+  tagId: string,
+): boolean {
+  if (!tagId) return false;
+  return (tags ?? []).some((tag) => resolveTagId(tag) === tagId);
+}
+EOF
+
 
 # -----------------------------------------------------------------------------
 # COLLECTIONS — tags (COP v1.1)
@@ -8604,88 +9256,171 @@ cat > src/data/collections/posts/posts.json << 'EOF'
     "title": "Designing with constraints, on purpose",
     "excerpt": "Every strong interface we have shipped started with a constraint we refused to negotiate away. Here is how we pick them.",
     "body": "Constraints are not the enemy of good design. They are the only reliable way to make a hundred small decisions coherent with each other. A palette of four colors forces hierarchy; a single display font forces rhythm.\n\nOn Inkwell we hold three constraints fixed: one measure for body text, one accent per surface, and no decoration that does not encode meaning. Everything else is allowed to move.\n\nThe result is not austerity. It is that rare feeling of a page where nothing competes with the words.",
-    "image": { "url": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80", "alt": "Fountain pen resting on a notebook with handwritten notes" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80",
+      "alt": "Fountain pen resting on a notebook with handwritten notes"
+    },
     "date": "2026-06-28",
     "author": "June Park",
     "readingTime": "6 min",
-    "tags": ["design", "process"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/design"
+      },
+      {
+        "$ref": "../tags/tags.json#/process"
+      },
+      {
+        "$ref": "../collections/tags/tags.json#/engineering"
+      }
+    ]
   },
   "the-boring-stack": {
     "id": "the-boring-stack",
     "title": "The boring stack is a feature",
     "excerpt": "We rebuilt our pipeline on tools nobody tweets about. Deploys got faster and the on-call channel went quiet.",
     "body": "There is a special kind of silence that follows choosing boring technology. The pager stops. The changelog reads like a grocery list. Nobody has to relearn the build system on a Tuesday.\n\nBoring does not mean old. It means the failure modes are documented, the upgrade path is known, and the second engineer to touch the code can predict what the first one did.\n\nWe budget our novelty. One genuinely new tool per quarter, everything else deliberately dull. That budget is the most productive constraint we have.",
-    "image": { "url": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&q=80", "alt": "Close-up of a circuit board with soldered components" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&q=80",
+      "alt": "Close-up of a circuit board with soldered components"
+    },
     "date": "2026-06-19",
     "author": "Tomas Lindgren",
     "readingTime": "5 min",
-    "tags": ["engineering", "tooling"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/engineering"
+      },
+      {
+        "$ref": "../tags/tags.json#/tooling"
+      }
+    ]
   },
   "write-the-readme-first": {
     "id": "write-the-readme-first",
     "title": "Write the README first",
     "excerpt": "If you cannot explain the tool before building it, you are about to build the wrong tool. A practice we stole from technical writers.",
     "body": "Before any code exists, we write the README as if the project were finished: what it does, how you install it, the three commands you will actually use. It takes an hour and it kills bad ideas while they are still cheap.\n\nThe README-first draft exposes the seams. If the usage section needs four paragraphs of caveats, the interface is wrong. If the install steps require a diagram, the packaging is wrong.\n\nDocumentation is not what you write after the work. Often, it is the work.",
-    "image": { "url": "https://images.unsplash.com/photo-1517842645767-c639042777db?w=1600&q=80", "alt": "Open notebook with a pen on a wooden desk beside a laptop" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1517842645767-c639042777db?w=1600&q=80",
+      "alt": "Open notebook with a pen on a wooden desk beside a laptop"
+    },
     "date": "2026-06-10",
     "author": "Ada Osei",
     "readingTime": "4 min",
-    "tags": ["writing", "process"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/writing"
+      },
+      {
+        "$ref": "../tags/tags.json#/process"
+      }
+    ]
   },
   "tokens-not-pixels": {
     "id": "tokens-not-pixels",
     "title": "Tokens, not pixels",
     "excerpt": "The day we deleted every hardcoded hex value was the day dark mode became a data change instead of a rewrite.",
     "body": "A design token is a promise: this value has a name, the name has a meaning, and the meaning survives a redesign. A hex code in a component is the opposite — a decision nobody can find later.\n\nOur rule is mechanical. Components consume semantic variables; variables resolve from a theme document; the theme document is data. Light mode, dark mode, a client rebrand: all of them become edits to one JSON file.\n\nIt is the least glamorous migration we ever ran, and the one with the highest return. Every surface in this journal, including the one you are reading, is painted through that chain.",
-    "image": { "url": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1600&q=80", "alt": "Monitor showing colorful code in a dark editor theme" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1600&q=80",
+      "alt": "Monitor showing colorful code in a dark editor theme"
+    },
     "date": "2026-05-30",
     "author": "June Park",
     "readingTime": "7 min",
-    "tags": ["design", "engineering", "tooling"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/design"
+      },
+      {
+        "$ref": "../tags/tags.json#/engineering"
+      },
+      {
+        "$ref": "../tags/tags.json#/tooling"
+      }
+    ]
   },
   "shipping-on-fridays": {
     "id": "shipping-on-fridays",
     "title": "Yes, we ship on Fridays",
     "excerpt": "The no-Friday-deploy rule treats the symptom. We fixed the disease instead, and the weekend stayed quiet anyway.",
     "body": "Teams that fear Friday deploys do not have a calendar problem, they have a confidence problem. The fix is not a freeze window; it is making deploys so small and so reversible that the day of the week stops mattering.\n\nWe ship changes measured in tens of lines, behind flags, with a rollback that takes one command and no meeting. When a deploy is that cheap, Friday afternoon is just another afternoon.\n\nThe cultural shift matters more than the tooling: nobody gets praised here for a heroic weekend fix. We praise the boring deploy that nobody noticed.",
-    "image": { "url": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1600&q=80", "alt": "Laptop and coffee cup on a tidy desk in warm morning light" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1600&q=80",
+      "alt": "Laptop and coffee cup on a tidy desk in warm morning light"
+    },
     "date": "2026-05-18",
     "author": "Marco Bellini",
     "readingTime": "5 min",
-    "tags": ["culture", "process"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/culture"
+      },
+      {
+        "$ref": "../tags/tags.json#/process"
+      }
+    ]
   },
   "notes-on-code-review": {
     "id": "notes-on-code-review",
     "title": "Code review is a writing exercise",
     "excerpt": "The best reviewers on our team are not the fastest readers of code. They are the most careful writers of comments.",
     "body": "A review comment is a tiny piece of technical writing with a hostile audience: a tired author who wants to merge. Precision and kindness are not in tension there — they are the same skill.\n\nWe rewrote our review guidelines around sentences, not checklists. Say what you observed, say why it matters, say what you would accept. Three sentences, no verdicts without reasons.\n\nReview latency dropped by half. Not because people read faster, but because nobody has to decode what a one-word comment meant.",
-    "image": { "url": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&q=80", "alt": "Two colleagues discussing work in front of a shared screen" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&q=80",
+      "alt": "Two colleagues discussing work in front of a shared screen"
+    },
     "date": "2026-05-04",
     "author": "Ada Osei",
     "readingTime": "6 min",
-    "tags": ["engineering", "culture"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/engineering"
+      },
+      {
+        "$ref": "../tags/tags.json#/culture"
+      }
+    ]
   },
   "the-second-draft": {
     "id": "the-second-draft",
     "title": "The second draft is the real one",
     "excerpt": "Everything on this journal is published twice: once to find out what we think, once to say it properly.",
     "body": "First drafts are for discovering the argument. They meander, they hedge, they bury the point in paragraph four. That is fine — their job is excavation, not presentation.\n\nThe second draft starts from one question: what is the single sentence this piece exists to deliver? Everything that does not serve that sentence gets cut, no matter how much we liked writing it.\n\nOur average post loses forty percent of its words between drafts. Readers never miss them.",
-    "image": { "url": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80", "alt": "Handwritten manuscript pages with edits and crossed-out lines" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80",
+      "alt": "Handwritten manuscript pages with edits and crossed-out lines"
+    },
     "date": "2026-04-22",
     "author": "June Park",
     "readingTime": "4 min",
-    "tags": ["writing"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/writing"
+      }
+    ]
   },
   "tools-that-disappear": {
     "id": "tools-that-disappear",
     "title": "Good tools disappear",
     "excerpt": "The highest compliment for a tool is that nobody remembers using it. On interfaces that get out of the way.",
     "body": "You do not think about a doorknob when you open a door. That is the standard: a tool succeeded when the person forgot it was there and remembers only the work.\n\nEvery affordance we add is tested against one question — does this move attention toward the content or toward the chrome? Toolbars lost that argument here more than once.\n\nInvisible does not mean minimal for its own sake. It means every visible element earns its place by carrying meaning the content cannot carry alone.",
-    "image": { "url": "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=1600&q=80", "alt": "Minimal workspace with a laptop, plant and empty desk surface" },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=1600&q=80",
+      "alt": "Minimal workspace with a laptop, plant and empty desk surface"
+    },
     "date": "2026-04-09",
     "author": "Tomas Lindgren",
     "readingTime": "5 min",
-    "tags": ["tooling", "design"]
+    "tags": [
+      {
+        "$ref": "../tags/tags.json#/tooling"
+      },
+      {
+        "$ref": "../tags/tags.json#/design"
+      }
+    ]
   }
 }
 EOF
@@ -9309,6 +10044,7 @@ EOF
 cat > src/components/posts-list/View.tsx << 'EOF'
 // Layout: Features=A (BENTO) default variant, C (TIMELINE) alternative variant
 import React from 'react';
+import { resolveTagId } from '@/collections/posts/tag-refs';
 import { Card, CardContent } from '@/components/ui/card';
 import type { PostsListData, PostsListSettings } from './types';
 
@@ -9408,11 +10144,14 @@ export const PostsList: React.FC<{ data: PostsListData; settings: PostsListSetti
                 </h3>
                 <p className="mt-2 max-w-[64ch] text-sm leading-relaxed text-[var(--local-text-muted)]">{post.excerpt}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {post.tags.map((tagId) => (
-                    <span key={tagId} className="font-mono text-[0.65rem] uppercase tracking-widest text-[var(--local-accent)]">
-                      #{tagId}
-                    </span>
-                  ))}
+                  {(post.tags ?? []).map((tag, tagIdx) => {
+                    const tagId = resolveTagId(tag) ?? `tag-${tagIdx}`;
+                    return (
+                      <span key={tagId} className="font-mono text-[0.65rem] uppercase tracking-widest text-[var(--local-accent)]">
+                        #{tagId}
+                      </span>
+                    );
+                  })}
                 </div>
               </a>
             ))}
@@ -9446,11 +10185,14 @@ export const PostsList: React.FC<{ data: PostsListData; settings: PostsListSetti
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed text-[var(--local-text-muted)]">{post.excerpt}</p>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      {post.tags.map((tagId) => (
-                        <span key={tagId} className="font-mono text-[0.65rem] uppercase tracking-widest text-[var(--local-accent)]">
-                          #{tagId}
-                        </span>
-                      ))}
+                      {(post.tags ?? []).map((tag, tagIdx) => {
+                        const tagId = resolveTagId(tag) ?? `tag-${tagIdx}`;
+                        return (
+                          <span key={tagId} className="font-mono text-[0.65rem] uppercase tracking-widest text-[var(--local-accent)]">
+                            #{tagId}
+                          </span>
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>
@@ -9793,6 +10535,7 @@ EOF
 
 cat > src/components/related-tags/View.tsx << 'EOF'
 import React from 'react';
+import { isResolvedTag } from '@/collections/posts/tag-refs';
 import type { Tag } from '@/collections/tags';
 import type { RelatedTagsData, RelatedTagsSettings } from './types';
 
@@ -9842,10 +10585,15 @@ export const RelatedTags: React.FC<{ data: RelatedTagsData; settings: RelatedTag
   };
   const t = SECTION_THEME_VARS[sectionTheme] ?? SECTION_THEME_VARS.dark;
 
-  // Relation resolution: post.tags is an array of tag collection keys.
+  // After bake/runtime resolve, post.tags are expanded Tag objects.
+  // Fall back to the tags map for unresolved keys if present.
   const tagMap = data.tags ?? {};
   const related = (data.item.tags ?? [])
-    .map((tagId) => tagMap[tagId])
+    .map((tag) => {
+      if (isResolvedTag(tag)) return tag;
+      if (typeof tag === 'string') return tagMap[tag];
+      return undefined;
+    })
     .filter((tag): tag is Tag => Boolean(tag));
 
   return (
@@ -10069,6 +10817,7 @@ EOF
 
 cat > src/components/tag-posts/View.tsx << 'EOF'
 import React from 'react';
+import { postHasTag } from '@/collections/posts/tag-refs';
 import { Card, CardContent } from '@/components/ui/card';
 import type { TagPostsData, TagPostsSettings } from './types';
 
@@ -10112,11 +10861,10 @@ export const TagPosts: React.FC<{ data: TagPostsData; settings: TagPostsSettings
   };
   const t = SECTION_THEME_VARS[sectionTheme] ?? SECTION_THEME_VARS.dark;
 
-  // Inverse relation tag -> posts, computed from the single source of truth
-  // (post.tags) by filtering the full posts collection.
+  // Inverse relation tag -> posts from post.tags ($ref / resolved Tag).
   const tagId = data.item.id || '';
   const posts = Object.values(data.posts ?? {})
-    .filter((post) => (post.tags ?? []).includes(tagId))
+    .filter((post) => postHasTag(post.tags, tagId))
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
   return (
@@ -10899,7 +11647,13 @@ cat > src/data/config/theme.json << 'EOF'
         "weight": "800"
       }
     },
-    "borderRadius": { "sm": "4px", "md": "8px", "lg": "14px", "xl": "20px", "full": "9999px" },
+    "borderRadius": {
+      "sm": "4px",
+      "md": "8px",
+      "lg": "14px",
+      "xl": "20px",
+      "full": "9999px"
+    },
     "spacing": {
       "container-max": "1200px",
       "section-y": "96px",
@@ -10907,8 +11661,13 @@ cat > src/data/config/theme.json << 'EOF'
       "sidebar-w": "240px"
     },
     "zIndex": {
-      "base": "0", "elevated": "10", "dropdown": "100",
-      "sticky": "200", "overlay": "300", "modal": "400", "toast": "500"
+      "base": "0",
+      "elevated": "10",
+      "dropdown": "100",
+      "sticky": "200",
+      "overlay": "300",
+      "modal": "400",
+      "toast": "500"
     },
     "modes": {
       "light": {
@@ -10958,9 +11717,13 @@ cat > src/data/config/site.json << 'EOF'
       "logoText": "Inkwell",
       "logoHighlight": "journal",
       "announcement": "Collections demo: posts and tags, linked both ways",
-      "menu": { "$ref": "../config/menu.json#/main" }
+      "menu": {
+        "$ref": "../config/menu.json#/main"
+      }
     },
-    "settings": { "sticky": true }
+    "settings": {
+      "sticky": true
+    }
   },
   "footer": {
     "id": "global-footer",
@@ -10970,11 +11733,17 @@ cat > src/data/config/site.json << 'EOF'
       "tagline": "Notes on the craft of making software. An OlonJS demo tenant showing collections and cross-collection relations.",
       "email": "hello@inkwell-journal.example",
       "copyright": "© 2026 Inkwell Journal. Written slowly, shipped quietly.",
-      "menu": { "$ref": "../config/menu.json#/footer" }
+      "menu": {
+        "$ref": "../config/menu.json#/footer"
+      }
     },
-    "settings": { "showLogo": true }
+    "settings": {
+      "showLogo": true
+    }
   },
-  "identity": { "title": "Inkwell Journal" }
+  "identity": {
+    "title": "Inkwell Journal"
+  }
 }
 EOF
 
@@ -10982,17 +11751,54 @@ echo "-- Writing src/data/config/menu.json..."
 cat > src/data/config/menu.json << 'EOF'
 {
   "main": [
-    { "id": "menu-home", "label": "Home", "href": "/" },
-    { "id": "menu-posts", "label": "Posts", "href": "/posts" },
-    { "id": "menu-tags", "label": "Topics", "href": "/tags" },
-    { "id": "menu-about", "label": "About", "href": "/about" },
-    { "id": "menu-contact", "label": "Contact", "href": "/contact", "isCta": true }
+    {
+      "id": "menu-home",
+      "label": "Home",
+      "href": "/"
+    },
+    {
+      "id": "menu-posts",
+      "label": "Posts",
+      "href": "/posts"
+    },
+    {
+      "id": "menu-tags",
+      "label": "Topics",
+      "href": "/tags"
+    },
+    {
+      "id": "menu-about",
+      "label": "About",
+      "href": "/about"
+    },
+    {
+      "id": "menu-contact",
+      "label": "Contact",
+      "href": "/contact",
+      "isCta": true
+    }
   ],
   "footer": [
-    { "id": "footer-posts", "label": "Posts", "href": "/posts" },
-    { "id": "footer-tags", "label": "Topics", "href": "/tags" },
-    { "id": "footer-about", "label": "About", "href": "/about" },
-    { "id": "footer-contact", "label": "Contact", "href": "/contact" }
+    {
+      "id": "footer-posts",
+      "label": "Posts",
+      "href": "/posts"
+    },
+    {
+      "id": "footer-tags",
+      "label": "Topics",
+      "href": "/tags"
+    },
+    {
+      "id": "footer-about",
+      "label": "About",
+      "href": "/about"
+    },
+    {
+      "id": "footer-contact",
+      "label": "Contact",
+      "href": "/contact"
+    }
   ]
 }
 EOF
@@ -11018,11 +11824,27 @@ cat > src/data/pages/home.json << 'EOF'
         "title": "Notes on the",
         "titleHighlight": "craft of software",
         "subtitle": "Essays on design, engineering and process — published as a living demo of cross-collection relations: every post belongs to many tags, and every tag knows its posts without storing them twice.",
-        "primaryCta": { "id": "home-hero-cta-1", "label": "Read the posts", "href": "/posts", "variant": "primary" },
-        "secondaryCta": { "id": "home-hero-cta-2", "label": "Browse topics", "href": "/tags", "variant": "secondary" },
-        "image": { "url": "https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?w=2000&q=80", "alt": "Fountain pen nib in sharp close-up over paper" }
+        "primaryCta": {
+          "id": "home-hero-cta-1",
+          "label": "Read the posts",
+          "href": "/posts",
+          "variant": "primary"
+        },
+        "secondaryCta": {
+          "id": "home-hero-cta-2",
+          "label": "Browse topics",
+          "href": "/tags",
+          "variant": "secondary"
+        },
+        "image": {
+          "url": "https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?w=2000&q=80",
+          "alt": "Fountain pen nib in sharp close-up over paper"
+        }
       },
-      "settings": { "paddingTop": "xl", "paddingBottom": "none" }
+      "settings": {
+        "paddingTop": "xl",
+        "paddingBottom": "none"
+      }
     },
     {
       "id": "home-featured-posts",
@@ -11033,9 +11855,13 @@ cat > src/data/pages/home.json << 'EOF'
         "description": "The four most recent essays, pulled live from the posts collection and sorted by date.",
         "variant": "bento",
         "limit": 4,
-        "items": { "$ref": "../collections/posts/posts.json" }
+        "items": {
+          "$ref": "../collections/posts/posts.json"
+        }
       },
-      "settings": { "paddingTop": "xl" }
+      "settings": {
+        "paddingTop": "xl"
+      }
     },
     {
       "id": "home-tags",
@@ -11044,7 +11870,9 @@ cat > src/data/pages/home.json << 'EOF'
         "label": "Topics",
         "title": "Browse by topic",
         "description": "Six tags, one collection. Each card links to a tag page that computes its own post list from the relation.",
-        "items": { "$ref": "../collections/tags/tags.json" }
+        "items": {
+          "$ref": "../collections/tags/tags.json"
+        }
       },
       "settings": {}
     },
@@ -11055,10 +11883,30 @@ cat > src/data/pages/home.json << 'EOF'
         "label": "The journal in numbers",
         "title": "Small, deliberate, linked",
         "stats": [
-          { "id": "stat-posts", "icon": "pen-line", "value": "8", "label": "Essays published, each in a posts collection entry" },
-          { "id": "stat-tags", "icon": "tag", "value": "6", "label": "Topics in the tags collection" },
-          { "id": "stat-relations", "icon": "sparkles", "value": "14", "label": "Post-to-tag links resolved at render time" },
-          { "id": "stat-authors", "icon": "users", "value": "4", "label": "Writers behind the desk" }
+          {
+            "id": "stat-posts",
+            "icon": "pen-line",
+            "value": "8",
+            "label": "Essays published, each in a posts collection entry"
+          },
+          {
+            "id": "stat-tags",
+            "icon": "tag",
+            "value": "6",
+            "label": "Topics in the tags collection"
+          },
+          {
+            "id": "stat-relations",
+            "icon": "sparkles",
+            "value": "14",
+            "label": "Post-to-tag links resolved at render time"
+          },
+          {
+            "id": "stat-authors",
+            "icon": "users",
+            "value": "4",
+            "label": "Writers behind the desk"
+          }
         ]
       },
       "settings": {}
@@ -11070,10 +11918,23 @@ cat > src/data/pages/home.json << 'EOF'
         "label": "Start anywhere",
         "title": "Pick a thread, pull it",
         "description": "Every post links to its topics and every topic links back to its posts. That is the whole demo — and the whole point.",
-        "primaryCta": { "id": "home-cta-1", "label": "Read the latest", "href": "/posts", "variant": "primary" },
-        "secondaryCta": { "id": "home-cta-2", "label": "About this demo", "href": "/about", "variant": "secondary" }
+        "primaryCta": {
+          "id": "home-cta-1",
+          "label": "Read the latest",
+          "href": "/posts",
+          "variant": "primary"
+        },
+        "secondaryCta": {
+          "id": "home-cta-2",
+          "label": "About this demo",
+          "href": "/about",
+          "variant": "secondary"
+        }
       },
-      "settings": { "paddingTop": "xl", "paddingBottom": "xl" }
+      "settings": {
+        "paddingTop": "xl",
+        "paddingBottom": "xl"
+      }
     }
   ]
 }
@@ -11188,7 +12049,7 @@ cat > src/data/pages/tags.json << 'EOF'
 EOF
 
 echo "-- Writing page: posts/[slug] (post detail + related-tags)..."
-cat > src/data/pages/post-detail.json << 'EOF'
+cat > src/data/pages/posts/[slug].json << 'EOF'
 {
   "id": "post-detail-page",
   "slug": "posts/[slug]",
@@ -11215,7 +12076,7 @@ cat > src/data/pages/post-detail.json << 'EOF'
         "title": "Filed under",
         "emptyLabel": "This post has no topics yet.",
         "item": { "$ref": "collection:current" },
-        "tags": { "$ref": "../collections/tags/tags.json" }
+        "tags": { "$ref": "../../collections/tags/tags.json" }
       },
       "settings": {}
     },
@@ -11233,7 +12094,7 @@ cat > src/data/pages/post-detail.json << 'EOF'
 EOF
 
 echo "-- Writing page: tags/[slug] (tag detail + tag-posts)..."
-cat > src/data/pages/tag-detail.json << 'EOF'
+cat > src/data/pages/tags/[slug].json << 'EOF'
 {
   "id": "tag-detail-page",
   "slug": "tags/[slug]",
@@ -11259,7 +12120,7 @@ cat > src/data/pages/tag-detail.json << 'EOF'
         "title": "Posts on this topic",
         "emptyLabel": "No posts carry this tag yet.",
         "item": { "$ref": "collection:current" },
-        "posts": { "$ref": "../collections/posts/posts.json" }
+        "posts": { "$ref": "../../collections/posts/posts.json" }
       },
       "settings": {}
     },
@@ -11450,9 +12311,9 @@ echo "              CollectionRegistry, ui:collection-ref bindings,"
 echo "              posts/[slug] + tags/[slug] dynamic pages,"
 echo "              collection:current refs on detail sections"
 echo "  [x] Step 9  IconResolver (6 icons) + AdminStudioClient wiring verified"
-echo "  [x] Relations: posts->tags stored on post side only;"
+echo "  [x] Relations: posts->tags authored as \$ref pointers (tag-refs.ts);"
 echo "              tags->posts computed at render (tag-posts capsule);"
-echo "              post detail resolves tag keys (related-tags capsule)"
+echo "              related-tags resolves Tag objects / legacy keys"
 echo "  [x] Light/dark: both palettes designed; header toggle via dataset.theme"
 echo "  [x] Typography: Bricolage Grotesque / Instrument Sans / JetBrains Mono"
 echo "  [x] No emoji, no hardcoded theme colors, CTAs use .label,"
