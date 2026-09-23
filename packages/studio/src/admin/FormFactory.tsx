@@ -35,7 +35,7 @@ const generateDefaultValue = (schema: z.ZodTypeAny): unknown => {
   if (schema instanceof z.ZodString) return "";
   if (schema instanceof z.ZodNumber) return 0;
   if (schema instanceof z.ZodBoolean) return false;
-  if (schema instanceof z.ZodEnum) return schema._def.values[0];
+  if (schema instanceof z.ZodEnum) return Object.values(schema._def.entries)[0];
   return null;
 };
 
@@ -367,7 +367,7 @@ export const FormFactory: React.FC<FormFactoryProps> = ({
                 <div className="mt-4 space-y-2">
                   {Object.entries(recordValue).map(([recordKey, recordItem], index) => {
                     const itemRecord = isRecord(recordItem) ? recordItem : {};
-                    const itemSchema = getEffectiveSchema(effectiveSchema.valueSchema);
+                    const itemSchema = getEffectiveSchema(effectiveSchema._def.valueType as z.ZodTypeAny);
                     const itemId = String(itemRecord.id ?? recordKey);
                     const isExpandedItem = openItemIdFromPath != null && String(openItemIdFromPath) === itemId;
                     const isFadedItem = inItemScope && isFocusedField && openItemIdFromPath != null && !isExpandedItem;
@@ -577,7 +577,7 @@ export const FormFactory: React.FC<FormFactoryProps> = ({
         const widgetKey: WidgetType =
           uiHint in InputWidgets ? (uiHint as WidgetType) : 'ui:text';
         const Widget = (InputWidgets[widgetKey] || InputWidgets['ui:text']) as React.ComponentType<BaseWidgetProps>;
-        const options = effectiveSchema instanceof z.ZodEnum ? (effectiveSchema._def.values as string[]) : undefined;
+        const options = effectiveSchema instanceof z.ZodEnum ? (Object.values(effectiveSchema._def.entries) as string[]) : undefined;
         const isFocusedField = fieldKeyMatches(effectiveFocusedFieldKey, key);
 
         return (
