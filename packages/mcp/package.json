@@ -9,7 +9,8 @@
     "olonjs-mcp": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsup src/cli.ts --format esm --clean",
+    "build": "npm run typecheck && tsup src/cli.ts --format esm --clean",
+    "typecheck": "tsc --noEmit",
     "dev": "tsup src/cli.ts --format esm --watch",
     "start": "node dist/cli.js"
   },
