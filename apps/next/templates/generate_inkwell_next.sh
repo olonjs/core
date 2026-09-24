@@ -2618,6 +2618,8 @@ import type { TagPostsData, TagPostsSettings } from '@/components/tag-posts';
 import type { ContentBlockData, ContentBlockSettings } from '@/components/content-block';
 import type { StatsBandData, StatsBandSettings } from '@/components/stats-band';
 import type { CtaBannerData, CtaBannerSettings } from '@/components/cta-banner';
+import type { Post } from '@/collections/posts';
+import type { Tag } from '@/collections/tags';
 
 export type SectionComponentPropsMap = {
   'header': { data: HeaderData; settings: HeaderSettings };
@@ -2665,6 +2667,10 @@ declare module '@olonjs/core' {
     'content-block': ContentBlockSettings;
     'stats-band': StatsBandSettings;
     'cta-banner': CtaBannerSettings;
+  }
+  export interface CollectionItemRegistry {
+    posts: Post;
+    tags: Tag;
   }
 }
 
