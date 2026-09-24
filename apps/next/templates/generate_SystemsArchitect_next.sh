@@ -1301,7 +1301,7 @@ export const ContactFormSchema = BaseSectionData.merge(WithFormRecipient).extend
 });
 export const ContactFormSubmissionSchema = z.object({
   name: z.string().min(1).describe('Full name'),
-  email: z.string().email().describe('Reply email'),
+  email: z.email().describe('Reply email'),
   message: z.string().min(1).describe('Message body'),
 });
 EOF
