@@ -172,19 +172,29 @@ async function main() {
   const runUpdateThenSave = async (value) => {
     const rawUpdate = await page.evaluate(
       async ({ toolName, slug, sectionId, sectionType, fieldKey, value: nextValue }) => {
+        const args = { slug, sectionId, sectionType, fieldKey, value: nextValue };
         const native = document.modelContext;
         const protocol = document.modelContextProtocol;
-        const runtime = native?.executeTool ? native : protocol?.executeTool ? protocol : null;
-        if (!runtime) {
-          throw new Error(
-            'WebMCP runtime unavailable: no document.modelContext (native) and no document.modelContextProtocol (polyfill).',
-          );
+        // Native Chrome WebMCP: executeTool(toolObject, argsObject) — the tool
+        // object comes from getTools(); JSON-stringified args retired in Chrome 155.
+        if (native && typeof native.executeTool === 'function') {
+          const tools = await native.getTools();
+          const tool = tools.find((entry) => entry.name === toolName);
+          if (!tool) {
+            throw new Error(`Tool "${toolName}" not found in native getTools().`);
+          }
+          const result = await native.executeTool(tool, args);
+          if (result === null) {
+            throw new Error(`Tool "${toolName}" returned null (navigation).`);
+          }
+          return typeof result === 'string' ? result : JSON.stringify(result);
         }
-        const raw = await runtime.executeTool(
-          toolName,
-          JSON.stringify({ slug, sectionId, sectionType, fieldKey, value: nextValue }),
+        if (protocol && typeof protocol.executeTool === 'function') {
+          return protocol.executeTool(toolName, JSON.stringify(args));
+        }
+        throw new Error(
+          'WebMCP runtime unavailable: no document.modelContext (native) and no document.modelContextProtocol (polyfill).',
         );
-        return typeof raw === 'string' ? raw : JSON.stringify(raw);
       },
       {
         toolName: target.toolName,
@@ -203,14 +213,24 @@ async function main() {
       async ({ saveToolName }) => {
         const native = document.modelContext;
         const protocol = document.modelContextProtocol;
-        const runtime = native?.executeTool ? native : protocol?.executeTool ? protocol : null;
-        if (!runtime) {
-          throw new Error(
-            'WebMCP runtime unavailable: no document.modelContext (native) and no document.modelContextProtocol (polyfill).',
-          );
+        if (native && typeof native.executeTool === 'function') {
+          const tools = await native.getTools();
+          const tool = tools.find((entry) => entry.name === saveToolName);
+          if (!tool) {
+            throw new Error(`Tool "${saveToolName}" not found in native getTools().`);
+          }
+          const result = await native.executeTool(tool, {});
+          if (result === null) {
+            throw new Error(`Tool "${saveToolName}" returned null (navigation).`);
+          }
+          return typeof result === 'string' ? result : JSON.stringify(result);
         }
-        const raw = await runtime.executeTool(saveToolName, '{}');
-        return typeof raw === 'string' ? raw : JSON.stringify(raw);
+        if (protocol && typeof protocol.executeTool === 'function') {
+          return protocol.executeTool(saveToolName, '{}');
+        }
+        throw new Error(
+          'WebMCP runtime unavailable: no document.modelContext (native) and no document.modelContextProtocol (polyfill).',
+        );
       },
       { saveToolName: target.saveToolName }
     );
@@ -269,16 +289,17 @@ async function main() {
       );
     }
 
-    const toolNames = await page.evaluate(() => {
+    const toolNames = await page.evaluate(async () => {
       const native = document.modelContext;
       const protocol = document.modelContextProtocol;
-      const listTools =
-        typeof native?.getTools === 'function'
-          ? () => native.getTools()
-          : typeof protocol?.listTools === 'function'
-            ? () => protocol.listTools()
-            : null;
-      return listTools ? listTools().map((tool) => tool.name) : [];
+      if (native && typeof native.getTools === 'function') {
+        const tools = await native.getTools();
+        return tools.map((tool) => tool.name);
+      }
+      if (protocol && typeof protocol.listTools === 'function') {
+        return protocol.listTools().map((tool) => tool.name);
+      }
+      return [];
     });
     for (const required of [target.toolName, target.saveToolName]) {
       if (!toolNames.includes(required)) {

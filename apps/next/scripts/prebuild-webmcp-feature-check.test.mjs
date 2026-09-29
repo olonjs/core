@@ -17,11 +17,13 @@ describe('next verify:webmcp script', () => {
   it('probes the native document.modelContext surface with polyfill fallback', () => {
     assert.ok(fs.existsSync(SCRIPT), `missing ${SCRIPT}`);
     const src = fs.readFileSync(SCRIPT, 'utf8');
-    // Native Chrome surface: document.modelContext.getTools() / executeTool().
+    // Native Chrome surface: document.modelContext.getTools() / executeTool(toolObject, argsObject).
     assert.match(src, /document\.modelContext/);
-    assert.match(src, /native\?\.getTools/);
-    // Polyfill fallback (browsers without native WebMCP).
+    assert.match(src, /await native\.getTools\(\)/);
+    assert.match(src, /native\.executeTool\(tool,/);
+    // Polyfill fallback (browsers without native WebMCP): listTools / executeTool(name, json).
     assert.match(src, /document\.modelContextProtocol/);
+    assert.match(src, /protocol\.executeTool\(/);
     // modelContextTesting is never assigned by the runtime — probing it is a false negative.
     assert.doesNotMatch(src, /modelContextTesting/);
     assert.doesNotMatch(src, /navigator\.modelContext/);
