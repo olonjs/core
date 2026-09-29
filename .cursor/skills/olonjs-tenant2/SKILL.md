@@ -32,7 +32,7 @@ The OlonJS Architecture Specifications **v1.6** are expressed through the specs 
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\IDAC_1.2.md" `
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JAP_1.3.md" `
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JEB_1.2.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JSP_1.1.md" `
+- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JSP_1.10.md" `
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\MTRP_1.3.md" `
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\TBP_1.1.md" `
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\TOCC_1.1.md" `
@@ -141,7 +141,7 @@ theme.json → published runtime vars → tenant semantic bridge → section --l
 
 Layer 3 (`--local-*`) is **mandatory** when the section owns background, text color, border, accent, or radius concerns.
 
-## Menu Binding (JSP v1.9 — Architectural Law)
+## Menu Binding (JSP v1.10 — Architectural Law)
 
 `menu.json` is the source of truth for all menu data. Shell instances bind to it by reference — they do not own the menu.
 
