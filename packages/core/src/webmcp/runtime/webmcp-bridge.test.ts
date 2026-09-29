@@ -335,4 +335,123 @@ describe('webmcp runtime bridge', () => {
       });
     }
   });
+
+  it('logs a warning instead of leaking an unhandled rejection when a native async registerTool rejects', async () => {
+    const originalWindow = globalThis.window;
+    const originalDocument = globalThis.document;
+    if (globalThis.window) {
+      delete (globalThis.window as unknown as { __olonWebMcpControllers__?: unknown }).__olonWebMcpControllers__;
+    }
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const nativeRegisterTool = vi.fn(async () => {
+      throw new Error('InvalidStateError: duplicate tool name');
+    });
+
+    Object.defineProperty(globalThis, 'window', {
+      value: {} as Window,
+      configurable: true,
+      writable: true,
+    });
+    Object.defineProperty(globalThis, 'document', {
+      value: { modelContext: { registerTool: nativeRegisterTool } } as Document,
+      configurable: true,
+      writable: true,
+    });
+
+    try {
+      const tool = {
+        name: 'update-section',
+        description: 'Update section',
+        inputSchema: { type: 'object', properties: {} },
+        execute: async () => ({ content: [{ type: 'text', text: 'ok' }], isError: false }),
+      };
+
+      registerWebMcpTool(tool);
+
+      await vi.waitFor(() => {
+        expect(nativeRegisterTool).toHaveBeenCalledTimes(1);
+      });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[WebMCP] registerTool failed'),
+        'update-section',
+        expect.any(Error),
+      );
+    } finally {
+      warnSpy.mockRestore();
+      Object.defineProperty(globalThis, 'window', {
+        value: originalWindow,
+        configurable: true,
+        writable: true,
+      });
+      Object.defineProperty(globalThis, 'document', {
+        value: originalDocument,
+        configurable: true,
+        writable: true,
+      });
+    }
+  });
+
+  it('completes a native async registerTool without warning on success', async () => {
+    const originalWindow = globalThis.window;
+    const originalDocument = globalThis.document;
+    if (globalThis.window) {
+      delete (globalThis.window as unknown as { __olonWebMcpControllers__?: unknown }).__olonWebMcpControllers__;
+    }
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    let registered = false;
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const nativeRegisterTool = vi.fn(async () => {
+      await gate;
+      registered = true;
+    });
+
+    Object.defineProperty(globalThis, 'window', {
+      value: {} as Window,
+      configurable: true,
+      writable: true,
+    });
+    Object.defineProperty(globalThis, 'document', {
+      value: { modelContext: { registerTool: nativeRegisterTool } } as Document,
+      configurable: true,
+      writable: true,
+    });
+
+    try {
+      const tool = {
+        name: 'save',
+        description: 'Persist draft',
+        inputSchema: { type: 'object', properties: {} },
+        execute: async () => ({ content: [{ type: 'text', text: 'ok' }], isError: false }),
+      };
+
+      registerWebMcpTool(tool);
+      expect(registered).toBe(false);
+      release();
+      await vi.waitFor(() => {
+        expect(registered).toBe(true);
+      });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+      Object.defineProperty(globalThis, 'window', {
+        value: originalWindow,
+        configurable: true,
+        writable: true,
+      });
+      Object.defineProperty(globalThis, 'document', {
+        value: originalDocument,
+        configurable: true,
+        writable: true,
+      });
+    }
+  });
 });

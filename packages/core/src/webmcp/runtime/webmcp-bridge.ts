@@ -16,6 +16,13 @@ type WebMcpTool = {
   description: string;
   inputSchema: Record<string, unknown>;
   execute: (args: unknown) => Promise<unknown> | unknown;
+  /** Native WebMCP annotations (readOnlyHint, consequentialHint, …) — passthrough, optional. */
+  annotations?: {
+    readOnlyHint?: boolean;
+    consequentialHint?: boolean;
+    untrustedContentHint?: boolean;
+    debugging?: boolean;
+  };
 };
 
 type WebMcpToolInfo = Omit<WebMcpTool, 'execute'>;
@@ -23,9 +30,12 @@ type WebMcpToolInfo = Omit<WebMcpTool, 'execute'>;
 type WebMcpRegisterToolOptions = { signal?: AbortSignal };
 
 type ModelContextLike = {
-  registerTool?: (tool: WebMcpTool, options?: WebMcpRegisterToolOptions) => void;
+  registerTool?: (tool: WebMcpTool, options?: WebMcpRegisterToolOptions) => void | Promise<void>;
   unregisterTool?: (name: string) => void;
   readResource?: (uri: string) => Promise<unknown>;
+  /** Native Chrome WebMCP surface (async, descriptor-based). */
+  getTools?: () => Promise<unknown[]>;
+  executeTool?: (...args: unknown[]) => Promise<unknown>;
 };
 
 type ModelContextProtocolLike = {
@@ -395,7 +405,16 @@ export function registerWebMcpTool(tool: WebMcpTool): () => void {
   const controller = new AbortController();
   controllers?.set(tool.name, controller);
 
-  modelContext.registerTool(tool, { signal: controller.signal });
+  // Native Chrome WebMCP's registerTool is async and can reject (e.g.
+  // InvalidStateError on duplicate tool names). Registration is fire-and-forget
+  // by design, so swallow the rejection here — otherwise it surfaces as an
+  // unhandled promise. The polyfill's registerTool is sync: Promise.resolve()
+  // makes the handling a no-op for it.
+  void Promise.resolve(
+    modelContext.registerTool(tool, { signal: controller.signal }),
+  ).catch((error: unknown) => {
+    console.warn('[WebMCP] registerTool failed', tool.name, error);
+  });
 
   return () => {
     controller.abort();
