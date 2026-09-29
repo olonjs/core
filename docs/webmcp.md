@@ -6,7 +6,7 @@ OlonJS implements **WebMCP** (Web Model Context Protocol) natively within its En
 
 Instead of running a separate backend Node.js server, OlonJS exposes the **React Engine itself** as an MCP server directly within the browser tab.
 
-1.  **Discovery (The Manifesto):** When an Agent visits the site, the Engine exposes a manifesto of capabilities via `document.modelContextProtocol`.
+1.  **Discovery (The Manifesto):** When an Agent visits the site, the Engine exposes a manifesto of capabilities via `document.modelContext` (native) or `document.modelContextProtocol` (polyfill).
 2.  **Semantic Bridge:** The Agent doesn't "click buttons" (`.btn-primary`). It calls explicitly typed functions (Tools) using JSON.
 3.  **Governance & Security:** The Engine validates all Agent inputs against the tenant's Zod schemas *before* altering the React state or saving to disk.
 
@@ -14,11 +14,33 @@ Instead of running a separate backend Node.js server, OlonJS exposes the **React
 
 ## Accessing WebMCP
 
-Tool registration uses the WebMCP Imperative API on **`document.modelContext`** (spec). `navigator.modelContext` is removed — do not use it.
+There are **two surfaces**, and the runtime adapts:
+
+- **Native (Chrome WebMCP):** `document.modelContext` is a `ModelContext` instance (an `EventTarget`) exposing `registerTool()`, `getTools()`, `executeTool(toolName, argsJson)` and the `ontoolchange` event. **No `listTools`, no `readResource`.**
+- **Polyfill (other browsers):** when the native `registerTool` is absent, `ensureWebMcpRuntime()` installs the OlonJS polyfill — `document.modelContext` (registerTool/unregisterTool/readResource) **plus** `document.modelContextProtocol` (`listTools()`, `executeTool()`, `readResource()`).
+
+`navigator.modelContext` is removed — do not use it.
 
 ```typescript
-const modelContext = document.modelContext;
-const mcp = document.modelContextProtocol;
+// Both surfaces live under document.modelContext; the protocol is polyfill-only.
+const native = document.modelContext;              // ModelContext (Chrome) or polyfill registerTool surface
+const protocol = document.modelContextProtocol;    // undefined on native Chrome
+```
+
+**Probing a surface in automation** (works on both):
+
+```javascript
+function getWebMcpRuntime() {
+  const native = document.modelContext;
+  const protocol = document.modelContextProtocol;
+  if (native && typeof native.getTools === 'function') {
+    return { listTools: () => native.getTools(), executeTool: (n, a) => native.executeTool(n, a) };
+  }
+  if (protocol && typeof protocol.listTools === 'function') {
+    return { listTools: () => protocol.listTools(), executeTool: (n, a) => protocol.executeTool(n, a) };
+  }
+  return null;
+}
 ```
 
 ---
@@ -29,9 +51,9 @@ You can query the Engine to see which tools are currently available.
 
 OlonJS uses an **Enterprise Grade** architecture: instead of exposing dozens of redundant tools for each section type, it exposes a single, universal `update-section` tool.
 
-**Console Example:**
+**Console Example (native Chrome):**
 ```javascript
-const tools = document.modelContextProtocol.listTools();
+const tools = document.modelContext.getTools();
 console.log(tools);
 // Output:
 // [{
@@ -41,15 +63,22 @@ console.log(tools);
 // }]
 ```
 
+**Console Example (polyfill browsers):**
+```javascript
+const tools = document.modelContextProtocol.listTools();
+console.log(tools);
+// same shape as above
+```
+
 ---
 
 ## 2. Reading Resources (Data Fetching)
 
 Agents can read the exact data state of any page without parsing HTML. OlonJS pages are exposed as `olon://` URIs.
 
-Currently, the Engine supports reading page data. The Agent can discover available resources using the `listResources` method (if implemented) or directly fetch known paths.
+`readResource` is available on the **polyfill** (`document.modelContextProtocol.readResource` / `document.modelContext.readResource`). Native Chrome `ModelContext` does not expose `readResource` — on native browsers, read the same data over the HTTP discovery surface (`/mcp-manifest.json`, `/pages/<slug>.json`).
 
-**Console Example:**
+**Console Example (polyfill browsers):**
 ```javascript
 // Fetch the structured JSON data for the current 'home' page
 const pageDataString = await document.modelContextProtocol.readResource('olon://pages/home');
@@ -113,13 +142,26 @@ console.log(JSON.parse(responseStr));
 // Output: { content: [{ type: "text", text: "{\"ok\":true,...}" }], isError: false }
 ```
 
+**Same call on native Chrome** (`executeTool` lives on `document.modelContext`):
+
+```javascript
+const responseStr = await document.modelContext.executeTool(
+  'update-section',
+  JSON.stringify({ sectionId: 'hero-1', sectionType: 'olon-hero', data: { headline: 'Hello' } }),
+);
+```
+
 ### `save`
 
 Persists all pending draft changes using the active save mode (local file, hot save, or save2repo). Call it **once** after all `update-section` calls are complete.
 
 ```javascript
+// polyfill browsers
 const saveStr = await document.modelContextProtocol.executeTool('save', '{}');
 console.log(JSON.parse(saveStr)); // { content: [...], isError: false }
+
+// native Chrome
+const saveStr2 = await document.modelContext.executeTool('save', '{}');
 ```
 
 ---
@@ -210,7 +252,7 @@ export function bootstrapVisitorWebMcpRuntime() {
 
 ### 4. The polyfill (`ensureWebMcpRuntime`)
 
-`ensureWebMcpRuntime` (in `@olonjs/core`, `src/webmcp/runtime/webmcp-bridge.ts`) is idempotent: if a native `document.modelContext.registerTool` already exists (Chrome WebMCP), it leaves it intact; otherwise it installs a polyfill implementing:
+`ensureWebMcpRuntime` (in `@olonjs/core`, `src/webmcp/runtime/webmcp-bridge.ts`) is idempotent: **if the native `document.modelContext.registerTool` already exists (Chrome WebMCP), it leaves it intact and installs nothing** — on native Chrome there is **no** `document.modelContextProtocol`. Otherwise it installs the polyfill implementing:
 
 - `document.modelContext.registerTool / unregisterTool / readResource`
 - `document.modelContextProtocol.listTools() / executeTool(name, argsJson) / readResource(uri)`
@@ -219,12 +261,20 @@ export function bootstrapVisitorWebMcpRuntime() {
 
 ### 5. E2E feature-check harness
 
-`apps/next/scripts/webmcp-feature-check.mjs` (and the tenant-alpha twin) verifies the live surface through a headless browser — **always via `document.modelContextProtocol`** (`listTools()` / `executeTool()`), never via a testing alias:
+`apps/next/scripts/webmcp-feature-check.mjs` (and the tenant-alpha / olonjs.io twins) verifies the live surface through a headless browser, probing **both surfaces** — native `document.modelContext.getTools()/executeTool()` first, then the `document.modelContextProtocol.listTools()/executeTool()` polyfill — never via a testing alias:
 
 ```js
-const toolNames = await page.evaluate(() =>
-  document.modelContextProtocol?.listTools?.().map((tool) => tool.name) ?? [],
-);
+const toolNames = await page.evaluate(() => {
+  const native = document.modelContext;
+  const protocol = document.modelContextProtocol;
+  const listTools =
+    typeof native?.getTools === 'function'
+      ? () => native.getTools()
+      : typeof protocol?.listTools === 'function'
+        ? () => protocol.listTools()
+        : null;
+  return listTools ? listTools().map((tool) => tool.name) : [];
+});
 // expect: ["update-section", "save"] on /admin, [] on visitor pages
 ```
 

@@ -14,9 +14,13 @@ const SCRIPT = path.join(__dirname, 'webmcp-feature-check.mjs');
 const PKG = path.join(ROOT, 'package.json');
 
 describe('next verify:webmcp script', () => {
-  it('probes document.modelContextProtocol (the surface ensureWebMcpRuntime assigns)', () => {
+  it('probes the native document.modelContext surface with polyfill fallback', () => {
     assert.ok(fs.existsSync(SCRIPT), `missing ${SCRIPT}`);
     const src = fs.readFileSync(SCRIPT, 'utf8');
+    // Native Chrome surface: document.modelContext.getTools() / executeTool().
+    assert.match(src, /document\.modelContext/);
+    assert.match(src, /native\?\.getTools/);
+    // Polyfill fallback (browsers without native WebMCP).
     assert.match(src, /document\.modelContextProtocol/);
     // modelContextTesting is never assigned by the runtime — probing it is a false negative.
     assert.doesNotMatch(src, /modelContextTesting/);

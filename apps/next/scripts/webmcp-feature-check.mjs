@@ -172,14 +172,19 @@ async function main() {
   const runUpdateThenSave = async (value) => {
     const rawUpdate = await page.evaluate(
       async ({ toolName, slug, sectionId, sectionType, fieldKey, value: nextValue }) => {
-        const runtime = document.modelContextProtocol;
-        if (!runtime?.executeTool) {
-          throw new Error('document.modelContextProtocol.executeTool is unavailable.');
+        const native = document.modelContext;
+        const protocol = document.modelContextProtocol;
+        const runtime = native?.executeTool ? native : protocol?.executeTool ? protocol : null;
+        if (!runtime) {
+          throw new Error(
+            'WebMCP runtime unavailable: no document.modelContext (native) and no document.modelContextProtocol (polyfill).',
+          );
         }
-        return runtime.executeTool(
+        const raw = await runtime.executeTool(
           toolName,
-          JSON.stringify({ slug, sectionId, sectionType, fieldKey, value: nextValue })
+          JSON.stringify({ slug, sectionId, sectionType, fieldKey, value: nextValue }),
         );
+        return typeof raw === 'string' ? raw : JSON.stringify(raw);
       },
       {
         toolName: target.toolName,
@@ -195,7 +200,18 @@ async function main() {
       throw new Error(`WebMCP ${target.toolName} returned an error: ${rawUpdate}`);
     }
     const rawSave = await page.evaluate(
-      async ({ saveToolName }) => document.modelContextProtocol.executeTool(saveToolName, '{}'),
+      async ({ saveToolName }) => {
+        const native = document.modelContext;
+        const protocol = document.modelContextProtocol;
+        const runtime = native?.executeTool ? native : protocol?.executeTool ? protocol : null;
+        if (!runtime) {
+          throw new Error(
+            'WebMCP runtime unavailable: no document.modelContext (native) and no document.modelContextProtocol (polyfill).',
+          );
+        }
+        const raw = await runtime.executeTool(saveToolName, '{}');
+        return typeof raw === 'string' ? raw : JSON.stringify(raw);
+      },
       { saveToolName: target.saveToolName }
     );
     const parsedSave = JSON.parse(rawSave);
@@ -254,8 +270,15 @@ async function main() {
     }
 
     const toolNames = await page.evaluate(() => {
-      const runtime = document.modelContextProtocol;
-      return runtime?.listTools?.().map((tool) => tool.name) ?? [];
+      const native = document.modelContext;
+      const protocol = document.modelContextProtocol;
+      const listTools =
+        typeof native?.getTools === 'function'
+          ? () => native.getTools()
+          : typeof protocol?.listTools === 'function'
+            ? () => protocol.listTools()
+            : null;
+      return listTools ? listTools().map((tool) => tool.name) : [];
     });
     for (const required of [target.toolName, target.saveToolName]) {
       if (!toolNames.includes(required)) {
