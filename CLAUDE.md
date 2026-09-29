@@ -17,7 +17,7 @@ Specs di riferimento: **`specs/2.0/`** (set modulare per-protocollo) + `specs/2.
 | Acronimo | Nome | Versione | Spec | Cosa governa |
 |---|---|---|---|---|
 | **MTRP** | Modular Type Registry Pattern | v1.3 | `specs/2.0/MTRP_1.3.md` | Estensibilità TypeScript via module augmentation in `types.ts` — zero modifiche al Core |
-| **JSP** | JsonPages Site Protocol | v1.1 | `specs/2.0/JSP_1.1.md` | Ontologia deterministica del filesystem: `config/` per governance globale, `pages/` per contenuto |
+| **JSP** | JsonPages Site Protocol | v1.10 | `specs/2.0/JSP_1.1.md` | Ontologia deterministica del filesystem: `config/` per governance globale, `pages/` per contenuto |
 | **TBP** | Tenant Block Protocol | v1.1 | `specs/2.0/TBP_1.1.md` | Section Capsules — ogni sezione contiene `View.tsx`, `schema.ts`, `types.ts`, `index.ts` |
 | **CIP** | Component Implementation Protocol | v1.7 | `specs/2.0/TBP_1.1.md` (§4) | Regole per View: agnostica da schema, theme chain, z-index, asset resolution |
 | **ECIP** | Editor Component Implementation Protocol | v1.6 | `specs/2.0/ECIP.md` | Contratto schema-driven per Studio: Form Factory, `ui:*` descriptors, path-based selection |
