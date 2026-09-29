@@ -8,25 +8,26 @@ Il nome viene da "holon": ogni sito è autonomo e completo, ma parte di una rete
 
 Ogni scelta tecnica — Zod schemas, `ui:*` descriptors, `data-jp-*` DOM attributes, IDs stabili — è parte del contratto che rende ogni sezione ispezionabile e operabile da un agente AI.
 
-Specs di riferimento: `specs/olonjsSpecs_V_1_6.md`
+Specs di riferimento: **`specs/2.0/`** (set modulare per-protocollo) + `specs/2.0/ComplianceModel.md` (architectural law vs limitazioni vs tenant drift) e `specs/2.0/Appendix.md` (annex code-generation).
 
 ---
 
-## I Protocolli Architetturali (v1.6)
+## I Protocolli Architetturali (specs/2.0)
 
-| Acronimo | Nome | Versione | Cosa governa |
-|---|---|---|---|
-| **MTRP** | Modular Type Registry Pattern | v1.3 | Estensibilità TypeScript via module augmentation in `types.ts` — zero modifiche al Core |
-| **JSP** | JsonPages Site Protocol | v1.9 | Ontologia deterministica del filesystem: `config/` per governance globale, `pages/` per contenuto |
-| **TBP** | Tenant Block Protocol | v1.1 | Section Capsules — ogni sezione contiene `View.tsx`, `schema.ts`, `types.ts`, `index.ts` |
-| **CIP** | Component Implementation Protocol | v1.7 | Regole per View: agnostica da schema, theme chain, z-index, asset resolution |
-| **ECIP** | Editor Component Implementation Protocol | v1.6 | Contratto schema-driven per Studio: Form Factory, `ui:*` descriptors, path-based selection |
-| **IDAC** | ICE Data Attribute Contract | v1.2 | Attributi DOM `data-jp-*` per Stage/Inspector — leggibili da agenti e umani |
-| **TOCC** | Tenant Overlay CSS Contract | v1.1 | Selettori CSS tenant per overlay Studio (`[data-jp-section-overlay]`) |
-| **BSDS** | Base Schema Fragments | v1.1 | ID anchor e React keys stabili — `BaseSectionData`, `BaseArrayItem`, `BaseSectionSettings` |
-| **ASC** | AddSectionConfig | v1.1 | Contratto add-section per Studio: tipi, label, default data |
-| **JEB** | JsonPagesConfig & Engine Bootstrap | v1.2 | Contratto bootstrap tra tenant app e `JsonPagesEngine` |
-| **JAP** | JsonPages Admin Protocol | v1.3 | Orchestrazione deterministica di Studio: Stage, Inspector, Working Draft, persistenza |
+| Acronimo | Nome | Versione | Spec | Cosa governa |
+|---|---|---|---|---|
+| **MTRP** | Modular Type Registry Pattern | v1.3 | `specs/2.0/MTRP_1.3.md` | Estensibilità TypeScript via module augmentation in `types.ts` — zero modifiche al Core |
+| **JSP** | JsonPages Site Protocol | v1.1 | `specs/2.0/JSP_1.1.md` | Ontologia deterministica del filesystem: `config/` per governance globale, `pages/` per contenuto |
+| **TBP** | Tenant Block Protocol | v1.1 | `specs/2.0/TBP_1.1.md` | Section Capsules — ogni sezione contiene `View.tsx`, `schema.ts`, `types.ts`, `index.ts` |
+| **CIP** | Component Implementation Protocol | v1.7 | `specs/2.0/TBP_1.1.md` (§4) | Regole per View: agnostica da schema, theme chain, z-index, asset resolution |
+| **ECIP** | Editor Component Implementation Protocol | v1.6 | `specs/2.0/ECIP.md` | Contratto schema-driven per Studio: Form Factory, `ui:*` descriptors, path-based selection |
+| **COP** | Collection Protocol | v1.1 | `specs/2.0/COP_v1.1.md` | Collection indipendenti dalle pagine, consumate via `$ref` binding (runtime, Studio, WebMCP, public document) |
+| **IDAC** | ICE Data Attribute Contract | v1.2 | `specs/2.0/IDAC_1.2.md` | Attributi DOM `data-jp-*` per Stage/Inspector — leggibili da agenti e umani |
+| **TOCC** | Tenant Overlay CSS Contract | v1.1 | `specs/2.0/TOCC_1.1.md` | Selettori CSS tenant per overlay Studio (`[data-jp-section-overlay]`) |
+| **BSDS** | Base Schema Fragments | v1.1 | `specs/2.0/BSDS_1.1.md` | ID anchor e React keys stabili — `BaseSectionData`, `BaseArrayItem`, `BaseSectionSettings` |
+| **ASC** | AddSectionConfig | v1.1 | `specs/2.0/ASC_1.1.md` | Contratto add-section per Studio: tipi, label, default data |
+| **JEB** | JsonPagesConfig & Engine Bootstrap | v1.2 | `specs/2.0/JEB_1.2.md` | Contratto bootstrap tra tenant app e `JsonPagesEngine` |
+| **JAP** | JsonPages Admin Protocol | v1.3 | `specs/2.0/JAP_1.3.md` | Orchestrazione deterministica di Studio: Stage, Inspector, Working Draft, persistenza |
 
 ---
 
