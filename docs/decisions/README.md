@@ -49,14 +49,14 @@ Optional: `Follow-ups`, `Open Points`, `Compliance mapping`, `Risk mitigation`, 
 | 0006 | [Data router and `ScrollRestoration` in `JsonPagesEngine`](./ADR-0006-data-router-and-scroll-restoration-in-jsonpagesengine.md) | Proposed — pending implementation, QA, and acceptance | 2026-05-04 |
 | 0007 | [Section capsule lazy-loading and heavy-dep budget for tenant apps](./ADR-0007-section-lazy-load-and-heavy-dep-budget.md) | Proposed — pending implementation and verification | 2026-05-08 |
 | 0008 | [Performance roadmap from Lighthouse mobile 58 to ≥ 90](./ADR-0008-perf-roadmap-to-mobile-90.md) | Accepted as roadmap — Phase B done; Phase A in flight; Phase C pending measurement | 2026-05-09 |
-| 0009 | [Split Studio from `@olonjs/core` runtime via `/runtime` subpath export](./ADR-0009-core-studio-split-via-runtime-subpath.md) | Accepted — implemented in `@olonjs/core` v1.1.0; deployed to `olon.js.org` | 2026-05-09 |
+| 0009 | [Split Studio from `@olonjs/core` runtime via `/runtime` subpath export](./ADR-0009-core-studio-split-via-runtime-subpath.md) | **Superseded by ADR-0016** (was: Accepted — implemented in `@olonjs/core` v1.1.0) | 2026-05-09 |
 | 0010 | [Replace `motion/react` with CSS animations on the LCP path](./ADR-0010-hero-css-animation-over-motion-on-lcp-path.md) | Proposed — pending implementation and Lighthouse verification | 2026-05-10 |
 | 0011 | [Declare `@olonjs/core` as side-effect-free for aggressive tree-shaking](./ADR-0011-olonjs-core-side-effects-false.md) | Accepted — implemented in `@olonjs/core` v1.1.2; predicted bundle-size win measured at 0 KB for `apps/olonjs.io` (see Implementation notes) | 2026-05-10 |
-| 0012 | [Externalize the runtime entry from the full bundle to dedupe shared module instances](./ADR-0012-externalize-runtime-from-full-bundle.md) | Accepted — implemented in `@olonjs/core` v1.1.1; Studio renders sections verified | 2026-05-10 |
+| 0012 | [Externalize the runtime entry from the full bundle to dedupe shared module instances](./ADR-0012-externalize-runtime-from-full-bundle.md) | **Superseded by ADR-0016** (was: Accepted — implemented in `@olonjs/core` v1.1.1) | 2026-05-10 |
 | 0013 | [Implementation of the v1 canonical JSON Schema set via `npm run bump:all`](./ADR-0013-v1-schemas-implementation.md) | Accepted | 2026-05-12 |
 | 0014 | [Opt-in server-side rendering via `createStaticRouter` and a `/server` subpath export](./ADR-0014-opt-in-ssr-via-static-router-and-server-subpath.md) | Proposed — pending implementation and verification | 2026-06-04 |
 | 0015 | [SSR initial-data and hydration handoff contract](./ADR-0015-ssr-initial-data-and-hydration-contract.md) | Proposed — pending implementation and verification | 2026-06-04 |
-| 0016 | [Split `@olonjs/core` into three packages — `core`, `react`, `studio`](./ADR-0016-core-react-studio-package-split.md) | Proposed | 2026-07-16 |
+| 0016 | [Split `@olonjs/core` into three packages — `core`, `react`, `studio`](./ADR-0016-core-react-studio-package-split.md) | **Accepted — implemented and published** (`@olonjs/core` 2.x framework-agnostic, `@olonjs/react` 0.2.x, `@olonjs/studio` 0.2.x; single `"."` export, no `/runtime` subpath) | 2026-07-16 |
 
 ## For agents
 

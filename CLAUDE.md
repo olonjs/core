@@ -32,10 +32,19 @@ Specs di riferimento: `specs/olonjsSpecs_V_1_6.md`
 
 ## Project Structure
 
-Monorepo con due workspaces:
+Monorepo npm workspaces — **11 package + 3 app**:
 
-- `packages/core` — `@olonjs/core` (CMS engine, pubblicato su npm)
-- `apps/tenant-alpha` — App tenant di riferimento che consuma `@olonjs/core`
+- `packages/core` — `@olonjs/core` (engine **framework-agnostic, zero React**, pubblicato su npm)
+- `packages/react` — `@olonjs/react` (binding React: `JsonPagesEngine`, `OlonJSEngine`, providers, cloud save)
+- `packages/studio` — `@olonjs/studio` (editor Studio: `FormFactory`, `AdminSidebar`, `StudioStage`)
+- `packages/next` — `@olonjs/next` (host binding Next.js App Router: RSC visitors + admin island)
+- `packages/mcp` — `@olonjs/mcp` (bridge MCP locale via Playwright → WebMCP)
+- `packages/cli` — `@olonjs/cli` (generatore tenant)
+- `packages/stack` — `@olonjs/stack` (manifest versioni — SSOT dipendenze)
+- `packages/jsonpages-{core,stack,cli}-compat` — bridge `@jsonpages/*`
+- `apps/tenant-alpha` — app Vite di riferimento (template `alpha`)
+- `apps/next` — app Next.js di riferimento (template `next`)
+- `apps/olonjs.io` — landing/marketing + schemi canonici
 
 ### File Paths (JSP v1.9 — canonical)
 
@@ -57,7 +66,7 @@ Monorepo con due workspaces:
 ## Tech Stack
 
 - **React 19**, TypeScript 5, Vite 6, Tailwind CSS 4
-- **Zod** per schema definition e Form Factory UI descriptors
+- **Zod v4** (`^4.6.0`, **v4-only** in tutto l'ecosistema). Migration note tenant: `z.string().email()` → `z.email()`, `z.record(v)` → `z.record(z.string(), v)`; in olon-platform si importa da `zod/v4`
 - **react-router-dom** v6 per routing
 - `@dnd-kit` per drag-and-drop nell'editor
 - `@radix-ui` primitives per UI components
@@ -86,9 +95,21 @@ npm run dist         # package source as distributable shell archive
 
 ### packages/core
 ```bash
-npm run build        # vite library build
+npm run build        # typecheck (tsc --noEmit) + vite library build
+npm run typecheck    # solo typecheck
 npm test             # vitest run
 ```
+
+> Tutti i package engine (core, react, studio, next, mcp) hanno `build = typecheck && <bundler>`: `vite-plugin-dts` NON fallisce sugli errori di tipo, il gate esplicito `tsc --noEmit` sì.
+
+---
+
+## Convenzioni di Lavoro
+
+- **Changelog**: ogni cambio rilevante ha il suo file in **`/changelog/<nome-commit>.md`** (un file per cambio, denominato dal commit).
+- **Plan/Tasks**: nomi **univoci** `tasks/plan-<module-id>.md` / `tasks/todo-<module-id>.md` — mai sovrascrivere `tasks/plan.md` (può appartenere ad altro lavoro).
+- **Spec**: `specs/<slug>-v<n>.md`, approvata prima di plan/tasks (workflow SDD gated).
+- **Zod v4**: mai dual-range o feature-detection sugli internals — v4-only, baseline `^4.6.0`.
 
 ---
 
@@ -264,4 +285,5 @@ Il contratto pubblico di OlonJS è pubblicato come JSON Schema a `https://olon.j
 **Gotcha non ovvi** (full detail in [ADR-0013](docs/decisions/ADR-0013-v1-schemas-implementation.md)):
 - `.optional().describe()` su schema registrate in `definitions`, mai `.describe()` diretto (preserva il `$ref` invece di decomporlo).
 - `z.object({}).passthrough()` per i placeholder cross-ref, mai `z.unknown()` (required-ness corretta).
+- **Dialetto `zod/v3`**: `zod-schemas.ts` importa da `zod/v3` (subpath compat incluso in zod v4) perché `zod-to-json-schema` è non più mantenuto (nov 2025) e supporta solo schemi v3-dialect. Follow-up tracciato: migrare `bump-schemas.ts` a `z.toJSONSchema()` nativo e rimuovere la dipendenza.
 

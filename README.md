@@ -30,10 +30,17 @@
 
 This repository contains the OlonJS stack:
 
-- `packages/core`: runtime engine (`@olonjs/core`)
+- `packages/core`: framework-agnostic engine (`@olonjs/core`)
+- `packages/react`: React rendering bindings (`@olonjs/react`)
+- `packages/studio`: schema-driven Studio editor (`@olonjs/studio`)
+- `packages/next`: Next.js App Router host binding (`@olonjs/next`)
+- `packages/mcp`: local MCP server bridge (`@olonjs/mcp`)
 - `packages/cli`: tenant generator (`@olonjs/cli`)
 - `packages/stack`: dependency manifest (`@olonjs/stack`)
-- `apps/tenant-alpha`: reference DNA template source
+- `packages/jsonpages-*-compat`: `@jsonpages/*` compatibility bridges
+- `apps/tenant-alpha`: Vite reference app, template source (`alpha`)
+- `apps/next`: Next.js reference app, template source (`next`)
+- `apps/olonjs.io`: marketing/landing site
 
 Use this file as entrypoint. Canonical docs are under `docs/`
 
@@ -50,10 +57,15 @@ Websites are currently built for humans (HTML-heavy, fragmented). AI agents stru
 
 This repository manages the entire OlonJS ecosystem:
 
-- **`packages/core` (@olonjs/core):** The runtime engine. Handles routing, state orchestration, and the Visual Studio (ICE).
+- **`packages/core` (@olonjs/core):** The framework-agnostic Sovereign Core Engine — protocol types, config/collection resolution, theme-token logic, WebMCP contracts, routing helpers. Zero React.
+- **`packages/react` (@olonjs/react):** React rendering bindings (visitor engine, config/theme providers, cloud save).
+- **`packages/studio` (@olonjs/studio):** The schema-driven Studio editor (FormFactory, AdminSidebar, Stage).
+- **`packages/next` (@olonjs/next):** Next.js App Router host binding (RSC visitors + admin island).
+- **`packages/mcp` (@olonjs/mcp):** Local MCP server bridge for Zero-UI tenant automation via Playwright.
 - **`packages/cli` (@olonjs/cli):** The primary entry point for developers. Scaffolds new tenants by projecting DNA templates.
 - **`packages/stack` (@olonjs/stack):** Version manifest package to keep dependency policy aligned.
-- **`apps/tenant-alpha`:** Source of truth for the `alpha` DNA template.
+- **`apps/tenant-alpha`:** Source of truth for the `alpha` DNA template (Vite).
+- **`apps/next`:** Source of truth for the `next` DNA template (Next.js).
 
 ## 🚦 Getting Started
 
@@ -116,7 +128,7 @@ Detailed technical documentation is available in the `docs/` directory:
 - **[Compatibility Cutoff](./docs/COMPAT_CUTOFF_EN.md):** Decommissioning plan for legacy `jsonpages` residues.
 
 ## 🛠️ Technical Stack
-- **Runtime:** React 19, TypeScript, Zod.
+- **Runtime:** React 19, TypeScript, Zod v4 (`^4.6.0`).
 - **Build:** Vite 6 + Tailwind CSS v4.
 - **Protocol:** WebMCP (Model Context Protocol) ready via deterministic JSON endpoints.
 

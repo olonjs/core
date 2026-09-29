@@ -107,6 +107,14 @@ Quando registrare in `definitions: { … }`:
 - **Per coerenza**: schemi single-use che però vogliamo siano renderizzati uguali in più file di output (es. `SiteIdentity` registrata sia in `site` che in `tenant`).
 - **Mai**: single-use senza ragione di consistenza → lasciare inline.
 
+### Regola 4 — dialetto `zod/v3` nel SOT
+
+`packages/core/src/contract/zod-schemas.ts` importa da **`zod/v3`** (subpath compat incluso nel package zod v4), non da `zod`:
+
+- `zod-to-json-schema` è **non più mantenuto** (nov 2025) e supporta solo schemi in dialetto v3 — la sua README raccomanda esplicitamente di autorare via `zod/v3`.
+- Il runtime del monorepo resta zod v4-only; solo questo file di authoring usa il dialetto v3.
+- Follow-up tracciato (header del file): migrare `bump-schemas.ts` a `z.toJSONSchema()` nativo e rimuovere `zod-to-json-schema`.
+
 ## Test cycle minimo
 
 ```bash
