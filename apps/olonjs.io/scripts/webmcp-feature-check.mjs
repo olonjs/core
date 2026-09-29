@@ -175,15 +175,18 @@ async function main() {
         const args = { slug, sectionId, sectionType, fieldKey, value: nextValue };
         const native = document.modelContext;
         const protocol = document.modelContextProtocol;
-        // Native Chrome WebMCP: executeTool(toolObject, argsObject) — the tool
-        // object comes from getTools(); JSON-stringified args retired in Chrome 155.
+        // Native Chrome WebMCP: executeTool(toolObject, args) — the tool object
+        // comes from getTools(). Args format: plain object since Chrome 155;
+        // before that the native expects a JSON string (verified on Chrome 153).
         if (native && typeof native.executeTool === 'function') {
           const tools = await native.getTools();
           const tool = tools.find((entry) => entry.name === toolName);
           if (!tool) {
             throw new Error(`Tool "${toolName}" not found in native getTools().`);
           }
-          const result = await native.executeTool(tool, args);
+          const chromeMajor = Number((navigator.userAgent.match(/Chrome\/(\d+)/) ?? [])[1] ?? 0);
+          const nativeArgs = chromeMajor >= 155 ? args : JSON.stringify(args);
+          const result = await native.executeTool(tool, nativeArgs);
           if (result === null) {
             throw new Error(`Tool "${toolName}" returned null (navigation).`);
           }
@@ -219,7 +222,9 @@ async function main() {
           if (!tool) {
             throw new Error(`Tool "${saveToolName}" not found in native getTools().`);
           }
-          const result = await native.executeTool(tool, {});
+          const chromeMajor = Number((navigator.userAgent.match(/Chrome\/(\d+)/) ?? [])[1] ?? 0);
+          const nativeArgs = chromeMajor >= 155 ? {} : '{}';
+          const result = await native.executeTool(tool, nativeArgs);
           if (result === null) {
             throw new Error(`Tool "${saveToolName}" returned null (navigation).`);
           }

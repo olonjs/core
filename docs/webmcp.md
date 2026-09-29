@@ -19,7 +19,9 @@ There are **two surfaces**, and the runtime adapts. The authoritative native API
 - **Native (Chrome WebMCP):** `document.modelContext` is a `ModelContext` instance (an `EventTarget`):
   - `await document.modelContext.registerTool(tool, { signal })` — **async**; tool = `{ name, description, inputSchema, execute, annotations? }` with `execute: async (parsedArgs, { signal }) => string` (the parsed args **object**, plus an `AbortSignal`). `annotations`: `readOnlyHint` / `consequentialHint` / `untrustedContentHint` / `debugging`.
   - `await document.modelContext.getTools()` — **async**, returns descriptor objects (alphabetical, same-origin by default; `{ fromOrigins: [...] }` for cross-origin). **No `execute` field in the descriptors.**
-  - `await document.modelContext.executeTool(tool, argsObject, { signal })` — takes the **tool object** (from `getTools()`) + a JSON-serializable **object** of args. **JSON-stringified args were retired in Chrome 155.** Returns the tool result string (or `null` on navigation).
+  - `await document.modelContext.executeTool(tool, args, { signal })` — takes the **tool object** (from `getTools()`) + the input args. Returns the tool result string (or `null` on navigation).
+    - **Chrome ≥ 155:** args = JSON-serializable **object**.
+    - **Chrome < 155:** args = **JSON string** (verified on Chrome 153 — an object fails with "Failed to parse input arguments").
   - Event: `document.modelContext.addEventListener('toolchange', …)`. **No `listTools`, no `readResource`.**
 - **Polyfill (other browsers):** when the native `registerTool` is absent, `ensureWebMcpRuntime()` installs the OlonJS polyfill — `document.modelContext` (registerTool/unregisterTool/readResource) **plus** `document.modelContextProtocol` (`listTools()`, `executeTool(name, json)`, `readResource()`).
 
@@ -32,13 +34,14 @@ async function getWebMcpRuntime() {
   const native = document.modelContext;
   const protocol = document.modelContextProtocol;
   if (native && typeof native.getTools === 'function') {
-    // Native: resolve the tool object, pass args as an object.
+    // Native: resolve the tool object; args object on Chrome >=155, JSON string below.
     return {
       listTools: async () => (await native.getTools()).map((tool) => tool.name),
       executeTool: async (toolName, args) => {
         const tool = (await native.getTools()).find((entry) => entry.name === toolName);
         if (!tool) throw new Error(`Tool "${toolName}" not found in native getTools().`);
-        return native.executeTool(tool, args);
+        const chromeMajor = Number((navigator.userAgent.match(/Chrome\/(\d+)/) ?? [])[1] ?? 0);
+        return native.executeTool(tool, chromeMajor >= 155 ? args : JSON.stringify(args));
       },
     };
   }
