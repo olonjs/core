@@ -3,7 +3,7 @@
 **Created:** 2026-09-29
 **Plan:** [`plan-external-collection-sources.md`](./plan-external-collection-sources.md)
 **Spec:** [`../specs/external-collection-sources-v1.md`](../specs/external-collection-sources-v1.md)
-**Status:** In progress — Phase 1 (package core) done
+**Status:** Done (2026-09-29) — suite 45/45, demo /prodotti verificata live, core intatto. Deviazioni: testing kit esportato dalla entry principale (non subpath `./testing`); provider reale shopify.ts non incluso (opzionale).
 **Regola:** TDD (RED→GREEN), test ermetici (fake clock, zero rete), `packages/core` intatto.
 
 ---
@@ -41,19 +41,19 @@
 
 ## Phase 2 — Policy decorators
 
-- [ ] **Task 5 — `withCache`**
+- [x] **Task 5 — `withCache`**
   - Acceptance: ttl + stale-while-revalidate + `CacheStore` pluggable (default in-memory); hit/miss/stale esposti via eventi; nessuno stato globale nascosto.
   - Verify: test con fake clock (hit, miss, scadenza, swr, store custom)
   - Files: `packages/sources/src/decorators/cache.ts`, `src/decorators/cache.test.ts`
   - Scope: Medium
 
-- [ ] **Task 6 — `withRetry` + `withTimeout`**
+- [x] **Task 6 — `withRetry` + `withTimeout`**
   - Acceptance: retry solo su errori retryable, backoff+jitter deterministico con clock iniettato; timeout annulla la resolve e produce `SourceError` `code:'timeout'`.
   - Verify: test con fake clock (attempts, backoff, timeout, non-retryable non ritentato)
   - Files: `packages/sources/src/decorators/{retry,timeout}.ts`, test
   - Scope: Medium
 
-- [ ] **Task 7 — `withFallback` + `withCircuitBreaker`**
+- [x] **Task 7 — `withFallback` + `withCircuitBreaker`**
   - Acceptance: fallback su stale quando la sorgente fallisce; breaker apre dopo N fallimenti, cooldown, half-open.
   - Verify: test con fake clock
   - Files: `packages/sources/src/decorators/{fallback,breaker}.ts`, test
@@ -61,7 +61,7 @@
 
 ## Phase 3 — Testing kit
 
-- [ ] **Task 8 — `@olonjs/sources/testing`**
+- [x] **Task 8 — `@olonjs/sources/testing`**
   - Acceptance: `createTestSource`, fake clock, `runSourceConformance(source)` (abort, chiave===id, errori tipizzati, parse, eventi attesi); il provider d'esempio la passa.
   - Verify: self-test del kit + conformance su un provider d'esempio in test
   - Files: `packages/sources/src/testing/*`, test
@@ -72,7 +72,7 @@
 
 ## Phase 4 — Distribution
 
-- [ ] **Task 9 — Metadati + stack**
+- [x] **Task 9 — Metadati + stack**
   - Acceptance: `sideEffects:false`, peer `@olonjs/core`; entry in `packages/stack/stack-versions.json`; prepack peers sync (come gli altri package). Inclusione in `release.js` **Ask first** (non in questa fase).
   - Verify: build verde; ispezione `package.json`/stack
   - Files: `packages/sources/package.json`, `packages/stack/stack-versions.json`
