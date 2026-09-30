@@ -1,0 +1,53 @@
+{
+  "name": "@olonjs/sources",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "main": "./dist/olonjs-sources.umd.cjs",
+  "module": "./dist/olonjs-sources.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/olonjs-sources.js",
+      "require": "./dist/olonjs-sources.umd.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "description": "Declarative external collection sources for OlonJS: declare a shape + resolve, validate, project. Policy (cache/retry/timeout/fallback/breaker) lives here, never in @olonjs/core.",
+  "author": "JsonPages Team",
+  "license": "MIT",
+  "homepage": "https://github.com/olonjs/npm-jpcore#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/olonjs/npm-jpcore.git",
+    "directory": "packages/sources"
+  },
+  "bugs": {
+    "url": "https://github.com/olonjs/npm-jpcore/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "npm run typecheck && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@olonjs/core": "^2.0.1"
+  },
+  "devDependencies": {
+    "@olonjs/stack": "^1.0.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.0",
+    "vite-plugin-dts": "^4.0.0",
+    "vitest": "^3.0.0",
+    "zod": "^4.6.0"
+  }
+}
