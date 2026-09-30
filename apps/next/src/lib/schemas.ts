@@ -5,6 +5,8 @@ import { EmptyTenantSchema } from '@/components/empty-tenant';
 import { FooterSchema } from '@/components/footer';
 import { FormDemoSchema, FormDemoSubmissionSchema } from '@/components/form-demo';
 import { HeaderSchema } from '@/components/header';
+import { ProdottoDetailSchema } from '@/components/prodotto-detail';
+import { ProdottiListSchema } from '@/components/prodotti-list';
 
 export const SECTION_SCHEMAS = {
   'authors-list': AuthorsListSchema,
@@ -14,6 +16,8 @@ export const SECTION_SCHEMAS = {
   footer: FooterSchema,
   'form-demo': FormDemoSchema,
   header: HeaderSchema,
+  'prodotti-list': ProdottiListSchema,
+  'prodotto-detail': ProdottoDetailSchema,
 } as const;
 
 /**

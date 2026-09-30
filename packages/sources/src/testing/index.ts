@@ -1,4 +1,23 @@
-import assert from 'node:assert/strict';
+/**
+ * Minimal, dependency-free assertions so the conformance suite runs in ANY
+ * environment (Node, edge, browser-based runners) without importing node:assert
+ * (which breaks the UMD build and non-Node runners).
+ */
+function fail(message: string): never {
+  throw new Error(`[sources:conformance] ${message}`);
+}
+
+function ok(value: unknown, message: string): void {
+  if (!value) fail(message);
+}
+
+function equal(actual: unknown, expected: unknown, message: string): void {
+  if (actual !== expected) fail(`${message} (expected ${String(expected)}, got ${String(actual)})`);
+}
+
+function deepEqual(actual: unknown, expected: unknown, message: string): void {
+  if (JSON.stringify(actual) !== JSON.stringify(expected)) fail(message);
+}
 import type {
   CollectionDocument,
   CollectionSource,
@@ -25,22 +44,22 @@ export async function runSourceConformance<TDocument extends CollectionDocument>
   const name = source.shape ? 'source' : 'source';
   const ctx: CollectionSourceContext = { source: name, params: options.params ?? {} };
 
-  assert.equal(typeof source.resolve, 'function', 'source.resolve must be a function');
-  assert.equal(typeof source.shape?.parse, 'function', 'source.shape.parse must be a function');
+  equal(typeof source.resolve, 'function', 'source.resolve must be a function');
+  equal(typeof source.shape?.parse, 'function', 'source.shape.parse must be a function');
   if (source.readOnly !== undefined) {
-    assert.equal(typeof source.readOnly, 'boolean', 'source.readOnly must be a boolean when set');
+    equal(typeof source.readOnly, 'boolean', 'source.readOnly must be a boolean when set');
   }
 
   const document = await source.resolve(ctx);
 
-  assert.ok(
+  ok(
     document !== null && typeof document === 'object' && !Array.isArray(document),
     'resolve() must return a keyed record (not null/array)'
   );
 
   for (const [key, item] of Object.entries(document)) {
-    assert.ok(item !== null && typeof item === 'object', `item at "${key}" must be an object`);
-    assert.equal(
+    ok(item !== null && typeof item === 'object', `item at "${key}" must be an object`);
+    equal(
       (item as { id?: unknown }).id,
       key,
       `record key "${key}" must equal item.id (OlonJS collection invariant)`
@@ -49,7 +68,7 @@ export async function runSourceConformance<TDocument extends CollectionDocument>
 
   // shape.parse must accept its own resolved document (round-trip).
   const reparsed = source.shape.parse(document);
-  assert.deepEqual(
+  deepEqual(
     reparsed,
     document,
     'shape.parse must accept the resolved document unchanged'

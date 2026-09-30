@@ -8,6 +8,8 @@ import { EmptyTenantView } from '@/components/empty-tenant';
 import { FooterView } from '@/components/footer';
 import { FormDemoView } from '@/components/form-demo';
 import { HeaderView } from '@/components/header';
+import { ProdottoDetailView } from '@/components/prodotto-detail';
+import { ProdottiListView } from '@/components/prodotti-list';
 
 export const ComponentRegistry: {
   [K in SectionType]: React.FC<SectionComponentPropsMap[K]>;
@@ -19,4 +21,6 @@ export const ComponentRegistry: {
   footer: FooterView as React.FC<SectionComponentPropsMap['footer']>,
   'form-demo': FormDemoView as React.FC<SectionComponentPropsMap['form-demo']>,
   header: HeaderView as React.FC<SectionComponentPropsMap['header']>,
+  'prodotti-list': ProdottiListView as React.FC<SectionComponentPropsMap['prodotti-list']>,
+  'prodotto-detail': ProdottoDetailView as React.FC<SectionComponentPropsMap['prodotto-detail']>,
 };

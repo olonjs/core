@@ -1,0 +1,26 @@
+{
+  "id": "prodotto-detail-page",
+  "slug": "prodotti/[slug]",
+  "meta": {
+    "title": "Dettaglio prodotto",
+    "description": "Pagina dinamica alimentata dalla sorgente esterna catalogo."
+  },
+  "sections": [
+    {
+      "id": "prodotto-detail-1",
+      "type": "prodotto-detail",
+      "data": {
+        "anchorId": "dettaglio-prodotto",
+        "item": {
+          "$ref": "collection:current"
+        },
+        "backLabel": "← Torna al catalogo"
+      }
+    }
+  ],
+  "collection": {
+    "source": "catalogo",
+    "paramKey": "slug"
+  },
+  "global-header": false
+}

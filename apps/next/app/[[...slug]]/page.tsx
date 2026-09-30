@@ -10,11 +10,10 @@ import {
 import { loadVisitorPage } from '@olonjs/next/server';
 import { EmptyTenantView } from '@/components/empty-tenant';
 import { WebMcpVisitorRuntime } from '@/components/webmcp/WebMcpVisitorRuntime';
-import { CollectionRegistry } from '@/lib/CollectionRegistry';
 import { buildVisitorWebPageJsonLd } from '@/lib/buildVisitorWebPageJsonLd';
-import { getFileCollections } from '@/lib/loaders/getFileCollections';
 import { getFilePages } from '@/lib/loaders/getFilePages';
 import { getFileSiteBundle } from '@/lib/loaders/getFileSiteConfig';
+import { loadVisitorPageBundle } from '@/lib/loaders/loadVisitorPageBundle';
 import { resolveVisitorShell } from '@/lib/resolveVisitorShell';
 import { VisitorSection } from '@/lib/VisitorSection';
 
@@ -80,7 +79,10 @@ export default async function VisitorCatchAllPage({ params, searchParams }: Page
     notFound();
   }
 
-  const collections = getFileCollections();
+  const { collections, collectionSchemas } = await loadVisitorPageBundle({
+    page: result.page,
+    params: result.params,
+  });
   const { siteConfig, menuConfig, themeConfig } = getFileSiteBundle();
   const collectionContext = resolveCollectionContext(result.page, result.params, collections);
 
@@ -90,7 +92,7 @@ export default async function VisitorCatchAllPage({ params, searchParams }: Page
     themeConfig,
     menuConfig,
     collections,
-    collectionSchemas: CollectionRegistry as never,
+    collectionSchemas: collectionSchemas as never,
     collectionContext,
     refDocuments: {
       'menu.json': menuConfig,

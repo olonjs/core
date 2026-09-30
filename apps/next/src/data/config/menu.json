@@ -17,6 +17,10 @@
       "href": "#Getstarted"
     },
     {
+      "label": "Prodotti",
+      "href": "/prodotti"
+    },
+    {
       "label": "GitHub",
       "href": "https://github.com/olonjs/core"
     }

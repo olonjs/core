@@ -5,8 +5,11 @@ import type { EmptyTenantData, EmptyTenantSettings } from '@/components/empty-te
 import type { FooterData, FooterSettings } from '@/components/footer';
 import type { FormDemoData, FormDemoSettings } from '@/components/form-demo';
 import type { HeaderData, HeaderSettings } from '@/components/header';
+import type { ProdottoDetailData, ProdottoDetailSettings } from '@/components/prodotto-detail';
+import type { ProdottiListData, ProdottiListSettings } from '@/components/prodotti-list';
 import type { Autore } from '@/collections/autori';
 import type { Libro } from '@/collections/libri';
+import type { Prodotto } from '@/collections/prodotti';
 
 export type SectionComponentPropsMap = {
   'authors-list': { data: AuthorsListData; settings?: AuthorsListSettings };
@@ -16,6 +19,8 @@ export type SectionComponentPropsMap = {
   footer: { data: FooterData; settings?: FooterSettings };
   header: { data: HeaderData; settings?: HeaderSettings };
   'form-demo': { data: FormDemoData; settings?: FormDemoSettings };
+  'prodotti-list': { data: ProdottiListData; settings?: ProdottiListSettings };
+  'prodotto-detail': { data: ProdottoDetailData; settings?: ProdottoDetailSettings };
 };
 
 declare module '@olonjs/core' {
@@ -27,6 +32,8 @@ declare module '@olonjs/core' {
     footer: FooterData;
     header: HeaderData;
     'form-demo': FormDemoData;
+    'prodotti-list': ProdottiListData;
+    'prodotto-detail': ProdottoDetailData;
   }
   export interface SectionSettingsRegistry {
     'authors-list': AuthorsListSettings;
@@ -36,10 +43,13 @@ declare module '@olonjs/core' {
     footer: FooterSettings;
     header: HeaderSettings;
     'form-demo': FormDemoSettings;
+    'prodotti-list': ProdottiListSettings;
+    'prodotto-detail': ProdottoDetailSettings;
   }
   export interface CollectionItemRegistry {
     autori: Autore;
     libri: Libro;
+    prodotti: Prodotto;
   }
 }
 

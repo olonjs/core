@@ -1,0 +1,24 @@
+{
+  "id": "prodotti-page",
+  "slug": "prodotti",
+  "meta": {
+    "title": "Prodotti",
+    "description": "Catalogo proiettato da una sorgente esterna (demo @olonjs/sources)."
+  },
+  "sections": [
+    {
+      "id": "prodotti-list-1",
+      "type": "prodotti-list",
+      "data": {
+        "anchorId": "catalogo-prodotti",
+        "eyebrow": "Projected source demo",
+        "title": "Prodotti",
+        "description": "Catalogo letto da una sorgente esterna, validato con la sua Zod shape e proiettato nel contratto OlonJS.",
+        "items": {
+          "$ref": "../collections/catalogo/catalogo.json"
+        }
+      }
+    }
+  ],
+  "global-header": false
+}
