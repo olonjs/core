@@ -68,7 +68,7 @@ Open at decision time: whether the engine itself must understand sources (lazy p
 - [x] `runSourceConformance` suite published for third-party providers.
 - [x] Add `@olonjs/sources` to the release graph and `stack-versions.json` (peer `@olonjs/core`).
 - [x] Demo `/prodotti` in `apps/next` (example provider + contracts/manifest check).
-- [ ] Docs page for the authored/projected boundary and provider authoring.
+- [x] Docs page for the authored/projected boundary and provider authoring (`docs/sources.md`).
 - [x] Add the index row for this ADR in `docs/decisions/README.md`.
 - [ ] Publish `@olonjs/sources` to npm (`release:enterprise` includes it; publication is Ask first).
 

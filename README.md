@@ -117,6 +117,7 @@ Detailed technical documentation is available in the `docs/` directory:
 - **[CLI Contract](./docs/CLI.md):** Command surface, template resolution, and generation pipeline.
 - **[Templates Governance](./docs/TEMPLATES.md):** Rules for managing DNA source of truth and conformance checks.
 - **[WebMCP (Browser API)](./docs/webmcp.md):** The Agent-Native browser API for Zero-UI mutations and programmatic exploration.
+- **[External Collection Sources](./docs/sources.md):** Project external systems of record (catalog, PIM, …) into the OlonJS contract (`@olonjs/sources`).
 
 ### Onboarding & Governance
 - **[Client Onboarding](./docs_governance_en.md):** Guide for graphics and data development.

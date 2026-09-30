@@ -48,7 +48,7 @@ Apps:
 - declarative **external collection sources**: `CollectionSource = { shape, resolve, readOnly? }` — the projection seam for system-of-record entities (catalog, PIM, …) whose SOT is external
 - orchestration (`collectCollectionSources`, `resolveCollectionSources`) + policy decorators (`withCache`/`withRetry`/`withTimeout`/`withFallback`/`withCircuitBreaker`) + conformance/test kit
 - depends on `@olonjs/core` (reuses its public helpers); **core stays untouched** — see ADR-0018
-- opt-in for tenants; see [`specs/external-collection-sources-v1.md`](../specs/external-collection-sources-v1.md)
+- opt-in for tenants; see [docs/sources.md](./sources.md) and [`specs/external-collection-sources-v1.md`](../specs/external-collection-sources-v1.md)
 
 ## `@olonjs/studio`
 
