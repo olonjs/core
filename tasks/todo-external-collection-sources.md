@@ -3,32 +3,32 @@
 **Created:** 2026-09-29
 **Plan:** [`plan-external-collection-sources.md`](./plan-external-collection-sources.md)
 **Spec:** [`../specs/external-collection-sources-v1.md`](../specs/external-collection-sources-v1.md)
-**Status:** Not started
+**Status:** In progress — Phase 1 (package core) done
 **Regola:** TDD (RED→GREEN), test ermetici (fake clock, zero rete), `packages/core` intatto.
 
 ---
 
 ## Phase 1 — Package core
 
-- [ ] **Task 1 — Scaffold `packages/sources`**
+- [x] **Task 1 — Scaffold `packages/sources`**
   - Acceptance: package.json (`@olonjs/sources`, peer `@olonjs/core`, `sideEffects:false`), tsconfig, vite.config, vitest.config; `build = npm run typecheck && vite build`.
   - Verify: `npm run typecheck -w @olonjs/sources` (con placeholder export) e `npm test -w @olonjs/sources` passano.
   - Files: `packages/sources/{package.json,tsconfig.json,vite.config.ts,vitest.config.ts,src/index.ts}`
   - Scope: Small
 
-- [ ] **Task 2 — Contract + `defineCollectionSource`**
+- [x] **Task 2 — Contract + `defineCollectionSource`**
   - Acceptance: `CollectionSource`, `CollectionSourceContext`, `SourceError` (code/source/retryable/cause), `SourceEvent`, `defineCollectionSource` con inferenza; nessun throw raw.
   - Verify: unit test del tipo/errore; `npm test -w @olonjs/sources`
   - Files: `packages/sources/src/contract.ts`, `src/index.ts`, `src/contract.test.ts`
   - Scope: Small
 
-- [ ] **Task 3 — `collectCollectionSources(page)`**
+- [x] **Task 3 — `collectCollectionSources(page)`**
   - Acceptance: dato una `PageConfig`, restituisce i source name necessari (da `page.collection.source` e dai binding `ui:collection-ref:*`/`$ref` via `getCollectionRefBindings` di core); nessuna logica core duplicata.
   - Verify: test con fixture di pagine reali (lista + dettaglio) + caso sorgente assente
   - Files: `packages/sources/src/collect.ts`, `src/collect.test.ts`
   - Scope: Small
 
-- [ ] **Task 4 — `resolveCollectionSources`**
+- [x] **Task 4 — `resolveCollectionSources`**
   - Acceptance: risolve solo le sorgenti richieste, `shape.parse` sul documento, invariante chiave===item.id, ritorna `{ collections, collectionSchemas, provenance }`, errori → `SourceError`, `abort` propagato; memoize per-ctx (una `resolve` per source per chiamata).
   - Verify: test (needed-only, validazione fallita, errore tipizzato, abort, dedupe)
   - Files: `packages/sources/src/resolve.ts`, `src/resolve.test.ts`
@@ -80,25 +80,25 @@
 
 ## Phase 5 — Demo in apps/next
 
-- [ ] **Task 10 — Provider d'esempio + collection schema**
+- [x] **Task 10 — Provider d'esempio + collection schema**
   - Acceptance: `src/sources/catalogo.ts` deterministico (finto servizio esterno, latenza/errore controllabili) con `defineCollectionSource` + `withCache`; `src/collections/prodotti/{schema,types,index}.ts` (`ProdottoSchema`); augmentation `CollectionItemRegistry`.
   - Verify: unit test del provider con `runSourceConformance`; typecheck tenant
   - Files: `apps/next/src/sources/*`, `apps/next/src/collections/prodotti/*`, `apps/next/src/types.ts`
   - Scope: Medium
 
-- [ ] **Task 11 — Capsula `prodotti-list`**
+- [x] **Task 11 — Capsula `prodotti-list`**
   - Acceptance: capsule TBP (View/schema/types/index); schema `items: z.record(z.string(), ProdottoSchema).describe('ui:collection-ref:catalogo')`; View pura (nessun fetch); registrata in ComponentRegistry + SECTION_SCHEMAS + augmentation.
   - Verify: `npm run typecheck -w tenant-next`; build
   - Files: `apps/next/src/components/prodotti-list/*`, `src/lib/ComponentRegistry.tsx`, `src/lib/schemas.ts`
   - Scope: Medium
 
-- [ ] **Task 12 — Pagine + loader wiring**
+- [x] **Task 12 — Pagine + loader wiring**
   - Acceptance: `src/data/pages/prodotti.json` (lista) + `prodotti/[slug].json` (`page.collection` binding); loader `src/lib/loaders/loadVisitorPageBundle.ts` che chiama `collectCollectionSources` + `resolveCollectionSources` e spreda `collections`/`collectionSchemas`; route sottile; link menu.
   - Verify: `npm run build -w tenant-next`; smoke dev su `/prodotti`
   - Files: `apps/next/src/data/pages/*.json`, `src/lib/loaders/loadVisitorPageBundle.ts`, `app/[[...slug]]/page.tsx`, `src/data/config/menu.json`
   - Scope: Medium
 
-- [ ] **Task 13 — Verifica contratti/manifest + gate**
+- [x] **Task 13 — Verifica contratti/manifest + gate**
   - Acceptance: `/prodotti.json` espone i dati proiettati; `/schemas/collections/catalogo.schema.json` e `/mcp-manifests/prodotti.json` derivano dalla stessa shape; `verify:webmcp` verde; `git diff packages/core` vuoto.
   - Verify: fetch dei 3 endpoint + feature-check
   - Files: nessuno (verifica)
