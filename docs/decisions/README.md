@@ -57,6 +57,8 @@ Optional: `Follow-ups`, `Open Points`, `Compliance mapping`, `Risk mitigation`, 
 | 0014 | [Opt-in server-side rendering via `createStaticRouter` and a `/server` subpath export](./ADR-0014-opt-in-ssr-via-static-router-and-server-subpath.md) | Proposed — pending implementation and verification | 2026-06-04 |
 | 0015 | [SSR initial-data and hydration handoff contract](./ADR-0015-ssr-initial-data-and-hydration-contract.md) | Proposed — pending implementation and verification | 2026-06-04 |
 | 0016 | [Split `@olonjs/core` into three packages — `core`, `react`, `studio`](./ADR-0016-core-react-studio-package-split.md) | **Accepted — implemented and published** (`@olonjs/core` 2.x framework-agnostic, `@olonjs/react` 0.2.x, `@olonjs/studio` 0.2.x; single `"."` export, no `/runtime` subpath) | 2026-07-16 |
+| 0017 | [Next.js binding — RSC visitors + admin client island](./ADR-0017-next-rsc-visitors-admin-island.md) | Accepted | 2026-07-22 |
+| 0018 | [External collection sources ship as a package, not in core](./ADR-0018-external-collection-sources-as-package.md) | Proposed — spec [`external-collection-sources-v1`](../../specs/external-collection-sources-v1.md) | 2026-09-29 |
 
 ## For agents
 
