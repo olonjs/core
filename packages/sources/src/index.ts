@@ -5,3 +5,5 @@
  * decorators/testing entries) policy + test kit. `@olonjs/core` is untouched.
  */
 export * from './contract';
+export * from './collect';
+export * from './resolve';
