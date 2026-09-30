@@ -17,6 +17,7 @@
   "packages": {
     "@olonjs/core": "^2.0.0",
     "@olonjs/react": "^0.2.0",
+    "@olonjs/sources": "^0.1.0",
     "@olonjs/studio": "^0.2.0"
   },
   "dependencies": {

@@ -43,7 +43,8 @@ Always publish in this order (see `scripts/release.js`):
 
 1. `@olonjs/stack`
 2. `@olonjs/core`
-3. `@olonjs/studio`
+3. `@olonjs/sources` — external collection sources (pins `@olonjs/core`)
+4. `@olonjs/studio`
 4. `@olonjs/react`
 5. `@olonjs/mcp`
 6. `@olonjs/next`
@@ -55,6 +56,7 @@ Always publish in this order (see `scripts/release.js`):
 Reason:
 
 - `core` aligns dependency contracts using the stack manifest (`prepack` sync)
+- `sources` depends on `core` (its shape/contract layer imports core public helpers) and is opt-in for tenants
 - `studio` / `react` / `mcp` / `next` follow the ADR-0016 dependency graph
 - `@olonjs/next` must publish before tenant-next pins it and before CLI packages both DNA templates
 - both tenant workspaces regenerate DNA (`dist`) with pinned versions before CLI publish

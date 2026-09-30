@@ -12,3 +12,4 @@ export * from './decorators/retry';
 export * from './decorators/timeout';
 export * from './decorators/fallback';
 export * from './decorators/breaker';
+export * from './testing';

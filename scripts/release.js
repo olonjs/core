@@ -207,6 +207,10 @@ function getCommandPlan() {
     { step: "3/6", desc: "@olonjs/core", cmd: "npm run build -w @olonjs/core", cwd: "root", skip: false },
     { step: "3/6", desc: "@olonjs/core", cmd: "npm version patch --no-git-tag-version -w @olonjs/core", cwd: "root", skip: false },
     { step: "3/6", desc: "@olonjs/core (publish)", cmd: "npm publish --access public -w @olonjs/core", cwd: "root", skip: dryRun },
+    { step: "3a/6", desc: "@olonjs/sources", cmd: "Update package.json @olonjs/core -> ^<new-version>", cwd: "packages/sources", skip: false },
+    { step: "3a/6", desc: "@olonjs/sources", cmd: "npm run build -w @olonjs/sources", cwd: "root", skip: false },
+    { step: "3a/6", desc: "@olonjs/sources", cmd: "npm version patch --no-git-tag-version -w @olonjs/sources", cwd: "root", skip: false },
+    { step: "3a/6", desc: "@olonjs/sources (publish)", cmd: "npm publish --access public -w @olonjs/sources", cwd: "root", skip: dryRun },
     { step: "3b/6", desc: "@olonjs/studio", cmd: "Update package.json @olonjs/core -> ^<new-version>", cwd: "packages/studio", skip: false },
     { step: "3b/6", desc: "@olonjs/studio", cmd: "npm run build -w @olonjs/studio", cwd: "root", skip: false },
     { step: "3b/6", desc: "@olonjs/studio", cmd: "npm version patch --no-git-tag-version -w @olonjs/studio", cwd: "root", skip: false },
@@ -280,6 +284,22 @@ function stepCore() {
     run("npm publish --access public -w @olonjs/core");
   } else {
     log("[dry-run] Skipping npm publish for core");
+  }
+  return newVersion;
+}
+
+function stepSources(coreVersion) {
+  log("Step 3a/6: @olonjs/sources — pin @olonjs/core, build, version patch & publish (from root -w)");
+  const dir = path.join(ROOT, "packages", "sources");
+  const pkg = readPackageJson(dir);
+  pkg.dependencies["@olonjs/core"] = `^${coreVersion}`;
+  writePackageJson(dir, pkg);
+  run("npm run build -w @olonjs/sources");
+  const newVersion = patchToUnpublished("@olonjs/sources", dir);
+  if (!dryRun) {
+    run("npm publish --access public -w @olonjs/sources");
+  } else {
+    log("[dry-run] Skipping npm publish for sources");
   }
   return newVersion;
 }
@@ -444,6 +464,7 @@ function main() {
     stepBuildAll();
     const stackVersion = stepStack();
     const coreVersion = stepCore();
+    stepSources(coreVersion);
     const studioVersion = stepStudio(coreVersion);
     const reactVersion = stepReact(coreVersion, studioVersion);
     stepMcp();

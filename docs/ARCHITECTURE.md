@@ -10,6 +10,7 @@ Packages:
 
 - `packages/core` -> `@olonjs/core` — framework-agnostic engine
 - `packages/react` -> `@olonjs/react` — React rendering bindings
+- `packages/sources` -> `@olonjs/sources` — declarative external collection sources (projection seam; policy decorators)
 - `packages/studio` -> `@olonjs/studio` — schema-driven Studio editor UI
 - `packages/next` -> `@olonjs/next` — Next.js App Router host binding
 - `packages/mcp` -> `@olonjs/mcp` — local MCP server bridge (Playwright → WebMCP)
@@ -41,6 +42,13 @@ Apps:
 
 - React rendering bindings: `JsonPagesEngine`, `OlonJSEngine` (visitor-only), `PageRenderer`, `SectionRenderer`, `ConfigContext`, theme loading, cloud save handlers
 - dynamically imports `@olonjs/studio` (optional peer) only on `/admin`
+
+## `@olonjs/sources`
+
+- declarative **external collection sources**: `CollectionSource = { shape, resolve, readOnly? }` — the projection seam for system-of-record entities (catalog, PIM, …) whose SOT is external
+- orchestration (`collectCollectionSources`, `resolveCollectionSources`) + policy decorators (`withCache`/`withRetry`/`withTimeout`/`withFallback`/`withCircuitBreaker`) + conformance/test kit
+- depends on `@olonjs/core` (reuses its public helpers); **core stays untouched** — see ADR-0018
+- opt-in for tenants; see [`specs/external-collection-sources-v1.md`](../specs/external-collection-sources-v1.md)
 
 ## `@olonjs/studio`
 
@@ -101,7 +109,7 @@ Template DNA must originate from source apps — never edited manually:
 
 Two npm flows plus an automatic site deploy; see [PUBLISHING.md](./PUBLISHING.md) for the operational details:
 
-- `npm run release` — publishes the full ADR-0016 graph: `stack → core → studio → react → mcp → next → tenant-alpha → tenant-next → cli → @jsonpages/*` (auto-patch versions, rewrites cross-package pins, regenerates DNA)
+- `npm run release` — publishes the full ADR-0016 graph: `stack → core → sources → studio → react → mcp → next → tenant-alpha → tenant-next → cli → @jsonpages/*` (auto-patch versions, rewrites cross-package pins, regenerates DNA)
 - `npm run release:enterprise` — gated release (`check:templates` + `dist:dna:all` first, then the same graph)
 - `olon.js.org` site — deployed automatically to `gh-pages` by `.github/workflows/deploy-landing.yml` on every push to `main` that touches `apps/olonjs.io/**`, `packages/core/**`, or the workflow itself. The site builds `@olonjs/core` from the monorepo workspace, not from the npm registry.
 
