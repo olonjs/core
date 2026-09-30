@@ -2,11 +2,11 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Date
 
-2026-09-29
+2026-09-29 (accepted 2026-09-30)
 
 ## Context
 
@@ -64,18 +64,23 @@ Open at decision time: whether the engine itself must understand sources (lazy p
 
 ## Follow-ups
 
-- [ ] Scaffold `packages/sources` (contract, resolve, collect, decorators, testing) with typecheck+build gates.
-- [ ] `runSourceConformance` suite published for third-party providers.
-- [ ] Add `@olonjs/sources` to the release graph and `stack-versions.json` (peer `@olonjs/core`).
-- [ ] Demo `/prodotti` in `apps/next` (example provider + contracts/manifest check).
+- [x] Scaffold `packages/sources` (contract, resolve, collect, decorators, testing) with typecheck+build gates.
+- [x] `runSourceConformance` suite published for third-party providers.
+- [x] Add `@olonjs/sources` to the release graph and `stack-versions.json` (peer `@olonjs/core`).
+- [x] Demo `/prodotti` in `apps/next` (example provider + contracts/manifest check).
 - [ ] Docs page for the authored/projected boundary and provider authoring.
-- [ ] Add the index row for this ADR in `docs/decisions/README.md`.
+- [x] Add the index row for this ADR in `docs/decisions/README.md`.
+- [ ] Publish `@olonjs/sources` to npm (`release:enterprise` includes it; publication is Ask first).
 
 ## Open Points
 
-- Package name: `@olonjs/sources` vs `@olonjs/projection` — leaning `@olonjs/sources`.
-- v1 decorator set (all five vs `withCache`+`withFallback`) — see spec `specs/external-collection-sources-v1.md`.
-- Whether the demo includes the dynamic detail route `/prodotti/[slug]` (page.collection binding) in v1.
+All three were decided on 2026-09-29 and folded into the spec/implementation (see `specs/external-collection-sources-v1.md`):
+
+- Package name: **`@olonjs/sources`**.
+- v1 decorator set: **all five** (`withCache`, `withRetry`, `withTimeout`, `withFallback`, `withCircuitBreaker`).
+- Demo includes the dynamic detail route **`/prodotti/[slug]`** (page.collection binding).
+
+Deviations accepted during implementation: the testing kit is exported from the main entry (not a `./testing` subpath, to keep a single UMD-safe build); the optional real-world provider (`src/sources/shopify.ts`) was not shipped.
 
 ## References
 
