@@ -1,7 +1,7 @@
 # Spec: External Collection Sources (`@olonjs/sources`)
 
 **Created:** 2026-09-29
-**Status:** DRAFT — Phase 1 SDD, in attesa di review
+**Status:** Approved (2026-09-29) — decisioni OQ chiuse, pronta per plan/tasks
 **Module id:** `external-collection-sources`
 **Contact:** architecture discussion 2026-09-29 (see ADR-0018)
 **Scope check (Phase 0):** capability singola — il demo `/prodotti` in `apps/next` è la sua slice end-to-end, non una capability separata.
@@ -127,7 +127,9 @@ Convenzioni: named export, nessun default; `SourceError` con `{ code, source, re
 
 ## Open Questions
 
-1. **Nome package**: `@olonjs/sources` (leaning) vs `@olonjs/projection`.
-2. **Set decoratori v1**: tutti e cinque (leaning) vs minimale (`withCache` + `withFallback`).
-3. **Demo dynamic route** `/prodotti/[slug]` con `page.collection` in v1 (leaning: sì — prova il binding dinamico) o dopo.
-4. **Punto di aggancio nel tenant**: loader dedicato `src/lib/loaders/loadVisitorPageBundle` (leaning) vs direttamente in `app/[[...slug]]/page.tsx`.
+Tutte chiuse (2026-09-29, leaning confermati):
+
+1. **Nome package** → **`@olonjs/sources`**.
+2. **Set decoratori v1** → **tutti e cinque** (`withCache`, `withRetry`, `withTimeout`, `withFallback`, `withCircuitBreaker`).
+3. **Demo dynamic route** → **`/prodotti/[slug]` incluso in v1** (prova il binding `page.collection`).
+4. **Punto di aggancio nel tenant** → **loader dedicato** (`src/lib/loaders/loadVisitorPageBundle`), route sottile.
