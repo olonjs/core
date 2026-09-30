@@ -29,6 +29,11 @@ export interface CollectionSourceContext {
   params: Record<string, string>;
   /** Aborted when the render/request is cancelled. */
   signal?: AbortSignal;
+  /**
+   * Observability hook, forwarded by `resolveCollectionSources`. Decorators
+   * emit their own events (e.g. `op: 'cache'`) through it.
+   */
+  onEvent?: SourceObserver;
 }
 
 export interface CollectionSource<TDocument extends CollectionDocument = CollectionDocument> {
@@ -53,6 +58,7 @@ export type SourceErrorCode =
   | 'timeout'
   | 'aborted'
   | 'missing-source'
+  | 'circuit-open'
   | 'unknown';
 
 const RETRYABLE_BY_CODE: Record<SourceErrorCode, boolean> = {
@@ -61,6 +67,7 @@ const RETRYABLE_BY_CODE: Record<SourceErrorCode, boolean> = {
   'missing-source': false,
   'invalid-document': false,
   aborted: false,
+  'circuit-open': false,
   unknown: false,
 };
 

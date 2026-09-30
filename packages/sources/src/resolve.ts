@@ -79,7 +79,7 @@ export async function resolveCollectionSources(
 
       let raw: unknown;
       try {
-        raw = await source.resolve({ source: sourceName, params, signal });
+        raw = await source.resolve({ source: sourceName, params, signal, onEvent });
       } catch (error) {
         const mapped =
           error instanceof SourceError
