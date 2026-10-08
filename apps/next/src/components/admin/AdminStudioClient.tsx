@@ -17,6 +17,7 @@ import { ComponentRegistry } from '@/lib/ComponentRegistry';
 import { iconMap } from '@/lib/IconResolver';
 import { SECTION_SCHEMAS } from '@/lib/schemas';
 import { buildEnabledWebMcpConfig } from '@/lib/webmcp/buildEnabledWebMcpConfig';
+import { adminToolExecutors, declaredAdminTools } from '@/lib/webmcp/toolRegistry';
 
 export type AdminStudioClientProps = {
   tenantId?: string;
@@ -104,7 +105,11 @@ export function AdminStudioClient({
       themeCss: { tenant: '' },
       iconRegistry: iconMap,
       addSection: addSectionConfig,
-      webmcp: buildEnabledWebMcpConfig(),
+      webmcp: {
+        ...buildEnabledWebMcpConfig(),
+        tools: declaredAdminTools,
+        toolExecutors: adminToolExecutors,
+      },
       persistence: {
         saveToFile,
         ...(coldSave ? { coldSave } : {}),

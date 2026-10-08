@@ -19,12 +19,13 @@ import {
 import { loadVisitorPage } from '@olonjs/next/server';
 import { EmptyTenantView } from '@/components/empty-tenant';
 import { WebMcpVisitorRuntime } from '@/components/webmcp/WebMcpVisitorRuntime';
-import { CollectionRegistry } from '@/lib/CollectionRegistry';
 import { buildVisitorWebPageJsonLd } from '@/lib/buildVisitorWebPageJsonLd';
-import { getFileCollections } from '@/lib/loaders/getFileCollections';
 import { getFilePages } from '@/lib/loaders/getFilePages';
 import { getFileSiteBundle } from '@/lib/loaders/getFileSiteConfig';
+import { loadVisitorPageBundle } from '@/lib/loaders/loadVisitorPageBundle';
 import { resolveVisitorShell } from '@/lib/resolveVisitorShell';
+import { resolvePublicToolNames } from '@/lib/webmcp/resolvePublicToolNames';
+import { sectionPublicTools } from '@/lib/webmcp/toolRegistry';
 import { VisitorSection } from '@/lib/VisitorSection';
 
 export const dynamic = 'force-dynamic';
@@ -89,7 +90,10 @@ export default async function VisitorCatchAllPage({ params, searchParams }: Page
     notFound();
   }
 
-  const collections = getFileCollections();
+  const { collections, collectionSchemas } = await loadVisitorPageBundle({
+    page: result.page,
+    params: result.params,
+  });
   const { siteConfig, menuConfig, themeConfig } = getFileSiteBundle();
   const collectionContext = resolveCollectionContext(result.page, result.params, collections);
 
@@ -99,7 +103,7 @@ export default async function VisitorCatchAllPage({ params, searchParams }: Page
     themeConfig,
     menuConfig,
     collections,
-    collectionSchemas: CollectionRegistry as never,
+    collectionSchemas: collectionSchemas as never,
     collectionContext,
     refDocuments: {
       'menu.json': menuConfig,
@@ -113,6 +117,7 @@ export default async function VisitorCatchAllPage({ params, searchParams }: Page
   const pageNum = Number(firstSearchValue(query.page) ?? '1') || 1;
   const shell = resolveVisitorShell(page, resolved.siteConfig ?? siteConfig);
   const sectionExtras = { authorId, page: pageNum, pathname };
+  const publicToolNames = resolvePublicToolNames(page.sections, sectionPublicTools as Record<string, readonly string[]>);
   const title = page.meta?.title ?? result.registrySlug;
   const description = typeof page.meta?.description === 'string' ? page.meta.description : '';
   const jsonLd = buildVisitorWebPageJsonLd({
@@ -123,7 +128,7 @@ export default async function VisitorCatchAllPage({ params, searchParams }: Page
 
   return (
     <>
-      <WebMcpVisitorRuntime />
+      <WebMcpVisitorRuntime toolNames={publicToolNames} />
       <link rel="mcp-manifest" href={buildPageManifestHref(requestSlug)} />
       <link rel="olon-contract" href={buildPageContractHref(requestSlug)} />
       <script
@@ -214,17 +219,40 @@ mkdir -p "app/api/public-collection/[source]/[file]"
 echo "Creating app/api/public-collection/[source]/[file]/route.ts..."
 cat << 'END_OF_FILE_CONTENT' > "app/api/public-collection/[source]/[file]/route.ts"
 import { NextResponse } from 'next/server';
+import { resolveCollectionSources } from '@olonjs/sources';
 import { resolvePublicCollectionDocument } from '@/lib/loaders/publishedContent';
+import { collectionSources } from '@/sources';
 import { loadRuntimeSurfaceForSite } from '@/lib/webmcp/runtime/loadRuntimeSurface';
 
 export const dynamic = 'force-dynamic';
 
-/** GET /collections/{source}/{source}.json (rewrite) — collection document, runtime. */
+/**
+ * GET /collections/{source}/{source}.json (rewrite) — collection document, runtime.
+ *
+ * File-backed collections are read from the content bundle; EXTERNAL sources
+ * (ADR-0018) are projected on demand so the contract's `dataHref` resolves.
+ * Note: resolution here has no route params — parameterized sources should be
+ * resolved at the page level (see loadPublicPageBundleForRequest).
+ */
 export async function GET(_request: Request, context: { params: Promise<{ source: string; file: string }> }) {
   try {
     const { source, file } = await context.params;
+    const sourceName = decodeURIComponent(source);
+
+    if (sourceName in collectionSources) {
+      const resolved = await resolveCollectionSources({
+        sources: collectionSources as never,
+        needed: [sourceName],
+      });
+      const projected = resolved.collections[sourceName];
+      if (!projected) {
+        return NextResponse.json({ error: 'Collection not found' }, { status: 404 });
+      }
+      return NextResponse.json(projected);
+    }
+
     const { bundle } = loadRuntimeSurfaceForSite();
-    const doc = resolvePublicCollectionDocument(bundle, decodeURIComponent(source), decodeURIComponent(file));
+    const doc = resolvePublicCollectionDocument(bundle, sourceName, decodeURIComponent(file));
     if (!doc) return NextResponse.json({ error: 'Collection not found' }, { status: 404 });
     return NextResponse.json(doc);
   } catch (error) {
@@ -761,10 +789,11 @@ cat << 'END_OF_FILE_CONTENT' > "package.json"
     "dist:dna": "npm run dist"
   },
   "dependencies": {
-    "@olonjs/core": "^2.0.1",
-    "@olonjs/next": "^0.0.13",
-    "@olonjs/react": "^0.2.1",
-    "@olonjs/studio": "^0.2.1",
+    "@olonjs/core": "^2.0.2",
+    "@olonjs/next": "^0.0.14",
+    "@olonjs/react": "^0.2.2",
+    "@olonjs/sources": "^0.1.0",
+    "@olonjs/studio": "^0.2.2",
     "clsx": "^2.1.1",
     "lucide-react": "^0.474.0",
     "next": "^15.5.0",
@@ -779,6 +808,7 @@ cat << 'END_OF_FILE_CONTENT' > "package.json"
     "@types/node": "^22.13.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "jsdom": "^26.1.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.3",
     "vitest": "^3.0.0"
@@ -1011,10 +1041,16 @@ const SCRIPT = path.join(__dirname, 'webmcp-feature-check.mjs');
 const PKG = path.join(ROOT, 'package.json');
 
 describe('next verify:webmcp script', () => {
-  it('probes document.modelContextProtocol (the surface ensureWebMcpRuntime assigns)', () => {
+  it('probes the native document.modelContext surface with polyfill fallback', () => {
     assert.ok(fs.existsSync(SCRIPT), `missing ${SCRIPT}`);
     const src = fs.readFileSync(SCRIPT, 'utf8');
+    // Native Chrome surface: document.modelContext.getTools() / executeTool(toolObject, argsObject).
+    assert.match(src, /document\.modelContext/);
+    assert.match(src, /await native\.getTools\(\)/);
+    assert.match(src, /native\.executeTool\(tool,/);
+    // Polyfill fallback (browsers without native WebMCP): listTools / executeTool(name, json).
     assert.match(src, /document\.modelContextProtocol/);
+    assert.match(src, /protocol\.executeTool\(/);
     // modelContextTesting is never assigned by the runtime — probing it is a false negative.
     assert.doesNotMatch(src, /modelContextTesting/);
     assert.doesNotMatch(src, /navigator\.modelContext/);
@@ -1205,13 +1241,31 @@ async function main() {
   const runUpdateThenSave = async (value) => {
     const rawUpdate = await page.evaluate(
       async ({ toolName, slug, sectionId, sectionType, fieldKey, value: nextValue }) => {
-        const runtime = document.modelContextProtocol;
-        if (!runtime?.executeTool) {
-          throw new Error('document.modelContextProtocol.executeTool is unavailable.');
+        const args = { slug, sectionId, sectionType, fieldKey, value: nextValue };
+        const native = document.modelContext;
+        const protocol = document.modelContextProtocol;
+        // Native Chrome WebMCP: executeTool(toolObject, args) — the tool object
+        // comes from getTools(). Args format: plain object since Chrome 155;
+        // before that the native expects a JSON string (verified on Chrome 153).
+        if (native && typeof native.executeTool === 'function') {
+          const tools = await native.getTools();
+          const tool = tools.find((entry) => entry.name === toolName);
+          if (!tool) {
+            throw new Error(`Tool "${toolName}" not found in native getTools().`);
+          }
+          const chromeMajor = Number((navigator.userAgent.match(/Chrome\/(\d+)/) ?? [])[1] ?? 0);
+          const nativeArgs = chromeMajor >= 155 ? args : JSON.stringify(args);
+          const result = await native.executeTool(tool, nativeArgs);
+          if (result === null) {
+            throw new Error(`Tool "${toolName}" returned null (navigation).`);
+          }
+          return typeof result === 'string' ? result : JSON.stringify(result);
         }
-        return runtime.executeTool(
-          toolName,
-          JSON.stringify({ slug, sectionId, sectionType, fieldKey, value: nextValue })
+        if (protocol && typeof protocol.executeTool === 'function') {
+          return protocol.executeTool(toolName, JSON.stringify(args));
+        }
+        throw new Error(
+          'WebMCP runtime unavailable: no document.modelContext (native) and no document.modelContextProtocol (polyfill).',
         );
       },
       {
@@ -1228,7 +1282,30 @@ async function main() {
       throw new Error(`WebMCP ${target.toolName} returned an error: ${rawUpdate}`);
     }
     const rawSave = await page.evaluate(
-      async ({ saveToolName }) => document.modelContextProtocol.executeTool(saveToolName, '{}'),
+      async ({ saveToolName }) => {
+        const native = document.modelContext;
+        const protocol = document.modelContextProtocol;
+        if (native && typeof native.executeTool === 'function') {
+          const tools = await native.getTools();
+          const tool = tools.find((entry) => entry.name === saveToolName);
+          if (!tool) {
+            throw new Error(`Tool "${saveToolName}" not found in native getTools().`);
+          }
+          const chromeMajor = Number((navigator.userAgent.match(/Chrome\/(\d+)/) ?? [])[1] ?? 0);
+          const nativeArgs = chromeMajor >= 155 ? {} : '{}';
+          const result = await native.executeTool(tool, nativeArgs);
+          if (result === null) {
+            throw new Error(`Tool "${saveToolName}" returned null (navigation).`);
+          }
+          return typeof result === 'string' ? result : JSON.stringify(result);
+        }
+        if (protocol && typeof protocol.executeTool === 'function') {
+          return protocol.executeTool(saveToolName, '{}');
+        }
+        throw new Error(
+          'WebMCP runtime unavailable: no document.modelContext (native) and no document.modelContextProtocol (polyfill).',
+        );
+      },
       { saveToolName: target.saveToolName }
     );
     const parsedSave = JSON.parse(rawSave);
@@ -1286,9 +1363,17 @@ async function main() {
       );
     }
 
-    const toolNames = await page.evaluate(() => {
-      const runtime = document.modelContextProtocol;
-      return runtime?.listTools?.().map((tool) => tool.name) ?? [];
+    const toolNames = await page.evaluate(async () => {
+      const native = document.modelContext;
+      const protocol = document.modelContextProtocol;
+      if (native && typeof native.getTools === 'function') {
+        const tools = await native.getTools();
+        return tools.map((tool) => tool.name);
+      }
+      if (protocol && typeof protocol.listTools === 'function') {
+        return protocol.listTools().map((tool) => tool.name);
+      }
+      return [];
     });
     for (const required of [target.toolName, target.saveToolName]) {
       if (!toolNames.includes(required)) {
@@ -1397,6 +1482,43 @@ export type Libro = z.infer<typeof LibroSchema>;
 export type LibriCollection = z.infer<typeof LibriCollectionSchema>;
 
 END_OF_FILE_CONTENT
+mkdir -p "src/collections/prodotti"
+echo "Creating src/collections/prodotti/index.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/collections/prodotti/index.ts"
+export { ProdottoSchema, ProdottiCollectionSchema } from './schema';
+export type { Prodotto, ProdottiCollection } from './types';
+
+END_OF_FILE_CONTENT
+echo "Creating src/collections/prodotti/schema.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/collections/prodotti/schema.ts"
+import { z } from 'zod';
+import { BaseCollectionItem } from '@olonjs/core';
+
+/**
+ * Demo collection whose source of truth is EXTERNAL (see src/sources/catalogo.ts).
+ * Same Zod item shape feeds the human list rendering (ui:* descriptors) and the
+ * agent contracts (JSON Schema emitted from this schema).
+ */
+export const ProdottoSchema = BaseCollectionItem.extend({
+  title: z.string().describe('ui:text'),
+  price: z.number().describe('ui:number'),
+  currency: z.string().default('EUR').describe('ui:text'),
+  description: z.string().optional().describe('ui:textarea'),
+  image: z.string().optional().describe('ui:text'),
+});
+
+export const ProdottiCollectionSchema = z.record(z.string(), ProdottoSchema);
+
+END_OF_FILE_CONTENT
+echo "Creating src/collections/prodotti/types.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/collections/prodotti/types.ts"
+import { z } from 'zod';
+import { ProdottoSchema, ProdottiCollectionSchema } from './schema';
+
+export type Prodotto = z.infer<typeof ProdottoSchema>;
+export type ProdottiCollection = z.infer<typeof ProdottiCollectionSchema>;
+
+END_OF_FILE_CONTENT
 mkdir -p "src/components"
 mkdir -p "src/components/admin"
 echo "Creating src/components/admin/AdminStudioClient.tsx..."
@@ -1420,6 +1542,7 @@ import { ComponentRegistry } from '@/lib/ComponentRegistry';
 import { iconMap } from '@/lib/IconResolver';
 import { SECTION_SCHEMAS } from '@/lib/schemas';
 import { buildEnabledWebMcpConfig } from '@/lib/webmcp/buildEnabledWebMcpConfig';
+import { adminToolExecutors, declaredAdminTools } from '@/lib/webmcp/toolRegistry';
 
 export type AdminStudioClientProps = {
   tenantId?: string;
@@ -1507,7 +1630,11 @@ export function AdminStudioClient({
       themeCss: { tenant: '' },
       iconRegistry: iconMap,
       addSection: addSectionConfig,
-      webmcp: buildEnabledWebMcpConfig(),
+      webmcp: {
+        ...buildEnabledWebMcpConfig(),
+        tools: declaredAdminTools,
+        toolExecutors: adminToolExecutors,
+      },
       persistence: {
         saveToFile,
         ...(coldSave ? { coldSave } : {}),
@@ -2535,6 +2662,7 @@ cat << 'END_OF_FILE_CONTENT' > "src/components/form-demo/index.ts"
 export { FormDemoView } from './View';
 export { FormDemoClient } from './FormDemoClient';
 export { FormDemoSchema, FormDemoSettingsSchema, FormDemoSubmissionSchema } from './schema';
+export { webmcpTools } from './webmcpTools';
 export type { FormDemoData, FormDemoSettings } from './types';
 
 END_OF_FILE_CONTENT
@@ -2563,6 +2691,173 @@ export const FormDemoSubmissionSchema = z.object({
 });
 
 END_OF_FILE_CONTENT
+echo "Creating src/components/form-demo/submitFormLead.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/form-demo/submitFormLead.test.ts"
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+const CLOUD_URL = 'https://cloud.example.com';
+const API_KEY = 'secret-key';
+
+async function loadSubmitFormLead() {
+  vi.resetModules();
+  vi.stubEnv('NEXT_PUBLIC_OLONJS_CLOUD_URL', CLOUD_URL);
+  vi.stubEnv('NEXT_PUBLIC_OLONJS_API_KEY', API_KEY);
+  return await import('./submitFormLead');
+}
+
+beforeEach(() => {
+  vi.stubGlobal('fetch', vi.fn());
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+});
+
+function mockFetchOk() {
+  const fetchMock = vi.mocked(fetch);
+  fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+  return fetchMock;
+}
+
+describe('submitFormLead', () => {
+  it('POSTs to {cloudUrl}/form/send with parity headers and full payload', async () => {
+    const { submitFormLead } = await loadSubmitFormLead();
+    const fetchMock = mockFetchOk();
+
+    const ctx = {
+      recipientEmail: 'lead@example.com',
+      sectionId: 'form-demo-1',
+      pageSlug: 'contatti',
+    };
+    const args = { name: 'Ada', email: 'ada@example.com', message: 'Ciao' };
+
+    await expect(submitFormLead(args, ctx)).resolves.toEqual({ ok: true });
+
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(`${CLOUD_URL}/form/send`);
+    const headers = init.headers as Record<string, string>;
+    expect(headers.Authorization).toBe(`Bearer ${API_KEY}`);
+    expect(headers['Content-Type']).toBe('application/json');
+    expect(headers['Idempotency-Key']).toMatch(/^form-form-demo-1-\d+$/);
+    const payload = JSON.parse(init.body as string) as Record<string, unknown>;
+    expect(payload).toMatchObject({
+      name: 'Ada',
+      email: 'ada@example.com',
+      message: 'Ciao',
+      recipientEmail: 'lead@example.com',
+      page: 'contatti',
+      section: 'form-demo-1',
+      source: 'olon-webmcp',
+    });
+    expect(typeof payload.submittedAt).toBe('string');
+  });
+
+  it('uses the dev-declared path, normalizing slashes', async () => {
+    const { submitFormLead } = await loadSubmitFormLead();
+    const fetchMock = mockFetchOk();
+
+    await submitFormLead(
+      { name: 'A', email: 'a@b.c', message: 'm' },
+      { recipientEmail: '', sectionId: 's1', pageSlug: 'x', path: '/lead/submit/' },
+    );
+
+    expect((fetchMock.mock.calls[0] as [string])[0]).toBe(`${CLOUD_URL}/lead/submit`);
+  });
+
+  it('throws a readable error on a non-ok response', async () => {
+    const { submitFormLead } = await loadSubmitFormLead();
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ error: 'bad gateway' }), { status: 502 }),
+    );
+
+    await expect(
+      submitFormLead(
+        { name: 'A', email: 'a@b.c', message: 'm' },
+        { recipientEmail: '', sectionId: 's1', pageSlug: 'x' },
+      ),
+    ).rejects.toThrow(/bad gateway/);
+  });
+
+  it('throws an explicit error when the cloud env is not configured', async () => {
+    vi.resetModules();
+    vi.stubEnv('NEXT_PUBLIC_OLONJS_CLOUD_URL', '');
+    vi.stubEnv('NEXT_PUBLIC_OLONJS_API_KEY', '');
+    const { submitFormLead } = await import('./submitFormLead');
+
+    await expect(
+      submitFormLead(
+        { name: 'A', email: 'a@b.c', message: 'm' },
+        { recipientEmail: '', sectionId: 's1', pageSlug: 'x' },
+      ),
+    ).rejects.toThrow(/Cloud env not configured/);
+  });
+});
+
+END_OF_FILE_CONTENT
+echo "Creating src/components/form-demo/submitFormLead.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/form-demo/submitFormLead.ts"
+import { cloudPolicy } from '@/lib/env/tenantEnv';
+
+export interface SubmitFormArgs {
+  name: string;
+  email: string;
+  message: string;
+}
+
+export interface SubmitFormContext {
+  recipientEmail: string;
+  sectionId: string;
+  pageSlug: string;
+  /** The dev-declared endpoint path (the variable piece); default 'form/send'. */
+  path?: string;
+}
+
+/**
+ * Shared submit executor for form sections (spec 03-webmcp-tool-submit-plugin).
+ *
+ * Base URL always comes from the cloud env chain (`tenantEnv`/`cloudPolicy`);
+ * the dev declares only the variable path. Header parity with tenant-alpha's
+ * `useOlonForms` (Bearer + Idempotency-Key).
+ */
+export async function submitFormLead(
+  args: SubmitFormArgs,
+  ctx: SubmitFormContext,
+): Promise<{ ok: true }> {
+  const base = (cloudPolicy.apiUrl ?? '').replace(/\/$/, '');
+  if (!base || !cloudPolicy.apiKey) {
+    throw new Error('Cloud env not configured (NEXT_PUBLIC_OLONJS_*).');
+  }
+
+  const path = (ctx.path ?? 'form/send').replace(/^\/+|\/+$/g, '');
+  const endpoint = `${base}/${path}`;
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${cloudPolicy.apiKey}`,
+      'Content-Type': 'application/json',
+      'Idempotency-Key': `form-${ctx.sectionId}-${Date.now()}`,
+    },
+    body: JSON.stringify({
+      ...args,
+      recipientEmail: ctx.recipientEmail,
+      page: ctx.pageSlug,
+      section: ctx.sectionId,
+      source: 'olon-webmcp',
+      submittedAt: new Date().toISOString(),
+    }),
+  });
+
+  const body = (await response.json().catch(() => ({}))) as { error?: string };
+  if (!response.ok) {
+    throw new Error(body.error ?? `Submit failed (${response.status})`);
+  }
+
+  return { ok: true };
+}
+
+END_OF_FILE_CONTENT
 echo "Creating src/components/form-demo/types.ts..."
 cat << 'END_OF_FILE_CONTENT' > "src/components/form-demo/types.ts"
 import { z } from 'zod';
@@ -2570,6 +2865,27 @@ import { FormDemoSchema, FormDemoSettingsSchema } from './schema';
 
 export type FormDemoData = z.infer<typeof FormDemoSchema>;
 export type FormDemoSettings = z.infer<typeof FormDemoSettingsSchema>;
+
+END_OF_FILE_CONTENT
+echo "Creating src/components/form-demo/webmcpTools.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/form-demo/webmcpTools.ts"
+import type { WebMcpToolDef } from '@olonjs/core';
+import { FormDemoSubmissionSchema } from './schema';
+
+/**
+ * Public WebMCP tools declared by the form-demo capsule (spec 03).
+ * Serializable defs only — the executor is registered client-side in
+ * `src/lib/webmcp/submitFormTool.ts` (functions cannot cross the RSC boundary).
+ */
+export const webmcpTools: readonly WebMcpToolDef[] = [
+  {
+    name: 'submit-form',
+    description: 'Submit the contact form on this page (name, email, message).',
+    surface: 'public',
+    inputSchema: FormDemoSubmissionSchema.toJSONSchema() as Record<string, unknown>,
+    annotations: { consequentialHint: true },
+  },
+];
 
 END_OF_FILE_CONTENT
 mkdir -p "src/components/header"
@@ -2662,22 +2978,221 @@ export type HeaderData = z.infer<typeof HeaderSchema>;
 export type HeaderSettings = z.infer<typeof HeaderSettingsSchema>;
 
 END_OF_FILE_CONTENT
+mkdir -p "src/components/prodotti-list"
+echo "Creating src/components/prodotti-list/View.tsx..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/prodotti-list/View.tsx"
+import type { Prodotto } from '@/collections/prodotti';
+import type { ProdottiListData, ProdottiListSettings } from './types';
+
+type ProdottiListViewProps = {
+  data: ProdottiListData;
+  settings?: ProdottiListSettings;
+};
+
+function formatPrice(prodotto: Prodotto): string {
+  const amount = (prodotto.price / 100).toFixed(2);
+  return `${amount} ${prodotto.currency ?? 'EUR'}`;
+}
+
+function toProdotti(items: ProdottiListData['items']): Prodotto[] {
+  return Object.values(items ?? {}).sort((a, b) => a.title.localeCompare(b.title));
+}
+
+/**
+ * RSC-safe catalog list — data comes from a PROJECTED external source
+ * (src/sources/catalogo.ts). The View itself never fetches (CIP).
+ */
+export function ProdottiListView({ data }: ProdottiListViewProps) {
+  const prodotti = toProdotti(data.items);
+
+  return (
+    <section className="bg-background px-6 py-16 text-foreground">
+      <div className="mx-auto w-full max-w-5xl">
+        {data.eyebrow ? (
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            {data.eyebrow}
+          </p>
+        ) : null}
+        <h1 data-jp-field="title" className="mt-2 text-3xl font-semibold">
+          {data.title}
+        </h1>
+        {data.description ? (
+          <p data-jp-field="description" className="mt-3 max-w-2xl text-muted-foreground">
+            {data.description}
+          </p>
+        ) : null}
+
+        <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {prodotti.map((prodotto) => (
+            <li
+              key={prodotto.id}
+              data-jp-item-id={prodotto.id}
+              data-jp-item-field="items"
+              className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+            >
+              <a
+                href={`/prodotti/${prodotto.id}`}
+                className="text-lg font-medium hover:underline"
+              >
+                {prodotto.title}
+              </a>
+              <p className="mt-2 text-sm text-muted-foreground">{formatPrice(prodotto)}</p>
+              {prodotto.description ? (
+                <p className="mt-3 text-sm text-muted-foreground">{prodotto.description}</p>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+
+        {prodotti.length === 0 ? (
+          <p className="mt-10 text-muted-foreground">No products available.</p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+END_OF_FILE_CONTENT
+echo "Creating src/components/prodotti-list/index.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/prodotti-list/index.ts"
+export { ProdottiListView } from './View';
+export { ProdottiListSchema, ProdottiListSettingsSchema } from './schema';
+export type { ProdottiListData, ProdottiListSettings } from './types';
+
+END_OF_FILE_CONTENT
+echo "Creating src/components/prodotti-list/schema.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/prodotti-list/schema.ts"
+import { z } from 'zod';
+import { BaseSectionData } from '@olonjs/core';
+import { ProdottoSchema } from '@/collections/prodotti';
+
+export const ProdottiListSchema = BaseSectionData.extend({
+  eyebrow: z.string().optional().describe('ui:text'),
+  title: z.string().describe('ui:text'),
+  description: z.string().optional().describe('ui:textarea'),
+  items: z.record(z.string(), ProdottoSchema).describe('ui:collection-ref:catalogo'),
+});
+
+export const ProdottiListSettingsSchema = z.object({});
+
+END_OF_FILE_CONTENT
+echo "Creating src/components/prodotti-list/types.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/prodotti-list/types.ts"
+import type { z } from 'zod';
+import type { ProdottiListSchema, ProdottiListSettingsSchema } from './schema';
+
+export type ProdottiListData = z.infer<typeof ProdottiListSchema>;
+export type ProdottiListSettings = z.infer<typeof ProdottiListSettingsSchema>;
+
+END_OF_FILE_CONTENT
+mkdir -p "src/components/prodotto-detail"
+echo "Creating src/components/prodotto-detail/View.tsx..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/prodotto-detail/View.tsx"
+import type { ProdottoDetailData, ProdottoDetailSettings } from './types';
+
+type ProdottoDetailViewProps = {
+  data: ProdottoDetailData;
+  settings?: ProdottoDetailSettings;
+};
+
+function formatPrice(price: number, currency?: string): string {
+  return `${(price / 100).toFixed(2)} ${currency ?? 'EUR'}`;
+}
+
+/** RSC-safe product detail — resolved from `collection:current` (projected source). */
+export function ProdottoDetailView({ data }: ProdottoDetailViewProps) {
+  const prodotto = data.item;
+
+  return (
+    <main className="min-h-screen bg-background px-6 py-16 text-foreground">
+      <article
+        data-jp-field="item"
+        data-jp-item-id={prodotto.id}
+        data-jp-item-field="item"
+        className="mx-auto w-full max-w-3xl rounded-2xl border border-border bg-card p-8 shadow-sm"
+      >
+        <a href="/prodotti" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+          {data.backLabel}
+        </a>
+        <h1 className="mt-10 text-3xl font-semibold">{prodotto.title}</h1>
+        <p className="mt-3 text-lg">{formatPrice(prodotto.price, prodotto.currency)}</p>
+        {prodotto.description ? (
+          <p className="mt-6 text-muted-foreground">{prodotto.description}</p>
+        ) : null}
+      </article>
+    </main>
+  );
+}
+
+END_OF_FILE_CONTENT
+echo "Creating src/components/prodotto-detail/index.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/prodotto-detail/index.ts"
+export { ProdottoDetailView } from './View';
+export { ProdottoDetailSchema, ProdottoDetailSettingsSchema } from './schema';
+export type { ProdottoDetailData, ProdottoDetailSettings } from './types';
+
+END_OF_FILE_CONTENT
+echo "Creating src/components/prodotto-detail/schema.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/prodotto-detail/schema.ts"
+import { z } from 'zod';
+import { BaseSectionData } from '@olonjs/core';
+import { ProdottoSchema } from '@/collections/prodotti';
+
+export const ProdottoDetailSchema = BaseSectionData.extend({
+  item: ProdottoSchema.describe('ui:collection-ref'),
+  backLabel: z.string().default('Torna al catalogo').describe('ui:text'),
+});
+
+export const ProdottoDetailSettingsSchema = z.object({});
+
+END_OF_FILE_CONTENT
+echo "Creating src/components/prodotto-detail/types.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/components/prodotto-detail/types.ts"
+import type { z } from 'zod';
+import type { ProdottoDetailSchema, ProdottoDetailSettingsSchema } from './schema';
+
+export type ProdottoDetailData = z.infer<typeof ProdottoDetailSchema>;
+export type ProdottoDetailSettings = z.infer<typeof ProdottoDetailSettingsSchema>;
+
+END_OF_FILE_CONTENT
 mkdir -p "src/components/webmcp"
 echo "Creating src/components/webmcp/WebMcpVisitorRuntime.tsx..."
 cat << 'END_OF_FILE_CONTENT' > "src/components/webmcp/WebMcpVisitorRuntime.tsx"
 'use client';
 
 import { useEffect } from 'react';
+import { registerWebMcpTool } from '@olonjs/core';
 import { bootstrapVisitorWebMcpRuntime } from '@/lib/webmcp/bootstrapVisitorWebMcpRuntime';
+// Side effect: registers the submit-form executor (spec 03). Client-only import.
+import '@/lib/webmcp/submitFormTool';
+import { visitorToolDefs } from '@/lib/webmcp/visitorToolDefs';
 
 /**
- * Client island: WebMCP imperative API on public pages (readResource / listTools empty).
- * Must not import @olonjs/studio.
+ * Client island: WebMCP imperative API on public pages.
+ * Installs the polyfill and registers the public tools enabled for the page
+ * (spec 02-webmcp-tool-public-runtime). Must not import @olonjs/studio.
+ *
+ * `toolNames` are computed server-side from the sections present on the page
+ * (functions cannot cross the RSC boundary — only names travel).
  */
-export function WebMcpVisitorRuntime() {
+export function WebMcpVisitorRuntime({ toolNames = [] }: { toolNames?: string[] }) {
   useEffect(() => {
     bootstrapVisitorWebMcpRuntime();
-  }, []);
+    const unregister = toolNames.map((name) => {
+      const def = visitorToolDefs[name];
+      if (!def) {
+        console.warn(`[WebMCP] visitor tool "${name}" has no executor definition.`);
+        return () => undefined;
+      }
+      return registerWebMcpTool({
+        ...def,
+        inputSchema: def.inputSchema ?? { type: 'object', additionalProperties: false, properties: {} },
+      });
+    });
+    return () => {
+      unregister.forEach((stop) => stop());
+    };
+  }, [toolNames]);
 
   return null;
 }
@@ -3062,8 +3577,8 @@ cat << 'END_OF_FILE_CONTENT' > "src/data/collections/libri/libri.json"
     "summary": "Fuga, destino e sogno si intrecciano in un romanzo sospeso tra reale e mitico."
   },
   "americanah": {
-    "id": "americanah",
-    "title": "Americanah",
+    "id": "americana",
+    "title": "Americana",
     "author": {
       "$ref": "../autori/autori.json#/chimamanda-ngozi-adichie"
     },
@@ -3133,6 +3648,10 @@ cat << 'END_OF_FILE_CONTENT' > "src/data/config/menu.json"
     {
       "label": "Get started",
       "href": "#Getstarted"
+    },
+    {
+      "label": "Prodotti",
+      "href": "/prodotti"
     },
     {
       "label": "GitHub",
@@ -3412,7 +3931,6 @@ cat << 'END_OF_FILE_CONTENT' > "src/data/pages/authors.json"
   ],
   "global-header": false
 }
-
 END_OF_FILE_CONTENT
 mkdir -p "src/data/pages/authors/[authorId]"
 echo "Creating src/data/pages/authors/[authorId]/libri.json..."
@@ -3560,16 +4078,77 @@ cat << 'END_OF_FILE_CONTENT' > "src/data/pages/libri/[slug].json"
 }
 
 END_OF_FILE_CONTENT
+mkdir -p "src/data/pages/prodotti"
+echo "Creating src/data/pages/prodotti.json..."
+cat << 'END_OF_FILE_CONTENT' > "src/data/pages/prodotti.json"
+{
+  "id": "prodotti-page",
+  "slug": "prodotti",
+  "meta": {
+    "title": "Prodotti",
+    "description": "Catalogo proiettato da una sorgente esterna (demo @olonjs/sources)."
+  },
+  "sections": [
+    {
+      "id": "prodotti-list-1",
+      "type": "prodotti-list",
+      "data": {
+        "anchorId": "catalogo-prodotti",
+        "eyebrow": "Projected source demo",
+        "title": "Prodotti",
+        "description": "Catalogo letto da una sorgente esterna, validato con la sua Zod shape e proiettato nel contratto OlonJS.",
+        "items": {
+          "$ref": "../collections/catalogo/catalogo.json"
+        }
+      }
+    }
+  ],
+  "global-header": false
+}
+
+END_OF_FILE_CONTENT
+echo "Creating src/data/pages/prodotti/[slug].json..."
+cat << 'END_OF_FILE_CONTENT' > "src/data/pages/prodotti/[slug].json"
+{
+  "id": "prodotto-detail-page",
+  "slug": "prodotti/[slug]",
+  "meta": {
+    "title": "Dettaglio prodotto",
+    "description": "Pagina dinamica alimentata dalla sorgente esterna catalogo."
+  },
+  "sections": [
+    {
+      "id": "prodotto-detail-1",
+      "type": "prodotto-detail",
+      "data": {
+        "anchorId": "dettaglio-prodotto",
+        "item": {
+          "$ref": "collection:current"
+        },
+        "backLabel": "← Torna al catalogo"
+      }
+    }
+  ],
+  "collection": {
+    "source": "catalogo",
+    "paramKey": "slug"
+  },
+  "global-header": false
+}
+
+END_OF_FILE_CONTENT
 # SKIP: src/index.css is binary and cannot be embedded as text.
 mkdir -p "src/lib"
 echo "Creating src/lib/CollectionRegistry.ts..."
 cat << 'END_OF_FILE_CONTENT' > "src/lib/CollectionRegistry.ts"
 import { AutoriCollectionSchema } from '@/collections/autori';
 import { LibriCollectionSchema } from '@/collections/libri';
+import { ProdottiCollectionSchema } from '@/collections/prodotti';
 
 export const CollectionRegistry = {
   autori: AutoriCollectionSchema,
   libri: LibriCollectionSchema,
+  catalogo: ProdottiCollectionSchema,
 } as const;
 
 export type CollectionType = keyof typeof CollectionRegistry;
@@ -3587,6 +4166,8 @@ import { EmptyTenantView } from '@/components/empty-tenant';
 import { FooterView } from '@/components/footer';
 import { FormDemoView } from '@/components/form-demo';
 import { HeaderView } from '@/components/header';
+import { ProdottoDetailView } from '@/components/prodotto-detail';
+import { ProdottiListView } from '@/components/prodotti-list';
 
 export const ComponentRegistry: {
   [K in SectionType]: React.FC<SectionComponentPropsMap[K]>;
@@ -3598,6 +4179,8 @@ export const ComponentRegistry: {
   footer: FooterView as React.FC<SectionComponentPropsMap['footer']>,
   'form-demo': FormDemoView as React.FC<SectionComponentPropsMap['form-demo']>,
   header: HeaderView as React.FC<SectionComponentPropsMap['header']>,
+  'prodotti-list': ProdottiListView as React.FC<SectionComponentPropsMap['prodotti-list']>,
+  'prodotto-detail': ProdottoDetailView as React.FC<SectionComponentPropsMap['prodotto-detail']>,
 };
 
 END_OF_FILE_CONTENT
@@ -5152,12 +5735,56 @@ END_OF_FILE_CONTENT
 echo "Creating src/lib/loaders/loadPublicPageBundleForRequest.ts..."
 cat << 'END_OF_FILE_CONTENT' > "src/lib/loaders/loadPublicPageBundleForRequest.ts"
 import type { PublicPageContentBundle } from '@olonjs/next/server';
+import { resolvePageMatchFromRegistry } from '@olonjs/core';
+import { collectCollectionSources, resolveCollectionSources } from '@olonjs/sources';
 import {
   buildServerApiCandidates,
   type ServerCloudBootSource,
 } from '@/lib/env/serverCloudPolicy';
+import { collectionSources } from '@/sources';
 import { loadLivePublicPageBundle } from './loadLivePublicPageBundle';
 import { loadLocalPublicPageBundle } from './loadLocalPublicPageBundle';
+
+/**
+ * Project external collection sources referenced by the requested slug's page
+ * (ADR-0018). Without this, page JSON endpoints would expose unresolved $refs.
+ */
+export async function withProjectedSources(
+  bundle: PublicPageContentBundle,
+  slug: string,
+  appRoot?: string,
+): Promise<PublicPageContentBundle> {
+  const match = resolvePageMatchFromRegistry(
+    bundle.pages as never,
+    slug
+  );
+  if (!match) return bundle;
+
+  const needed = collectCollectionSources(match.page).filter(
+    (name) => name in collectionSources
+  );
+  if (needed.length === 0) return bundle;
+
+  const resolved = await resolveCollectionSources({
+    sources: collectionSources as never,
+    needed,
+    params: match.params,
+  });
+
+  return {
+    ...bundle,
+    collections: {
+      ...(bundle.collections ?? {}),
+      ...(resolved.collections as NonNullable<PublicPageContentBundle['collections']>),
+    },
+    collectionSchemas: {
+      ...(bundle.collectionSchemas ?? {}),
+      ...(resolved.collectionSchemas as NonNullable<
+        PublicPageContentBundle['collectionSchemas']
+      >),
+    },
+  };
+}
 
 export type LoadPublicPageBundleForRequestInput = {
   bootSource: ServerCloudBootSource;
@@ -5190,16 +5817,74 @@ export async function loadPublicPageBundleForRequest(
     if (!apiUrl || !apiKey) {
       throw new Error('Live public page JSON requires cloud API URL and key');
     }
-    return loadLivePublicPageBundle({
+    const liveBundle = await loadLivePublicPageBundle({
       slug: input.slug,
       apiBases: buildServerApiCandidates(apiUrl),
       apiKey,
       appRoot,
       fetchImpl: input.fetchImpl,
     });
+    return withProjectedSources(liveBundle, input.slug, appRoot);
   }
 
-  return loadLocalPublicPageBundle(appRoot);
+  const localBundle = await loadLocalPublicPageBundle(appRoot);
+  return withProjectedSources(localBundle, input.slug, appRoot);
+}
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/loaders/loadVisitorPageBundle.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/loaders/loadVisitorPageBundle.ts"
+import type { JsonPagesConfig, PageConfig } from '@olonjs/core';
+import { collectCollectionSources, resolveCollectionSources } from '@olonjs/sources';
+import { CollectionRegistry } from '@/lib/CollectionRegistry';
+import { collectionSources } from '@/sources';
+import { getFileCollections } from './getFileCollections';
+
+export interface VisitorPageBundle {
+  collections: NonNullable<JsonPagesConfig['collections']>;
+  collectionSchemas: JsonPagesConfig['collectionSchemas'];
+  /** Provenance of the projected sources resolved for this route. */
+  sourceProvenance: Record<string, { fetchedAt: string; readOnly: boolean }>;
+}
+
+/**
+ * Load the per-route content bundle: file-backed collections plus the external
+ * sources this page needs (projected, validated, read-only).
+ *
+ * Sources are resolved ONLY when referenced by the page (ADR-0018 / spec
+ * external-collection-sources). Source names not registered as external
+ * sources are file-backed and skipped here.
+ */
+export async function loadVisitorPageBundle(input: {
+  page: PageConfig;
+  params: Record<string, string>;
+  appRoot?: string;
+}): Promise<VisitorPageBundle> {
+  const fileCollections = getFileCollections(input.appRoot) as NonNullable<
+    JsonPagesConfig['collections']
+  >;
+
+  const needed = collectCollectionSources(input.page).filter(
+    (name) => name in collectionSources
+  );
+
+  const resolved = await resolveCollectionSources({
+    sources: collectionSources as never,
+    needed,
+    params: input.params,
+  });
+
+  return {
+    collections: {
+      ...fileCollections,
+      ...(resolved.collections as NonNullable<JsonPagesConfig['collections']>),
+    },
+    collectionSchemas: {
+      ...(CollectionRegistry as JsonPagesConfig['collectionSchemas']),
+      ...(resolved.collectionSchemas as JsonPagesConfig['collectionSchemas']),
+    },
+    sourceProvenance: resolved.provenance,
+  };
 }
 
 END_OF_FILE_CONTENT
@@ -5354,6 +6039,8 @@ import { EmptyTenantSchema } from '@/components/empty-tenant';
 import { FooterSchema } from '@/components/footer';
 import { FormDemoSchema, FormDemoSubmissionSchema } from '@/components/form-demo';
 import { HeaderSchema } from '@/components/header';
+import { ProdottoDetailSchema } from '@/components/prodotto-detail';
+import { ProdottiListSchema } from '@/components/prodotti-list';
 
 export const SECTION_SCHEMAS = {
   'authors-list': AuthorsListSchema,
@@ -5363,6 +6050,8 @@ export const SECTION_SCHEMAS = {
   footer: FooterSchema,
   'form-demo': FormDemoSchema,
   header: HeaderSchema,
+  'prodotti-list': ProdottiListSchema,
+  'prodotto-detail': ProdottoDetailSchema,
 } as const;
 
 /**
@@ -5495,6 +6184,66 @@ export function buildEnabledWebMcpConfig(namespace?: string): {
     enabled: true,
     namespace: resolvedNamespace,
   };
+}
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/resolvePublicToolNames.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/resolvePublicToolNames.test.ts"
+import { describe, expect, it } from 'vitest';
+import { resolvePublicToolNames } from './resolvePublicToolNames';
+
+const sectionPublicTools = {
+  'form-demo': ['submit-form'],
+  'shop-catalog': ['search-product', 'add-to-cart'],
+};
+
+describe('resolvePublicToolNames', () => {
+  it('returns the public tools of the sections present on the page, deduplicated, in page order', () => {
+    const sections = [
+      { type: 'form-demo' },
+      { type: 'hero' },
+      { type: 'form-demo' },
+      { type: 'shop-catalog' },
+    ];
+    expect(resolvePublicToolNames(sections, sectionPublicTools)).toEqual([
+      'submit-form',
+      'search-product',
+      'add-to-cart',
+    ]);
+  });
+
+  it('returns an empty list when no section declares tools', () => {
+    expect(resolvePublicToolNames([{ type: 'hero' }], sectionPublicTools)).toEqual([]);
+  });
+
+  it('returns an empty list for an empty page', () => {
+    expect(resolvePublicToolNames([], sectionPublicTools)).toEqual([]);
+  });
+
+  it('ignores tool names not present in the section map', () => {
+    expect(resolvePublicToolNames([{ type: 'footer' }], sectionPublicTools)).toEqual([]);
+  });
+});
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/resolvePublicToolNames.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/resolvePublicToolNames.ts"
+/**
+ * Pure helper (spec 02-webmcp-tool-public-runtime): computes which public
+ * tool names are enabled for a page, from the section types present.
+ * Deduplicated, in page order.
+ */
+export function resolvePublicToolNames(
+  sections: ReadonlyArray<{ type: string }>,
+  sectionPublicTools: Record<string, readonly string[]>,
+): string[] {
+  const out: string[] = [];
+  for (const section of sections) {
+    for (const name of sectionPublicTools[section.type] ?? []) {
+      if (!out.includes(name)) out.push(name);
+    }
+  }
+  return out;
 }
 
 END_OF_FILE_CONTENT
@@ -5655,6 +6404,36 @@ describe('robots + sitemap', () => {
   });
 });
 
+describe('declared public tools in runtime contracts', () => {
+  const surfaceInput = {
+    bundle,
+    schemas,
+    declaredTools: [
+      {
+        name: 'submit-form',
+        description: 'Submit the contact form',
+        surface: 'public',
+        inputSchema: { type: 'object', properties: {} },
+      },
+    ] as const,
+  };
+
+  it('emits declared tools with their surface in the page contract', () => {
+    const contract = buildRuntimePageContract({ ...surfaceInput, slug: 'home' });
+    const submit = contract!.tools.find((t) => t.name === 'submit-form');
+    expect(submit).toBeDefined();
+    expect((submit as { surface?: string }).surface).toBe('public');
+    expect(contract!.tools.map((t) => t.name)).toEqual(['update-section', 'save', 'submit-form']);
+  });
+
+  it('emits declared tools in the page manifest tools list with surface', () => {
+    const manifest = buildRuntimePageManifest({ ...surfaceInput, slug: 'home' });
+    const submit = manifest!.tools.find((t) => t.name === 'submit-form');
+    expect(submit).toBeDefined();
+    expect((submit as { surface?: string }).surface).toBe('public');
+  });
+});
+
 END_OF_FILE_CONTENT
 echo "Creating src/lib/webmcp/runtime/agenticSurface.ts..."
 cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/runtime/agenticSurface.ts"
@@ -5672,6 +6451,7 @@ import {
   webmcp,
   type JsonPagesConfig,
   type PageConfig,
+  type WebMcpToolDef,
 } from '@olonjs/core';
 import type { PublicPageContentBundle } from '@olonjs/next/server';
 
@@ -5688,6 +6468,8 @@ export type RuntimeSurfaceInput = {
   bundle: PublicPageContentBundle;
   schemas: JsonPagesConfig['schemas'];
   submissionSchemas?: JsonPagesConfig['submissionSchemas'];
+  /** Tenant-declared tools (public surface), appended to the contract's built-ins. */
+  declaredTools?: readonly WebMcpToolDef[];
 };
 
 function joinSegments(segments: readonly string[]): string {
@@ -5776,6 +6558,7 @@ export function buildRuntimeSiteManifest(input: RuntimeSurfaceInput) {
     siteConfig: input.bundle.siteConfig,
     // Bundle carries SchemaLike; the manifest builder expects the Zod registry (same objects).
     collectionSchemas: input.bundle.collectionSchemas as never,
+    declaredTools: input.declaredTools,
   });
 }
 
@@ -5788,6 +6571,7 @@ export function buildRuntimePageManifest(input: RuntimeSurfaceInput & { slug: st
     schemas: input.schemas,
     submissionSchemas: input.submissionSchemas,
     siteConfig: input.bundle.siteConfig,
+    declaredTools: input.declaredTools,
   });
 }
 
@@ -5800,6 +6584,7 @@ export function buildRuntimePageContract(input: RuntimeSurfaceInput & { slug: st
     schemas: input.schemas,
     submissionSchemas: input.submissionSchemas,
     siteConfig: input.bundle.siteConfig,
+    declaredTools: input.declaredTools,
   });
 }
 
@@ -5818,6 +6603,7 @@ export function buildRuntimeLlmsTxt(input: RuntimeSurfaceInput): string {
     schemas: input.schemas,
     submissionSchemas: input.submissionSchemas,
     siteConfig: input.bundle.siteConfig,
+    declaredTools: input.declaredTools,
   });
 }
 
@@ -5927,6 +6713,7 @@ import { readServerCloudPolicy } from '@/lib/env/serverCloudPolicy';
 import { loadLocalPublicPageBundle } from '@/lib/loaders/loadLocalPublicPageBundle';
 import { loadPublicPageBundleForRequest } from '@/lib/loaders/loadPublicPageBundleForRequest';
 import { SECTION_SCHEMAS, SECTION_SUBMISSION_SCHEMAS } from '@/lib/schemas';
+import { declaredPublicTools } from '@/lib/webmcp/toolRegistry';
 import type { RuntimeSurfaceInput } from './agenticSurface';
 
 const schemas = SECTION_SCHEMAS as unknown as JsonPagesConfig['schemas'];
@@ -5949,7 +6736,7 @@ export async function loadRuntimeSurfaceForSlug(input: {
     apiUrl: policy.apiUrl,
     apiKey: policy.apiKey,
   });
-  return { bundle, schemas, submissionSchemas };
+  return { bundle, schemas, submissionSchemas, declaredTools: declaredPublicTools };
 }
 
 /**
@@ -5958,7 +6745,7 @@ export async function loadRuntimeSurfaceForSlug(input: {
  */
 export function loadRuntimeSurfaceForSite(): RuntimeSurfaceInput {
   const bundle = loadLocalPublicPageBundle(path.resolve(process.cwd()));
-  return { bundle, schemas, submissionSchemas };
+  return { bundle, schemas, submissionSchemas, declaredTools: declaredPublicTools };
 }
 
 /** Public base URL for absolute links (robots/sitemap). */
@@ -6019,6 +6806,236 @@ describe('next.config rewrites — runtime agentic surface', () => {
 });
 
 END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/submitFormTool.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/submitFormTool.test.ts"
+// @vitest-environment jsdom
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+const CLOUD_URL = 'https://cloud.example.com';
+
+async function loadModules() {
+  vi.resetModules();
+  vi.stubEnv('NEXT_PUBLIC_OLONJS_CLOUD_URL', CLOUD_URL);
+  vi.stubEnv('NEXT_PUBLIC_OLONJS_API_KEY', 'k');
+  const [{ sectionPublicTools, declaredPublicTools }, { visitorToolDefs }] = await Promise.all([
+    import('@/lib/webmcp/toolRegistry'),
+    import('@/lib/webmcp/visitorToolDefs'),
+  ]);
+  // Same side-effect import the visitor island performs: registers the executor.
+  await import('@/lib/webmcp/submitFormTool');
+  return { sectionPublicTools, declaredPublicTools, visitorToolDefs };
+}
+
+beforeEach(() => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 })));
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+  document.body.innerHTML = '';
+});
+
+describe('submit-form tool wiring', () => {
+  it('maps form-demo to submit-form and declares the public tool def', async () => {
+    const { sectionPublicTools, declaredPublicTools } = await loadModules();
+    expect(sectionPublicTools['form-demo']).toEqual(['submit-form']);
+
+    const def = declaredPublicTools.find((t) => t.name === 'submit-form');
+    expect(def).toBeDefined();
+    expect(def!.surface).toBe('public');
+    expect(def!.inputSchema).toMatchObject({
+      type: 'object',
+      properties: { name: { type: 'string' }, email: { type: 'string' }, message: { type: 'string' } },
+    });
+  });
+
+  it('registers the executor and submits a valid payload to {cloudUrl}/form/send', async () => {
+    const { visitorToolDefs } = await loadModules();
+    document.body.innerHTML =
+      '<form id="form-demo" data-olon-recipient="lead@example.com"></form>';
+
+    const tool = visitorToolDefs['submit-form'];
+    expect(tool).toBeDefined();
+
+    await expect(
+      tool.execute({ name: 'Ada', email: 'ada@example.com', message: 'Ciao' }),
+    ).resolves.toEqual({ ok: true });
+
+    const [url, init] = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(`${CLOUD_URL}/form/send`);
+    const payload = JSON.parse(init.body as string) as Record<string, unknown>;
+    expect(payload).toMatchObject({
+      recipientEmail: 'lead@example.com',
+      section: 'form-demo',
+      source: 'olon-webmcp',
+    });
+  });
+
+  it('rejects an invalid payload with a Zod validation error before any fetch', async () => {
+    const { visitorToolDefs } = await loadModules();
+    const tool = visitorToolDefs['submit-form'];
+
+    await expect(tool.execute({ name: '', email: 'not-an-email', message: '' })).rejects.toThrow();
+    expect(vi.mocked(fetch)).not.toHaveBeenCalled();
+  });
+});
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/submitFormTool.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/submitFormTool.ts"
+import { FormDemoSubmissionSchema } from '@/components/form-demo/schema';
+import { submitFormLead, type SubmitFormArgs } from '@/components/form-demo/submitFormLead';
+import { webmcpTools } from '@/components/form-demo/webmcpTools';
+import { visitorToolDefs } from './visitorToolDefs';
+
+const submitFormDef = webmcpTools.find((tool) => tool.name === 'submit-form');
+if (!submitFormDef) {
+  throw new Error('[WebMCP] form-demo capsule must declare the submit-form tool.');
+}
+
+/**
+ * Client-side executor registration for submit-form (spec 03).
+ *
+ * Imported as a side effect ONLY by the visitor island — never by server code:
+ * the executor chain (`submitFormLead` → `tenantEnv` → `@olonjs/react`) is
+ * client-bound. Validation uses the section's submission schema (ADR-0002),
+ * the same shape agents see in `sectionSubmissionSchemas` of the page contract.
+ */
+visitorToolDefs['submit-form'] = {
+  ...submitFormDef,
+  execute: async (rawArgs: unknown) => {
+    const parsed = FormDemoSubmissionSchema.parse(rawArgs);
+    const form = document.querySelector<HTMLFormElement>('form[data-olon-recipient]');
+    const args = rawArgs as Record<string, unknown>;
+    const sectionId =
+      typeof args.sectionId === 'string' && args.sectionId.trim()
+        ? args.sectionId.trim()
+        : form?.id || 'form-demo';
+    return submitFormLead(parsed as SubmitFormArgs, {
+      recipientEmail: form?.dataset.olonRecipient ?? '',
+      sectionId,
+      pageSlug: window.location.pathname,
+      path: 'form/send',
+    });
+  },
+};
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/toolRegistry.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/toolRegistry.ts"
+import type { WebMcpToolDef } from '@olonjs/core';
+import { webmcpTools as formDemoTools } from '@/components/form-demo';
+
+/**
+ * Tenant tool registry (spec 01-webmcp-tool-contract).
+ *
+ * Section capsules declare tools by exporting `webmcpTools` from their
+ * `index.ts`. Aggregate them here:
+ * - admin-surface defs + executors flow into the Studio island
+ *   (`AdminStudioClient` → `JsonPagesConfig.webmcp`);
+ * - public-surface tool names flow into the visitor page via
+ *   `sectionPublicTools` (module 02).
+ */
+
+/** Admin-surface tool defs registered in the Studio island. */
+export const declaredAdminTools: readonly WebMcpToolDef[] = [];
+
+/** Runtime executors for admin tools, keyed by tool name. */
+export const adminToolExecutors: Readonly<
+  Record<string, (args: unknown) => Promise<unknown> | unknown>
+> = {};
+
+/** Public tool names exposed per section type (consumed by module 02). */
+export const sectionPublicTools: Record<string, readonly string[]> = {
+  'form-demo': formDemoTools.map((tool) => tool.name),
+};
+
+/** Public-surface tool defs emitted in the runtime page contracts (module 02). */
+export const declaredPublicTools: readonly WebMcpToolDef[] = [...formDemoTools];
+
+END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/visitorIsland.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/visitorIsland.test.ts"
+// @vitest-environment jsdom
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { act, createElement } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { WebMcpVisitorRuntime } from '@/components/webmcp/WebMcpVisitorRuntime';
+import { visitorToolDefs } from '@/lib/webmcp/visitorToolDefs';
+
+function protocol() {
+  return (document as unknown as {
+    modelContextProtocol: {
+      listTools: () => Array<{ name: string }>;
+      executeTool: (name: string, inputArgsJson: string) => Promise<string>;
+    };
+  }).modelContextProtocol;
+}
+
+let root: Root | null = null;
+let container: HTMLDivElement | null = null;
+
+afterEach(() => {
+  delete visitorToolDefs['test-tool'];
+  if (root) {
+    act(() => root!.unmount());
+    root = null;
+  }
+  container?.remove();
+  container = null;
+  const doc = document as unknown as { modelContext?: unknown; modelContextProtocol?: unknown };
+  delete doc.modelContext;
+  delete doc.modelContextProtocol;
+  const win = window as unknown as { __olonWebMcpTools__?: unknown; __olonWebMcpControllers__?: unknown };
+  delete win.__olonWebMcpTools__;
+  delete win.__olonWebMcpControllers__;
+  vi.restoreAllMocks();
+});
+
+function mount(toolNames: string[]) {
+  container = document.createElement('div');
+  document.body.appendChild(container);
+  root = createRoot(container);
+  act(() => {
+    root!.render(createElement(WebMcpVisitorRuntime, { toolNames }));
+  });
+}
+
+describe('WebMcpVisitorRuntime — public tool registration', () => {
+  it('registers the declared tools for the page and executes them', async () => {
+    visitorToolDefs['test-tool'] = {
+      name: 'test-tool',
+      description: 'Test tool',
+      surface: 'public',
+      inputSchema: { type: 'object', additionalProperties: false, properties: {} },
+      execute: async (args: unknown) => ({ ok: true, args }),
+    };
+
+    mount(['test-tool', 'unknown-tool']);
+
+    await vi.waitFor(() => {
+      expect(protocol().listTools().map((t) => t.name)).toContain('test-tool');
+    });
+
+    const result = await protocol().executeTool('test-tool', '{"q":1}');
+    expect(JSON.parse(result)).toEqual({ ok: true, args: { q: 1 } });
+
+    act(() => root!.unmount());
+    root = null;
+
+    await vi.waitFor(() => {
+      expect(protocol().listTools().map((t) => t.name)).not.toContain('test-tool');
+    });
+  });
+
+  it('does not register anything when the page has no tool names', () => {
+    mount([]);
+    expect(protocol().listTools()).toEqual([]);
+  });
+});
+
+END_OF_FILE_CONTENT
 echo "Creating src/lib/webmcp/visitorPageWebMcpWiring.test.ts..."
 cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/visitorPageWebMcpWiring.test.ts"
 import { readFileSync } from 'node:fs';
@@ -6038,6 +7055,157 @@ describe('visitor page WebMCP wiring', () => {
 });
 
 END_OF_FILE_CONTENT
+echo "Creating src/lib/webmcp/visitorToolDefs.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/lib/webmcp/visitorToolDefs.ts"
+import type { WebMcpToolDef } from '@olonjs/core';
+
+export interface VisitorToolRegistration extends WebMcpToolDef {
+  /** Client-side executor — the dev's domain logic (fetch, route handler, external service). */
+  execute: (args: unknown) => Promise<unknown> | unknown;
+}
+
+/**
+ * Client-side registry of public tools: name → def with executor
+ * (spec 02-webmcp-tool-public-runtime).
+ *
+ * The RSC page passes only the enabled tool NAMES (functions cannot cross the
+ * RSC boundary); this registry resolves them to their executors at
+ * registration time in the visitor island.
+ *
+ * Section capsules register here — module 03 adds 'submit-form'.
+ */
+export const visitorToolDefs: Record<string, VisitorToolRegistration> = {};
+
+END_OF_FILE_CONTENT
+mkdir -p "src/sources"
+echo "Creating src/sources/catalogo.test.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/sources/catalogo.test.ts"
+import { describe, expect, it } from 'vitest';
+import { runSourceConformance } from '@olonjs/sources';
+import { catalogoSource, fetchCatalogoFromExternalService } from './catalogo';
+
+describe('catalogo (demo external source)', () => {
+  it('passes the provider conformance suite', async () => {
+    await expect(runSourceConformance(catalogoSource)).resolves.toBeUndefined();
+  });
+
+  it('projects a deterministic document keyed by product id', async () => {
+    const document = await fetchCatalogoFromExternalService();
+
+    expect(Object.keys(document).sort()).toEqual([
+      '1984',
+      'dune',
+      'il-nome-della-rosa',
+      'neuromancer',
+    ]);
+    for (const [key, item] of Object.entries(document)) {
+      expect(item.id).toBe(key);
+    }
+  });
+
+  it('surfaces failures for fallback/breaker policy to consume', async () => {
+    await expect(fetchCatalogoFromExternalService({ fail: true })).rejects.toThrow(
+      /unavailable/
+    );
+  });
+});
+
+END_OF_FILE_CONTENT
+echo "Creating src/sources/catalogo.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/sources/catalogo.ts"
+import { z } from 'zod';
+import { defineCollectionSource, withCache } from '@olonjs/sources';
+import { ProdottoSchema, type Prodotto } from '@/collections/prodotti';
+
+/**
+ * Demo provider: a DETERMINISTIC, local stand-in for an external catalog
+ * service (no network — keeps dev, tests and CI hermetic). The real-world twin
+ * would be `src/sources/shopify.ts` implementing the same contract.
+ *
+ * The `shape` is the single declaration: it validates the projected document
+ * and feeds the agent contracts (`/schemas/collections/catalogo.schema.json`).
+ */
+
+const CATALOGO_FIXTURE: Record<string, Prodotto> = {
+  dune: {
+    id: 'dune',
+    title: 'Dune — Edizione illustrata',
+    price: 2490,
+    currency: 'EUR',
+    description: 'Arrakis, spezia e politica: il classico di Frank Herbert.',
+  },
+  '1984': {
+    id: '1984',
+    title: '1984',
+    price: 1490,
+    currency: 'EUR',
+    description: 'Il Grande Fratello e il controllo del linguaggio.',
+  },
+  neuromancer: {
+    id: 'neuromancer',
+    title: 'Neuromancer',
+    price: 1890,
+    currency: 'EUR',
+    description: 'Il romanzo che ha definito il cyberpunk.',
+  },
+  'il-nome-della-rosa': {
+    id: 'il-nome-della-rosa',
+    title: 'Il nome della rosa',
+    price: 2100,
+    currency: 'EUR',
+    description: 'Un giallo medievale tra biblioteche e potere.',
+  },
+};
+
+export interface ExternalCatalogServiceOptions {
+  /** Simulated latency in ms (default 0 — deterministic tests). */
+  latencyMs?: number;
+  /** Force a failure, to exercise fallback/breaker policy. */
+  fail?: boolean;
+  signal?: AbortSignal;
+}
+
+/** Stand-in for the external system of record (Shopify/PIM/…). */
+export async function fetchCatalogoFromExternalService(
+  options: ExternalCatalogServiceOptions = {}
+): Promise<Record<string, Prodotto>> {
+  const { latencyMs = 0, fail = false, signal } = options;
+
+  if (latencyMs > 0) {
+    await new Promise((resolve) => setTimeout(resolve, latencyMs));
+  }
+  if (signal?.aborted) throw new Error('The catalog request was aborted');
+  if (fail) throw new Error('External catalog service unavailable');
+
+  return JSON.parse(JSON.stringify(CATALOGO_FIXTURE)) as Record<string, Prodotto>;
+}
+
+export const catalogoSource = withCache(
+  defineCollectionSource({
+    shape: z.record(z.string(), ProdottoSchema),
+    resolve: async ({ signal }) => fetchCatalogoFromExternalService({ signal }),
+    readOnly: true,
+  }),
+  { ttlMs: 60_000, swrMs: 300_000 }
+);
+
+END_OF_FILE_CONTENT
+echo "Creating src/sources/index.ts..."
+cat << 'END_OF_FILE_CONTENT' > "src/sources/index.ts"
+import { catalogoSource } from './catalogo';
+
+/**
+ * Tenant source registry. Adding a provider is a one-line change here — no
+ * changes to @olonjs/core (ADR-0018). Sources not listed here are file-backed
+ * collections loaded from src/data/collections.
+ */
+export const collectionSources = {
+  catalogo: catalogoSource,
+} as const;
+
+export type CollectionSourceName = keyof typeof collectionSources;
+
+END_OF_FILE_CONTENT
 echo "Creating src/types.ts..."
 cat << 'END_OF_FILE_CONTENT' > "src/types.ts"
 import type { AuthorsListData, AuthorsListSettings } from '@/components/authors-list';
@@ -6047,8 +7215,11 @@ import type { EmptyTenantData, EmptyTenantSettings } from '@/components/empty-te
 import type { FooterData, FooterSettings } from '@/components/footer';
 import type { FormDemoData, FormDemoSettings } from '@/components/form-demo';
 import type { HeaderData, HeaderSettings } from '@/components/header';
+import type { ProdottoDetailData, ProdottoDetailSettings } from '@/components/prodotto-detail';
+import type { ProdottiListData, ProdottiListSettings } from '@/components/prodotti-list';
 import type { Autore } from '@/collections/autori';
 import type { Libro } from '@/collections/libri';
+import type { Prodotto } from '@/collections/prodotti';
 
 export type SectionComponentPropsMap = {
   'authors-list': { data: AuthorsListData; settings?: AuthorsListSettings };
@@ -6058,6 +7229,8 @@ export type SectionComponentPropsMap = {
   footer: { data: FooterData; settings?: FooterSettings };
   header: { data: HeaderData; settings?: HeaderSettings };
   'form-demo': { data: FormDemoData; settings?: FormDemoSettings };
+  'prodotti-list': { data: ProdottiListData; settings?: ProdottiListSettings };
+  'prodotto-detail': { data: ProdottoDetailData; settings?: ProdottoDetailSettings };
 };
 
 declare module '@olonjs/core' {
@@ -6069,6 +7242,8 @@ declare module '@olonjs/core' {
     footer: FooterData;
     header: HeaderData;
     'form-demo': FormDemoData;
+    'prodotti-list': ProdottiListData;
+    'prodotto-detail': ProdottoDetailData;
   }
   export interface SectionSettingsRegistry {
     'authors-list': AuthorsListSettings;
@@ -6078,10 +7253,13 @@ declare module '@olonjs/core' {
     footer: FooterSettings;
     header: HeaderSettings;
     'form-demo': FormDemoSettings;
+    'prodotti-list': ProdottiListSettings;
+    'prodotto-detail': ProdottoDetailSettings;
   }
   export interface CollectionItemRegistry {
     autori: Autore;
     libri: Libro;
+    prodotti: Prodotto;
   }
 }
 
@@ -7394,7 +8572,7 @@ export const ContactFormSchema = BaseSectionData.merge(WithFormRecipient).extend
 });
 export const ContactFormSubmissionSchema = z.object({
   name: z.string().min(1).describe('Full name'),
-  email: z.string().email().describe('Reply email'),
+  email: z.email().describe('Reply email'),
   message: z.string().min(1).describe('Message body'),
 });
 EOF
@@ -11368,6 +12546,8 @@ import type { TagPostsData, TagPostsSettings } from '@/components/tag-posts';
 import type { ContentBlockData, ContentBlockSettings } from '@/components/content-block';
 import type { StatsBandData, StatsBandSettings } from '@/components/stats-band';
 import type { CtaBannerData, CtaBannerSettings } from '@/components/cta-banner';
+import type { Post } from '@/collections/posts';
+import type { Tag } from '@/collections/tags';
 
 export type SectionComponentPropsMap = {
   'header': { data: HeaderData; settings: HeaderSettings };
@@ -11415,6 +12595,10 @@ declare module '@olonjs/core' {
     'content-block': ContentBlockSettings;
     'stats-band': StatsBandSettings;
     'cta-banner': CtaBannerSettings;
+  }
+  export interface CollectionItemRegistry {
+    posts: Post;
+    tags: Tag;
   }
 }
 

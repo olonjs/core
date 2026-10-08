@@ -62,6 +62,38 @@ export interface AssetsConfig {
 export interface WebMcpConfig {
   enabled?: boolean;
   namespace?: string;
+  /**
+   * Tools declared by the tenant (section capsules), registered at runtime
+   * and emitted in the page contract so agents can discover them.
+   * `execute` is tenant-side and NOT part of this serializable shape —
+   * the runtime surface (admin island / visitor island) associates
+   * declared tools with their executors by name (see `toolExecutors`).
+   */
+  tools?: readonly WebMcpToolDef[];
+  /**
+   * Runtime-only executors for declared tools, keyed by tool name.
+   * NOT serialized and never emitted in contracts — the tenant builds
+   * this object client-side where functions can live.
+   */
+  toolExecutors?: Readonly<Record<string, (args: unknown) => Promise<unknown> | unknown>>;
+}
+
+/**
+ * Serializable declaration of a tenant-authored WebMCP tool (spec
+ * 01-webmcp-tool-contract). `inputSchema` is a plain JSON Schema — the
+ * dev serializes Zod shapes with `z.toJSONSchema()`.
+ */
+export interface WebMcpToolDef {
+  /** Unique tool name within the app; kebab-case. */
+  name: string;
+  description: string;
+  /** Where the tool is executable: Studio/admin island or public visitor page. */
+  surface: 'admin' | 'public';
+  inputSchema?: Record<string, unknown>;
+  annotations?: {
+    readOnlyHint?: boolean;
+    consequentialHint?: boolean;
+  };
 }
 
 type SchemaLike = { parse: (v: unknown) => unknown; shape?: Record<string, unknown> };

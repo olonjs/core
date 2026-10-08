@@ -172,3 +172,59 @@ describe('zod v4 serializer — page contract integration', () => {
     });
   });
 });
+
+describe('page contract — declared tool emission', () => {
+  const pageConfig = {
+    id: 'p1',
+    slug: 'home',
+    meta: { title: 'Home', description: '' },
+    sections: [{ id: 'hero-1', type: 'hero', data: {} }],
+  } as unknown as PageConfig;
+
+  const baseInput = {
+    slug: 'home',
+    pageConfig,
+    schemas: { hero: z.object({ title: z.string() }) },
+    siteConfig: emptySite,
+  };
+
+  it('labels built-in tools with surface admin', () => {
+    const contract = buildPageContract(baseInput);
+    expect(contract.tools.map((t) => ({ name: t.name, surface: (t as { surface?: string }).surface }))).toEqual([
+      { name: 'update-section', surface: 'admin' },
+      { name: 'save', surface: 'admin' },
+    ]);
+  });
+
+  it('appends declared tools with their declared surface', () => {
+    const contract = buildPageContract({
+      ...baseInput,
+      declaredTools: [{ name: 'search-product', description: 'd', surface: 'public' }],
+    });
+    expect(contract.tools.map((t) => t.name)).toEqual(['update-section', 'save', 'search-product']);
+    expect((contract.tools[2] as { surface?: string }).surface).toBe('public');
+  });
+
+  it('rejects a declared tool colliding with a built-in name', () => {
+    expect(() =>
+      buildPageContract({ ...baseInput, declaredTools: [{ name: 'save', description: 'd', surface: 'admin' }] }),
+    ).toThrow(/save/);
+  });
+
+  it('rejects non-kebab-case tool names', () => {
+    expect(() =>
+      buildPageContract({ ...baseInput, declaredTools: [{ name: 'searchProduct', description: 'd', surface: 'public' }] }),
+    ).toThrow(/kebab/);
+  });
+
+  it('emits declared tools even when the page has no typed sections', () => {
+    const contract = buildPageContract({
+      slug: 'empty',
+      pageConfig: { ...pageConfig, sections: [] } as unknown as PageConfig,
+      schemas: {},
+      siteConfig: emptySite,
+      declaredTools: [{ name: 'ping', description: 'd', surface: 'public' }],
+    });
+    expect(contract.tools.map((t) => t.name)).toEqual(['ping']);
+  });
+});

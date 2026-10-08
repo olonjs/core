@@ -151,3 +151,33 @@ describe('robots + sitemap', () => {
     expect(xml).toContain('<lastmod>2026-09-10T10:00:00Z</lastmod>');
   });
 });
+
+describe('declared public tools in runtime contracts', () => {
+  const surfaceInput = {
+    bundle,
+    schemas,
+    declaredTools: [
+      {
+        name: 'submit-form',
+        description: 'Submit the contact form',
+        surface: 'public',
+        inputSchema: { type: 'object', properties: {} },
+      },
+    ] as const,
+  };
+
+  it('emits declared tools with their surface in the page contract', () => {
+    const contract = buildRuntimePageContract({ ...surfaceInput, slug: 'home' });
+    const submit = contract!.tools.find((t) => t.name === 'submit-form');
+    expect(submit).toBeDefined();
+    expect((submit as { surface?: string }).surface).toBe('public');
+    expect(contract!.tools.map((t) => t.name)).toEqual(['update-section', 'save', 'submit-form']);
+  });
+
+  it('emits declared tools in the page manifest tools list with surface', () => {
+    const manifest = buildRuntimePageManifest({ ...surfaceInput, slug: 'home' });
+    const submit = manifest!.tools.find((t) => t.name === 'submit-form');
+    expect(submit).toBeDefined();
+    expect((submit as { surface?: string }).surface).toBe('public');
+  });
+});

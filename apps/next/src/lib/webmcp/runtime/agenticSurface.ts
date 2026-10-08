@@ -12,6 +12,7 @@ import {
   webmcp,
   type JsonPagesConfig,
   type PageConfig,
+  type WebMcpToolDef,
 } from '@olonjs/core';
 import type { PublicPageContentBundle } from '@olonjs/next/server';
 
@@ -28,6 +29,8 @@ export type RuntimeSurfaceInput = {
   bundle: PublicPageContentBundle;
   schemas: JsonPagesConfig['schemas'];
   submissionSchemas?: JsonPagesConfig['submissionSchemas'];
+  /** Tenant-declared tools (public surface), appended to the contract's built-ins. */
+  declaredTools?: readonly WebMcpToolDef[];
 };
 
 function joinSegments(segments: readonly string[]): string {
@@ -116,6 +119,7 @@ export function buildRuntimeSiteManifest(input: RuntimeSurfaceInput) {
     siteConfig: input.bundle.siteConfig,
     // Bundle carries SchemaLike; the manifest builder expects the Zod registry (same objects).
     collectionSchemas: input.bundle.collectionSchemas as never,
+    declaredTools: input.declaredTools,
   });
 }
 
@@ -128,6 +132,7 @@ export function buildRuntimePageManifest(input: RuntimeSurfaceInput & { slug: st
     schemas: input.schemas,
     submissionSchemas: input.submissionSchemas,
     siteConfig: input.bundle.siteConfig,
+    declaredTools: input.declaredTools,
   });
 }
 
@@ -140,6 +145,7 @@ export function buildRuntimePageContract(input: RuntimeSurfaceInput & { slug: st
     schemas: input.schemas,
     submissionSchemas: input.submissionSchemas,
     siteConfig: input.bundle.siteConfig,
+    declaredTools: input.declaredTools,
   });
 }
 
@@ -158,6 +164,7 @@ export function buildRuntimeLlmsTxt(input: RuntimeSurfaceInput): string {
     schemas: input.schemas,
     submissionSchemas: input.submissionSchemas,
     siteConfig: input.bundle.siteConfig,
+    declaredTools: input.declaredTools,
   });
 }
 

@@ -4,6 +4,7 @@ import { readServerCloudPolicy } from '@/lib/env/serverCloudPolicy';
 import { loadLocalPublicPageBundle } from '@/lib/loaders/loadLocalPublicPageBundle';
 import { loadPublicPageBundleForRequest } from '@/lib/loaders/loadPublicPageBundleForRequest';
 import { SECTION_SCHEMAS, SECTION_SUBMISSION_SCHEMAS } from '@/lib/schemas';
+import { declaredPublicTools } from '@/lib/webmcp/toolRegistry';
 import type { RuntimeSurfaceInput } from './agenticSurface';
 
 const schemas = SECTION_SCHEMAS as unknown as JsonPagesConfig['schemas'];
@@ -26,7 +27,7 @@ export async function loadRuntimeSurfaceForSlug(input: {
     apiUrl: policy.apiUrl,
     apiKey: policy.apiKey,
   });
-  return { bundle, schemas, submissionSchemas };
+  return { bundle, schemas, submissionSchemas, declaredTools: declaredPublicTools };
 }
 
 /**
@@ -35,7 +36,7 @@ export async function loadRuntimeSurfaceForSlug(input: {
  */
 export function loadRuntimeSurfaceForSite(): RuntimeSurfaceInput {
   const bundle = loadLocalPublicPageBundle(path.resolve(process.cwd()));
-  return { bundle, schemas, submissionSchemas };
+  return { bundle, schemas, submissionSchemas, declaredTools: declaredPublicTools };
 }
 
 /** Public base URL for absolute links (robots/sitemap). */

@@ -15,6 +15,8 @@ import { getFilePages } from '@/lib/loaders/getFilePages';
 import { getFileSiteBundle } from '@/lib/loaders/getFileSiteConfig';
 import { loadVisitorPageBundle } from '@/lib/loaders/loadVisitorPageBundle';
 import { resolveVisitorShell } from '@/lib/resolveVisitorShell';
+import { resolvePublicToolNames } from '@/lib/webmcp/resolvePublicToolNames';
+import { sectionPublicTools } from '@/lib/webmcp/toolRegistry';
 import { VisitorSection } from '@/lib/VisitorSection';
 
 export const dynamic = 'force-dynamic';
@@ -106,6 +108,7 @@ export default async function VisitorCatchAllPage({ params, searchParams }: Page
   const pageNum = Number(firstSearchValue(query.page) ?? '1') || 1;
   const shell = resolveVisitorShell(page, resolved.siteConfig ?? siteConfig);
   const sectionExtras = { authorId, page: pageNum, pathname };
+  const publicToolNames = resolvePublicToolNames(page.sections, sectionPublicTools as Record<string, readonly string[]>);
   const title = page.meta?.title ?? result.registrySlug;
   const description = typeof page.meta?.description === 'string' ? page.meta.description : '';
   const jsonLd = buildVisitorWebPageJsonLd({
@@ -116,7 +119,7 @@ export default async function VisitorCatchAllPage({ params, searchParams }: Page
 
   return (
     <>
-      <WebMcpVisitorRuntime />
+      <WebMcpVisitorRuntime toolNames={publicToolNames} />
       <link rel="mcp-manifest" href={buildPageManifestHref(requestSlug)} />
       <link rel="olon-contract" href={buildPageContractHref(requestSlug)} />
       <script

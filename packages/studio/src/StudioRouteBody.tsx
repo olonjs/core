@@ -512,9 +512,11 @@ export const StudioRouteBody: React.FC<StudioRouteBodyProps> = ({
     async (toolName: string, rawArgs: unknown) => {
       if (toolName === buildWebMcpToolName()) return executeWebMcpMutation(rawArgs);
       if (toolName === buildWebMcpSaveToolName()) return executeWebMcpSave();
+      const declaredExecutor = webMcp?.toolExecutors?.[toolName];
+      if (declaredExecutor) return declaredExecutor(rawArgs);
       throw new Error(`Unknown WebMCP tool "${toolName}".`);
     },
-    [executeWebMcpMutation, executeWebMcpSave]
+    [executeWebMcpMutation, executeWebMcpSave, webMcp?.toolExecutors]
   );
 
   const handleStudioMessage = useCallback(
@@ -635,9 +637,23 @@ export const StudioRouteBody: React.FC<StudioRouteBodyProps> = ({
       execute: () => handleWebMcpToolCall(buildWebMcpSaveToolName(), {}),
     });
 
+    // Tenant-declared admin tools (spec 01-webmcp-tool-contract): surface-filtered,
+    // executed through the tenant-supplied executors keyed by tool name.
+    const declaredAdminTools = (webMcp?.tools ?? []).filter((tool) => tool.surface === 'admin');
+    const unregisterDeclared = declaredAdminTools.map((tool) =>
+      registerWebMcpTool({
+        name: tool.name,
+        description: tool.description,
+        inputSchema: tool.inputSchema ?? { type: 'object', additionalProperties: false, properties: {} },
+        ...(tool.annotations ? { annotations: tool.annotations } : {}),
+        execute: (args) => handleWebMcpToolCall(tool.name, args),
+      })
+    );
+
     return () => {
       unregisterUpdate();
       unregisterSave();
+      unregisterDeclared.forEach((unregister) => unregister());
     };
   }, [webMcp?.enabled, slug, draft, globalDraft, handleWebMcpToolCall]);
 

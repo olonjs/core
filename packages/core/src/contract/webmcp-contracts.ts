@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { PageConfig, SiteConfig } from './kernel';
-import type { JsonPagesConfig } from './types-engine';
+import type { JsonPagesConfig, WebMcpToolDef } from './types-engine';
 
 const WEBMCP_TOOL_REQUEST_TYPE = 'olonjs:webmcp:tool-call';
 const WEBMCP_TOOL_RESULT_TYPE = 'olonjs:webmcp:tool-result';
@@ -9,6 +9,7 @@ export interface WebMcpToolContract {
   name: string;
   description: string;
   inputSchema: Record<string, unknown>;
+  surface: 'admin' | 'public';
 }
 
 export interface WebMcpSectionInstance {
@@ -70,7 +71,7 @@ export interface OlonJsPageManifest {
   };
   sectionTypes: string[];
   sectionInstances: WebMcpSectionInstance[];
-  tools: Array<Pick<WebMcpToolContract, 'name' | 'description'>>;
+  tools: Array<Pick<WebMcpToolContract, 'name' | 'description' | 'surface'>>;
 }
 
 export interface OlonJsSiteManifestIndex {
@@ -113,6 +114,8 @@ export interface BuildPageContractInput {
   schemas: JsonPagesConfig['schemas'];
   submissionSchemas?: JsonPagesConfig['submissionSchemas'];
   siteConfig: SiteConfig;
+  /** Tenant-declared tools (section capsules), appended to the built-ins. */
+  declaredTools?: readonly WebMcpToolDef[];
 }
 
 export interface BuildSiteManifestInput {
@@ -121,6 +124,8 @@ export interface BuildSiteManifestInput {
   submissionSchemas?: JsonPagesConfig['submissionSchemas'];
   siteConfig: SiteConfig;
   collectionSchemas?: Record<string, z.ZodTypeAny>;
+  /** Tenant-declared tools (section capsules), appended to the built-ins. */
+  declaredTools?: readonly WebMcpToolDef[];
 }
 
 function cloneJson<T>(value: T): T {
@@ -396,6 +401,20 @@ function buildToolName(): 'update-section' {
   return 'update-section';
 }
 
+const KEBAB_CASE_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const BUILTIN_TOOL_NAMES = new Set(['update-section', 'save']);
+
+function validateDeclaredTools(declaredTools: readonly WebMcpToolDef[] | undefined): void {
+  for (const tool of declaredTools ?? []) {
+    if (BUILTIN_TOOL_NAMES.has(tool.name)) {
+      throw new Error(`Declared WebMCP tool "${tool.name}" collides with a built-in tool name.`);
+    }
+    if (!KEBAB_CASE_RE.test(tool.name)) {
+      throw new Error(`Declared WebMCP tool name "${tool.name}" must be kebab-case.`);
+    }
+  }
+}
+
 export function buildPageContractHref(slug: string): string {
   return `/schemas/${slug}.schema.json`;
 }
@@ -427,6 +446,7 @@ export function buildPageContract({
   schemas,
   submissionSchemas,
   siteConfig,
+  declaredTools,
 }: BuildPageContractInput): OlonJsPageContract {
   const title = typeof pageConfig.meta?.title === 'string' ? pageConfig.meta.title : slug;
   const description = typeof pageConfig.meta?.description === 'string' ? pageConfig.meta.description : '';
@@ -458,7 +478,7 @@ export function buildPageContract({
     label: inferSectionLabel(section),
   }));
 
-  const tools: WebMcpToolContract[] =
+  const builtInTools: WebMcpToolContract[] =
     sectionTypes.filter((sectionType) => sectionSchemas[sectionType] != null).length > 0
       ? [
           {
@@ -466,15 +486,27 @@ export function buildPageContract({
             description:
               'Update a section field in the Studio draft. Does not persist — call save when all updates are complete. Use sectionType to select the matching schema from sectionSchemas.',
             inputSchema: buildMutationInputSchema(),
+            surface: 'admin' as const,
           },
           {
             name: 'save',
             description:
               'Persist all pending draft changes using the active save mode (local file, hot save, or save2repo). Call once after all update-section calls are complete.',
             inputSchema: { type: 'object', additionalProperties: false, properties: {} },
+            surface: 'admin' as const,
           },
         ]
       : [];
+
+  validateDeclaredTools(declaredTools);
+  const declaredToolContracts: WebMcpToolContract[] = (declaredTools ?? []).map((tool) => ({
+    name: tool.name,
+    description: tool.description,
+    inputSchema: tool.inputSchema ?? { type: 'object', additionalProperties: false, properties: {} },
+    surface: tool.surface,
+  }));
+
+  const tools: WebMcpToolContract[] = [...builtInTools, ...declaredToolContracts];
 
   const contract: OlonJsPageContract = {
     version: '1.0.0',
@@ -531,9 +563,10 @@ export function buildPageManifest(input: BuildPageContractInput): OlonJsPageMani
     },
     sectionTypes: contract.sectionTypes,
     sectionInstances: contract.sectionInstances,
-    tools: contract.tools.map(({ name, description }) => ({
+    tools: contract.tools.map(({ name, description, surface }) => ({
       name,
       description,
+      surface,
     })),
   };
 }
@@ -544,6 +577,7 @@ export function buildSiteManifest({
   submissionSchemas,
   siteConfig,
   collectionSchemas,
+  declaredTools,
 }: BuildSiteManifestInput): OlonJsSiteManifestIndex {
   const pageEntries = Object.entries(pages ?? {}).sort(([a], [b]) => a.localeCompare(b));
   const manifest: OlonJsSiteManifestIndex = {
@@ -551,7 +585,7 @@ export function buildSiteManifest({
     kind: 'olonjs-mcp-manifest-index',
     generatedAt: new Date().toISOString(),
     pages: pageEntries.map(([slug, pageConfig]) => {
-      const pageManifest = buildPageManifest({ slug, pageConfig, schemas, submissionSchemas, siteConfig });
+      const pageManifest = buildPageManifest({ slug, pageConfig, schemas, submissionSchemas, siteConfig, declaredTools });
       return {
         slug,
         title: pageManifest.title,
