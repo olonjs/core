@@ -1,4 +1,4 @@
-# OlonJS Admin Protocol (JAP) v1.3
+# OlonJS Admin Protocol (JAP) v1.4
 
 **Objective:** Deterministic orchestration of the Studio environment.
 
@@ -42,6 +42,17 @@ Studio and supporting build flows must remain compatible with a green `tsc && vi
 - section and nested focus synchronization uses path segments for nested targets
 - sidebar expansion state for nested arrays derives from the full root-to-leaf path
 - flat-only heuristics are non-compliant for nested structures
+
+## 8. Declared WebMCP Tools (admin surface — WTP)
+
+The Studio route body is the single dispatcher for admin-surface tools:
+
+- built-in tools (`update-section`, `save`) remain first-class, hardcoded
+- declared tools with `surface: 'admin'` are registered from `WebMcpConfig.toolExecutors` (JEB 10.5) alongside the built-ins
+- dispatch is by tool name; unknown names are rejected with an explicit error
+- registration is deterministic and cleaned up on unmount (no duplicate registrations)
+
+Declared tools never replace built-ins; a name collision with a built-in is an explicit contract-build error (WTP 11.3).
 
 **Why it matters:** JAP keeps editing deterministic across shell and page scopes without collapsing Studio into tenant-specific admin logic.
 

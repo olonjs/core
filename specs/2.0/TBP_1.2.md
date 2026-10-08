@@ -1,4 +1,4 @@
-## 3. Tenant Block Protocol (TBP) v1.1
+## 3. Tenant Block Protocol (TBP) v1.2
 
 **Objective:** Standardize the capsule structure for tenant section/component types.
 
@@ -10,10 +10,13 @@ Components are self-contained directories under `src/components/<sectionType>/`:
 - `schema.ts` -> Zod schema(s) for the data contract and optionally settings
 - `types.ts` -> TypeScript interfaces inferred from the schema
 - `index.ts` -> public API re-exporting View, schema(s), and types
+- `webmcpTools.ts` -> optional: `webmcpTools: readonly WebMcpToolDef[]` — serializable tool descriptors per WTP; re-exported from `index.ts`
 
 `schema.ts` must export at least one data schema for the type.
 Data schema should extend `BaseSectionData`.
 Array items should extend `BaseArrayItem`.
+
+`webmcpTools.ts` carries descriptor data only. Executor functions are tenant-side wiring (WTP 11.5) and are never part of the capsule contract.
 
 ### 3.2 Shell-Scoped Section Instances
 
@@ -203,7 +206,7 @@ Layer 2 - `@theme` bridge:
 }
 ```
 
-Additional modes should override the Layer 1 semantic bridge, for example under `[data-theme=\"light\"]`, while leaving Layer 2 unchanged.
+Additional modes should override the Layer 1 semantic bridge, for example under `[data-theme="light"]`, while leaving Layer 2 unchanged.
 
 Rule:
 

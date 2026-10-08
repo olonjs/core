@@ -30,12 +30,13 @@ The OlonJS Architecture Specifications **v1.6** are expressed through the specs 
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\COP_v1.1.md" `
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\ECIP.md" `
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\IDAC_1.2.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JAP_1.3.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JEB_1.2.md" `
+- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JAP_1.4.md" `
+- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JEB_1.3.md" `
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JSP_1.10.md" `
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\MTRP_1.3.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\TBP_1.1.md" `
+- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\TBP_1.2.md" `
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\TOCC_1.1.md" `
+- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\WTP_1.0.md" `
 - `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\Appendix.md" `
 
 

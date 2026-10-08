@@ -1,4 +1,4 @@
-## 10. JsonPagesConfig & Engine Bootstrap (JEB) v1.2
+## 10. JsonPagesConfig & Engine Bootstrap (JEB) v1.3
 
 **Objective:** Define the bootstrap contract between tenant app and `JsonPagesEngine`.
 
@@ -19,6 +19,7 @@ Required fields are:
 | `refDocuments` | `Record<string, unknown>` optional | Extra JSON documents available to `$ref` resolution |
 | `themeCss` | `{ tenant: string }` | Tenant CSS bridge data for Stage/runtime injection |
 | `addSection` | `AddSectionConfig` | Add-section configuration |
+| `webmcp` | `WebMcpConfig` optional | WebMCP runtime configuration (see 10.5) |
 
 ### 10.2 JsonPagesEngine
 
@@ -66,6 +67,19 @@ without this rule, Studio may resolve a referenced field from a stale bootstrap 
 `menuConfig` in bootstrap is the resolved menu document surface passed into the engine.
 
 Shell instances do not become menu owners because bootstrap includes `menuConfig`.
+
+### 10.5 WebMCP Bootstrap (WTP)
+
+`WebMcpConfig` shape:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `enabled` | boolean | Whether the WebMCP runtime is exposed on the page |
+| `namespace` | string optional | Runtime namespace qualifier |
+| `tools` | `WebMcpToolDef[]` optional | Declared tool descriptors (see WTP 11.1) |
+| `toolExecutors` | `Record<string, (args: unknown) => Promise<unknown> \| unknown>` optional | Tenant-side executors keyed by tool name; `admin` tools are registered and dispatched by the Studio route body (JAP); `public` tools are resolved name-only through the visitor page |
+
+Declared tools are validated and emitted in page contracts per WTP.
 
 **Why it matters:** JEB is the runtime boundary between sovereign tenant data and Core orchestration.
 

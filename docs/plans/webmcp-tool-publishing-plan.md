@@ -37,11 +37,11 @@ Tre moduli in ordine di build: (01) dichiarazione tool nelle capsule + registraz
 ## Open Questions (assunte con le proposte — review finale prima della publish)
 
 1. **Bridge MCP su visitor** (da spec 03): **RISOLTA — (b)**: nessuna modifica a `@olonjs/mcp` (il bridge serviva quando non c'era un browser per testare WebMCP; la verifica T12 userà il browser tool direttamente sulla pagina visitor). `@olonjs/mcp` NON entra nella batch di pubblicazione.
-2. **Contract pagina pubblica** (da spec 01): elencare tutto con `surface` discriminante (assunto).
-3. **`sectionId` nel payload submit** (da spec 03): opzionale, default primo form (assunto).
-4. **`inputSchema` opzionale** con default `{type:'object',properties:{}}`; **nomi kebab-case validati** (assunti).
-5. **Versioni publish** (proposta): core `2.0.2→2.1.0`, studio `0.2.2→0.3.0`, cli `3.0.166→3.1.0`, mcp `1.0.155→1.0.156`. Decide l'utente.
-6. **Slug tenant scaffold**: proposto `webmcp-demo` in `/home/dev/temp/`. Confermare.
+2. **Contract pagina pubblica** (da spec 01): elencare tutto con `surface` discriminante — **verificato T12**: contract `/form` emette `update-section/admin`, `save/admin`, `submit-form/public`.
+3. **`sectionId` nel payload submit** (da spec 03): opzionale, default primo form — **verificato T12**: `section: form-demo` dedotto dal form.
+4. **`inputSchema` opzionale** con default `{type:'object',properties:{}}`; **nomi kebab-case validati** — **verificato**: `submit-form` validato; errori Zod leggibili via tool.
+5. **Versioni publish**: **RISOLTA dall'utente** — `npm run release:enterprise` (numerazione patch, niente minor bump). Pubblicate: `@olonjs/core 2.0.3`, `@olonjs/studio 0.2.3`, `@olonjs/react 0.2.3`, `@olonjs/next 0.0.15`, `@olonjs/cli 3.0.167` (propagazione registry ~90s).
+6. **Slug tenant scaffold**: `webmcp-demo` in `/home/dev/temp/` — **eseguito T11**.
 
 ---
 
@@ -58,8 +58,8 @@ npm publish -w @olonjs/cli       # proposta 3.1.0 (DNA rigenerato in T9)
 (Versioni e ordine decisi dall'utente. `@olonjs/mcp` escluso: OQ#1 risolta con (b).)
 
 **Acceptance criteria:**
-- [ ] Versioni confermate dall'utente e pubblicate su npm
-- [ ] `npm view @olonjs/core version` ecc. mostrano le nuove versioni
+- [x] Versioni confermate dall'utente e pubblicate su npm — `release:enterprise`: core 2.0.3 · studio 0.2.3 · react 0.2.3 · next 0.0.15 · cli 3.0.167
+- [x] `npm view @olonjs/core version` ecc. mostrano le nuove versioni (verificato, propagazione ~90s)
 
 **Dependencies:** T9 · **Scope:** utente
 
@@ -68,13 +68,13 @@ npm publish -w @olonjs/cli       # proposta 3.1.0 (DNA rigenerato in T9)
 **Description:** `cd /home/dev/temp && npx @olonjs/cli new tenant webmcp-demo --template next` (slug proposto, confermare). Il tenant nasce con il nuovo DNA (submit tool nella capsule form-demo) e dipende dalle versioni npm pubblicate. Config env: `.env.local` con `NEXT_PUBLIC_OLONJS_CLOUD_URL` (valore per la prova, indicato dall'utente) — nessuna chiave in chat/repo.
 
 **Acceptance criteria:**
-- [ ] Tenant creato in `/home/dev/temp/webmcp-demo`, `npm install` verde
-- [ ] `package.json` del tenant pinna le versioni pubblicate (non workspace/link)
-- [ ] `npm run dev` parte; `/form` renderizza form-demo
+- [x] Tenant creato in `/home/dev/temp/webmcp-demo`, `npm install` verde (eseguito dal CLI)
+- [x] `package.json` del tenant pinna le versioni pubblicate (core ^2.0.3, react ^0.2.3, studio ^0.2.3, next ^0.0.15 — nessun workspace/link)
+- [x] `npm run dev` parte; `/form` renderizza form-demo (HTTP 200)
 
 **Verification:**
-- [ ] `npm run build` del tenant verde
-- [ ] Check manuale: pagina `/form` carica
+- [x] `npm run build` del tenant verde (5.8s, 6/6 pagine statiche)
+- [x] Check manuale: pagina `/form` carica; DNA contiene i nuovi file (`webmcpTools.ts`, `submitFormTool.ts`, `resolvePublicToolNames.ts`)
 
 **Dependencies:** T10 · **Files:** solo `/home/dev/temp/webmcp-demo/**` (fuori dal repo) · **Scope:** S
 
@@ -83,13 +83,13 @@ npm publish -w @olonjs/cli       # proposta 3.1.0 (DNA rigenerato in T9)
 **Description:** Sul tenant scaffoldato: bridge MCP (con flag visitor se approvato) → `listTools` sulla pagina con form-demo contiene `submit-form` → `executeTool('submit-form', {name,email,message})` → POST a `{CLOUD_URL}/form/send` osservato → risultato ok. Documentare la prova.
 
 **Acceptance criteria:**
-- [ ] `submit-form` presente in `listTools` solo sulla pagina con form-demo
-- [ ] Esecuzione reale osservata: URL/header/payload corretti
-- [ ] Payload invalido → errore tool leggibile
+- [x] `submit-form` presente in `listTools` solo sulla pagina con form-demo (`/form`: `["submit-form"]`; home: `[]`)
+- [x] Esecuzione reale osservata: POST `{CLOUD_URL}/form/send` con Bearer + Idempotency-Key + payload completo (echo server: `/tmp/olon-echo.log`)
+- [x] Payload invalido → errore tool leggibile (issues Zod `too_small`/`invalid_format`)
 
 **Verification:**
-- [ ] Prova manuale con bridge MCP (o browser tool se OQ #1 risolta con (b))
-- [ ] Report finale in chat con evidenze
+- [x] Prova con browser tool sulla pagina visitor (OQ #1 risolta con (b))
+- [x] Report finale in chat con evidenze
 
 **Dependencies:** T11 · **Scope:** S (esecuzione + report)
 
