@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <a href="https://olonjs.io">
+  <a href="https://olonjs.com">
     <img src="https://github.com/olonjs/npm-jpcore/blob/main/brand/mark/olon-mark-dark-256.png" width="120" height="120" alt="OlonJS Logo">
   </a>
 </p>
@@ -34,6 +34,7 @@ This repository contains the OlonJS stack:
 - `packages/react`: React rendering bindings (`@olonjs/react`)
 - `packages/studio`: schema-driven Studio editor (`@olonjs/studio`)
 - `packages/next`: Next.js App Router host binding (`@olonjs/next`)
+- `packages/sources`: external collection sources + policy decorators (`@olonjs/sources`)
 - `packages/mcp`: local MCP server bridge (`@olonjs/mcp`)
 - `packages/cli`: tenant generator (`@olonjs/cli`)
 - `packages/stack`: dependency manifest (`@olonjs/stack`)
@@ -53,7 +54,7 @@ Websites are currently built for humans (HTML-heavy, fragmented). AI agents stru
 -   **Schema-Driven Contracts:** Zod-validated content structures defined by the tenant. The schema is the API.
 -   **Sovereign Architecture:** A core JavaScript engine that orchestrates the runtime state and deterministic rendering of polymorphic web content.
 
-## 📦 Monorepo Structure (Nx + Workspaces)
+## 📦 Monorepo Structure (npm workspaces)
 
 This repository manages the entire OlonJS ecosystem:
 
@@ -61,6 +62,7 @@ This repository manages the entire OlonJS ecosystem:
 - **`packages/react` (@olonjs/react):** React rendering bindings (visitor engine, config/theme providers, cloud save).
 - **`packages/studio` (@olonjs/studio):** The schema-driven Studio editor (FormFactory, AdminSidebar, Stage).
 - **`packages/next` (@olonjs/next):** Next.js App Router host binding (RSC visitors + admin island).
+- **`packages/sources` (@olonjs/sources):** External collection sources with declarative policy decorators (cache/retry/fallback) — never in core.
 - **`packages/mcp` (@olonjs/mcp):** Local MCP server bridge for Zero-UI tenant automation via Playwright.
 - **`packages/cli` (@olonjs/cli):** The primary entry point for developers. Scaffolds new tenants by projecting DNA templates.
 - **`packages/stack` (@olonjs/stack):** Version manifest package to keep dependency policy aligned.
@@ -72,9 +74,9 @@ This repository manages the entire OlonJS ecosystem:
 ### Scaffolding a new Tenant
 The only command you need to start a new project with the OlonJS DNA:
 ```bash
-npx @olonjs/cli new tenant my-agentic-site --template alpha
+npx @olonjs/cli new tenant my-agentic-site --template next
 ```
-*Supported templates: `alpha` (default).*
+*Supported templates: `next`, `vite`, `alpha` (default). In non-interactive shells (CI/agents) `--template` is required.*
 
 ### Local Monorepo Development
 ```bash
@@ -90,8 +92,9 @@ npm run dev
 - `npm run dev`: run `tenant-alpha` in dev mode
 - `npm run build`: build `tenant-alpha`
 - `npm run build:all`: run `build` for all workspaces (if script exists)
-- `npm run check:templates`: validate CLI template assets (`alpha`)
-- `npm run dist:dna:all`: regenerate DNA via tenant SOT (`tenant-alpha`)
+- `npm run check:templates`: validate all CLI template assets (`alpha` + `next`)
+- `npm run dist:dna:all`: regenerate DNA via tenant SOTs (`tenant-alpha` + `tenant-next`)
+- `npm run test:boundary`: enforce the ADR-0016 package boundary graph
 - `npm run release`: legacy release flow (`scripts/release.js`)
 - `npm run release:enterprise`: gated release flow (`check:templates` + `dist:dna:all` + `release`)
 
@@ -100,6 +103,7 @@ npm run dev
 DNA is generated from tenant apps, not edited manually:
 
 - `apps/tenant-alpha` -> template `alpha`
+- `apps/next` -> template `next`
 
 Each source app owns its own `dist` script.
 Root `dist:dna:all` delegates to those `dist` scripts.
@@ -109,20 +113,22 @@ Root `dist:dna:all` delegates to those `dist` scripts.
 
 Detailed technical documentation is available in the `docs/` directory:
 
-### Specs 1.6
-- **[OlonJS Specs_V_1_6](./specs/olonjsSpecs_V_1_6.md)**
+### Specs 2.0
+- **[Specs 2.0 — Index](./specs/2.0/INDEX.md):** Entry point of the modular protocol set (13 protocols + ComplianceModel + Appendix): reasoned reading order, dependency graph, and per-protocol versions.
 
 ### Core Architecture & CLI
 - **[Architecture](./docs/ARCHITECTURE.md):** Monorepo layout, package responsibilities, and DNA regeneration flow.
 - **[CLI Contract](./docs/CLI.md):** Command surface, template resolution, and generation pipeline.
 - **[Templates Governance](./docs/TEMPLATES.md):** Rules for managing DNA source of truth and conformance checks.
 - **[WebMCP (Browser API)](./docs/webmcp.md):** The Agent-Native browser API for Zero-UI mutations and programmatic exploration.
+- **[MCP Bridge Guide](./docs/mcp-guide.md):** Local MCP server bridge for Studio automation.
 - **[External Collection Sources](./docs/sources.md):** Project external systems of record (catalog, PIM, …) into the OlonJS contract (`@olonjs/sources`).
+- **[Canonical JSON Schemas](./docs/canonical-schemas-howto.md):** How to evolve the public `schemas/v1` contract (Zod SOT → `bump:all`).
 
-### Onboarding & Governance
-- **[Client Onboarding](./docs_governance_en.md):** Guide for graphics and data development.
-- **[Governance Path](./docs/docs_governance_en.md):** Full CMS integration (Studio, ICE, Form Factory, IDAC).
-
+### Decisions & Governance
+- **[ADR Index](./docs/decisions/):** Architecture Decision Records.
+- **[Client Onboarding](./docs/docs_governance_en.md):** Guide for graphics and data development.
+- **[Governance Flows](./docs/flows/):** Full CMS integration (Studio, ICE, Form Factory, IDAC).
 
 ### Ops & Maintenance
 - **[Publishing & Release](./docs/PUBLISHING.md):** Operational source of truth for NPM releases and DNA sync.
@@ -130,7 +136,7 @@ Detailed technical documentation is available in the `docs/` directory:
 
 ## 🛠️ Technical Stack
 - **Runtime:** React 19, TypeScript, Zod v4 (`^4.6.0`).
-- **Build:** Vite 6 + Tailwind CSS v4.
+- **Build:** Vite 6 (tenant `alpha`) + Next.js 15 (tenant `next`) + Tailwind CSS v4.
 - **Protocol:** WebMCP (Model Context Protocol) ready via deterministic JSON endpoints.
 
 ## 🌐 JavaScript Ecosystem Integration
@@ -141,8 +147,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-**Built for the Agentic Web by the OlonJS Team.**  
+**Built for the Agentic Web by the OlonJS Team.**
 [olonjs.io](https://olonjs.io)
 
 ---
-
