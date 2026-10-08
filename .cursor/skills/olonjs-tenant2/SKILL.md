@@ -18,31 +18,9 @@ Read code first. Treat documents as secondary unless they help interpret code th
 
 ## Architecture Specifications
 
-**Normative:** OlonJS Architecture Specifications **v1.6**  
+The normative protocol set lives in `references/` — **start from `references/INDEX.md`**: reasoned reading order, dependency graph, and the single source of truth for per-protocol versions (MTRP 1.3 · JSP 1.10 · TBP 1.2 · CIP 1.7 · ECIP 1.6 · IDAC 1.2 · TOCC 1.1 · BSDS 1.1 · ASC 1.1 · JEB 1.3 · JAP 1.4 · WTP 1.0 · COP 1.1, plus ComplianceModel and Appendix).
 
-
-
-The OlonJS Architecture Specifications **v1.6** are expressed through the specs contained in the reference folder
-
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\ASC_1.1.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\BSDS_1.1.md" ` 
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\ComplianceModel.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\COP_v1.1.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\ECIP.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\IDAC_1.2.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JAP_1.4.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JEB_1.3.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\JSP_1.10.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\MTRP_1.3.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\TBP_1.2.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\TOCC_1.1.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\WTP_1.0.md" `
-- `"\\wsl.localhost\Ubuntu\home\dev\npm-jpcore\.cursor\skills\olonjs-tenant2\references\Appendix.md" `
-
-
-
-
-Key v1.6 laws that agents must not ignore:
+Key architectural laws that agents must not ignore:
 
 - `@olonjs/core` is a **token transporter/publisher**, not the semantic authority for tenant theme vocabulary
 - Theme flattening is explicit and normative (`tokens.colors.primary` → `--theme-colors-primary`)
@@ -177,7 +155,7 @@ Every View must attach these attributes on editable elements:
 
 `data-section-id` and `data-jp-section-overlay` are injected by Core — not by the tenant.
 
-## Path-Based Selection (ECIP v1.6 / JAP v1.3)
+## Path-Based Selection (ECIP v1.6 / JAP v1.4)
 
 Nested targeting uses `SelectionPath` — an array of `SelectionPathSegment`:
 
@@ -339,4 +317,4 @@ When you receive a OlonJS tenant task:
 3. Prefer fixing the tenant contract before touching visual polish.
 4. Keep generated and deterministic workflows reproducible.
 5. State assumptions when inferring intended branded output from examples.
-6. When in doubt about a theme, menu, or selection pattern, consult `specs/olonjsSpecs_V_1_6.md`.
+6. When in doubt about a theme, menu, or selection pattern, consult `references/INDEX.md`.
