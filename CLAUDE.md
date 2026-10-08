@@ -8,7 +8,7 @@ Il nome viene da "holon": ogni sito è autonomo e completo, ma parte di una rete
 
 Ogni scelta tecnica — Zod schemas, `ui:*` descriptors, `data-jp-*` DOM attributes, IDs stabili — è parte del contratto che rende ogni sezione ispezionabile e operabile da un agente AI.
 
-Specs di riferimento: **`specs/2.0/`** (set modulare per-protocollo) + `specs/2.0/ComplianceModel.md` (architectural law vs limitazioni vs tenant drift) e `specs/2.0/Appendix.md` (annex code-generation).
+Specs di riferimento: **`specs/2.0/`** (set modulare per-protocollo — punto d'ingresso: **`specs/2.0/INDEX.md`**, index ragionato con grafo dipendenze e ordine di lettura) + `specs/2.0/ComplianceModel.md` (architectural law vs limitazioni vs tenant drift) e `specs/2.0/Appendix.md` (annex code-generation).
 
 ---
 
