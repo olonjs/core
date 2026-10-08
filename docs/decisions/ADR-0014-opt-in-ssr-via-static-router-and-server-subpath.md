@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed — pending implementation and verification (2026-06-04)
+Superseded by ADR-0017 (Next.js binding — RSC visitors + admin client island) and ADR-0016 (rendering moved out of core into the browser-only `@olonjs/react`, which has no `createStaticRouter`/hydration path). SSR is delivered via Next RSC rendering of tenant Views (`apps/next/app/[[...slug]]/page.tsx`) instead of a core `/server` subpath. Previously: Proposed — pending implementation and verification (2026-06-04). Supersession recorded 2026-10-08.
 
 ## Date
 

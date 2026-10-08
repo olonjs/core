@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed — pending implementation and verification (2026-06-04)
+Superseded by ADR-0017 (Next.js binding — RSC visitors + admin client island) and ADR-0016. The initial-data/hydration handoff specified here targets the core `createStaticRouter` path of ADR-0014, which was never implemented; SSR is delivered via Next RSC instead. Previously: Proposed — pending implementation and verification (2026-06-04). Supersession recorded 2026-10-08.
 
 ## Date
 

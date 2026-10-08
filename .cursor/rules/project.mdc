@@ -11,24 +11,37 @@ AI-native content infrastructure for Vercel & Vite. Deterministic, sovereign, gi
 
 | Package | Path | npm name | Purpose |
 |---------|------|----------|---------|
-| **Core** | `packages/core` | `@olonjs/core` | Runtime engine consumed by tenant apps |
+| **Core** | `packages/core` | `@olonjs/core` | Contract/kernel types, `$ref` resolution, theme flattening, WebMCP contracts, routing helpers — zero React |
+| **React** | `packages/react` | `@olonjs/react` | `JsonPagesEngine`, rendering, theme runtime, HotSave |
+| **Studio** | `packages/studio` | `@olonjs/studio` | Editor UI: `FormFactory`, `StudioStage`, Inspector |
+| **Next** | `packages/next` | `@olonjs/next` | Next.js host binding (server loaders + `AdminIsland`) |
+| **MCP** | `packages/mcp` | `@olonjs/mcp` | Local MCP bridge (Playwright → WebMCP) |
+| **Sources** | `packages/sources` | `@olonjs/sources` | External collection sources + policy decorators |
 | **CLI** | `packages/cli` | `@olonjs/cli` | Tenant scaffolding from DNA templates |
 | **Stack** | `packages/stack` | `@olonjs/stack` | Version manifest for dependency alignment |
-| **Tenant Alpha** | `apps/tenant-alpha` | — | Reference DNA template source (default) |
+| **Compat** | `packages/jsonpages-{core,stack,cli}-compat` | `@jsonpages/*` | Rebrand compatibility bridges |
+| **Tenant Alpha** | `apps/tenant-alpha` | — | Reference DNA template source (Vite) |
+| **Tenant Next** | `apps/next` | — | Reference DNA template source (Next.js App Router) |
+| **Landing** | `apps/olonjs.io` | — | Marketing site + canonical v1 JSON Schemas |
 
-## Core / Tenant split (fundamental invariant)
+## Engine / Tenant split (fundamental invariant, post-ADR-0016)
 
-**Core owns:** routing, `/admin`, `/admin/preview`, preview stage, studio state, inspector/form factory, engine behavior.
+The engine is three packages; the tenant owns everything else.
+
+**Engine owns:** contract & resolution (`@olonjs/core`), routing + rendering engine (`@olonjs/react`), editor UI `/admin` + inspector + form factory (`@olonjs/studio`), Next server helpers (`@olonjs/next`).
 
 **Tenant owns:** sections (components), schemas, type augmentation, page/config JSON data, theme/design layer, workflow scripts.
 
 The tenant does NOT implement the CMS. It implements the tenant protocol consumed by the engine.
+
+Boundary law (ADR-0016, enforced by `npm run test:boundary` → `scripts/check-package-boundaries.mjs`): core never imports react/studio; studio never imports react; react → studio only via the single dynamic import in `packages/react/src/engine/StudioRoute.tsx`.
 
 ## DNA generation (source of truth)
 
 Template DNA is generated from source apps, never edited manually:
 
 - `apps/tenant-alpha` -> `packages/cli/assets/templates/alpha/`
+- `apps/next` -> `packages/cli/assets/templates/next/`
 
 Commands:
 - `npm run dist:dna:all` — regenerate all template DNA
@@ -37,15 +50,17 @@ Commands:
 
 ## Build tools
 
-- Vite 6 for core (library mode) and tenant apps
-- `@vitejs/plugin-react`, `vite-plugin-dts`, `@tailwindcss/vite`
-- TypeScript with ES2020 target, bundler module resolution
+- Vite 6 for library packages (`@olonjs/core`, `react`, `studio`, `sources`) and the Vite tenant apps
+- Next.js 15 App Router for `apps/next`
+- `@vitejs/plugin-react`, `vite-plugin-dts`, Tailwind CSS 4
+- TypeScript ES2020 target, bundler module resolution
 - Path alias: `@/*` -> `./src/*`
 
 ## Key specs and docs
 
-- `specs/olonjsSpecs_V_1_5.md` — protocol specification (v1.5, normative for tenants / Studio)
-- `docs/ARCHITECTURE.md` — monorepo architecture
+- `specs/2.0/` — modular protocol specs (MTRP, JSP, TBP, ECIP, IDAC, TOCC, BSDS, ASC, JEB, COP, JAP + ComplianceModel, Appendix); mirrored byte-identical in `.cursor/skills/olonjs-tenant2/references/`
+- `specs/1.6.1/olonjsSpecs_V_1_6_1.md` — monolithic v1.6.1 spec (draft)
+- `docs/ARCHITECTURE.md` — monorepo architecture (current)
 - `docs/CLI.md` — CLI behavior and template resolution
 - `docs/TEMPLATES.md` — template governance and DNA generation
 - `docs/PUBLISHING.md` — publish/release operations
@@ -61,4 +76,4 @@ Aliases: `olonjs` (primary), `jsonpages` (compatibility).
 ## Caveats
 
 - On Windows UNC paths (`\\wsl.localhost\...`), npm/cmd may fail; use WSL shell.
-- `scripts/release.js` only updates `tenant-alpha` dep pin during publish.
+- `scripts/release.js` pins workspace dependency versions during publish.

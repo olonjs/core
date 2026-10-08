@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed (2026-07-16)
+Accepted — implemented and normative. `packages/react` and `packages/studio` exist as separate npm workspaces (published `0.2.2`), the split is enforced by `scripts/check-package-boundaries.mjs` (`npm run test:boundary`), and `scripts/release.js` publishes the three-package graph in topological order. Status previously read "Proposed (2026-07-16)"; updated 2026-10-08.
 
 ## Date
 

@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted (2026-05-09) — implemented in `@olonjs/core` v1.1.0. Both bundles publish via `npm run build -w @olonjs/core` (`scripts/build-dual.mjs`). Tenants `apps/olonjs.io` and `apps/tenant-alpha` migrated to `@olonjs/core/runtime` for the visitor path with `JsonPagesEngine` lazy-loaded on `/admin`. Boundary check (`packages/core/scripts/check-runtime-decoupling.mjs`) enforced via `npm run test:boundary`. Production deploy of `apps/olonjs.io` confirms the decoupled artifacts on `gh-pages`.
+Superseded by ADR-0016 (2026-07-16) — the `/runtime` dual-bundle mechanism is retired: `@olonjs/core` ships a single `"."` export, no subpath, no `runtime-entry.ts`, no dual build.
+
+Historical record: Accepted (2026-05-09), implemented in `@olonjs/core` v1.1.0. Both bundles published via `npm run build -w @olonjs/core` (`scripts/build-dual.mjs`). Tenants `apps/olonjs.io` and `apps/tenant-alpha` migrated to `@olonjs/core/runtime` for the visitor path with `JsonPagesEngine` lazy-loaded on `/admin`. Boundary check (`packages/core/scripts/check-runtime-decoupling.mjs`) enforced via `npm run test:boundary`. Production deploy of `apps/olonjs.io` confirmed the decoupled artifacts on `gh-pages`. Supersession recorded 2026-10-08.
 
 ## Date
 
