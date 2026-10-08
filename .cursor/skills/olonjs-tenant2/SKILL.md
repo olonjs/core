@@ -79,12 +79,13 @@ Expect these files to move together:
 - `src/components/<section>/index.ts`
 - `src/lib/ComponentRegistry.tsx`
 - `src/lib/schemas.ts`
-- `src/lib/addSectionConfig.ts`
+- `src/lib/addSectionConfig.ts` ← **MOST-FORGOTTEN FILE: without an entry here the section never appears in the Studio Add-Section panel — even when View, schema and registry are all correct**
 - `src/types.ts`
 - `src/data/pages/**/*.json`
 - `src/data/config/site.json`
 - `src/data/config/theme.json`
 - `src/data/config/menu.json`
+- `src/data/collections/<name>/<name>.json` (collection-backed sections, see Collections)
 
 MANDATORY: if a section type changes, check all of the files above before concluding the task is done.
 
@@ -179,6 +180,7 @@ Legacy flat fields (`itemPath`, `itemField`, `itemId` as top-level) are **transi
 | `ui:list` | `z.array(...)` | Array editor with add/remove/reorder | Repeating items (cards, links, features) — items must extend `BaseArrayItem` |
 | `ui:image-picker` | `z.object({ url, alt? })` | Image picker + upload | Any image field — always use `ImageSelectionSchema` from `@olonjs/core` |
 | `ui:icon-picker` | `z.string()` | Icon selector | Icon name fields |
+| `ui:collection-ref:<source>` | string (collection name) | Collection reference picker | Binding a section to a collection source (COP) — tenant-level extension, see Collections |
 
 **Rules:**
 - `.describe('ui:...')` goes on the **field**, not on the parent object
@@ -207,12 +209,47 @@ count: z.number().describe('ui:slider'),             // does not exist
 image: z.string().describe('ui:image'),              // wrong — use ImageSelectionSchema
 ```
 
+## Persistence Modes
+
+Three save stories, selected by env (Next reads `NEXT_PUBLIC_*` as direct property access):
+
+| Mode | Condition | Behavior |
+|---|---|---|
+| Local | No `NEXT_PUBLIC_OLONJS_CLOUD_URL` | Saves via `/api/save-to-file` (file-based dev mode) |
+| HotSave | Cloud URL + API key, no SAVE2REPO | Direct KV cloud save |
+| Save2Repo | `NEXT_PUBLIC_OLONJS_SAVE2REPO=true` | Git commit via cloud bridge; loads from published static JSON |
+
+Env vars: `NEXT_PUBLIC_OLONJS_CLOUD_URL`, `NEXT_PUBLIC_OLONJS_API_KEY`, `NEXT_PUBLIC_OLONJS_SAVE2REPO`.
+
+**Pitfall:** with the cloud URL set but no `SAVE2REPO=true`, the server boots `live` and self-fetches its own cloud URL → "Live render unavailable". For local development always pair the cloud URL with `SAVE2REPO=true` (static boot from disk).
+
+## Collections (COP v1.1)
+
+Collections are content sets independent from pages, consumed via `$ref` bindings.
+
+- Data: `src/data/collections/<name>/<name>.json` (e.g. `libri/libri.json`) — items carry stable `id` (`BaseCollectionItem`)
+- Registry: tenant `CollectionRegistry` maps collection name → items schema
+- Binding: a section or page binds via `$ref` (e.g. `"items": { "$ref": "../collections/libri/libri.json" }`); Core resolves it, including `collection:current` for route-concrete pages (item detail routes)
+- Editor: the tenant-level descriptor `ui:collection-ref:<source>` renders the collection picker in the Form Factory
+- External/procedural sources (ADR-0018): `src/sources/<name>.ts` with `defineCollectionSource` + policy decorators — lives in `@olonjs/sources`, never in core
+
+Full contract: `references/COP_v1.1.md`.
+
+## Form Submissions (ADR-0002)
+
+A section that accepts submissions (contact forms, signups):
+
+- Schema: declare a submission schema in the capsule (e.g. `FormDemoSubmissionSchema` = `{ name, email, message }`) and register it in the tenant's `SECTION_SUBMISSION_SCHEMAS` keyed by section type
+- Recipient: mixin `WithFormRecipient` adds the recipient email field; the View's `<form>` carries `data-olon-recipient` with the value
+- Runtime: the visitor submits via the WebMCP tool `submit-form` (WTP reference plugin) — it validates against the section's submission schema, then POSTs to the tenant-declared cloud path with Bearer + Idempotency-Key; invalid payloads return readable Zod issues before any request
+
 ## What Good Work Looks Like
 
 A good tenant change:
 
 - stays inside tenant boundaries and if the issue is truly in `@olonjs/core`, `@olonjs/react`, or `@olonjs/studio` you communicate the issue to the user without ever touching those packages.
 - keeps schema, defaults, registry, and type augmentation aligned
+- registers every new section in `addSectionConfig.ts` — no entry, no Add-Section panel entry
 - preserves editability for strings, lists, nested objects, CTAs, and image fields
 - uses `ImageSelectionSchema`-style image fields when the content is image-driven
 - keeps page content JSON-first
@@ -226,12 +263,24 @@ A suspicious tenant change:
 - adds visual complexity without data bindings (`data-jp-field`, `data-jp-item-id`)
 - introduces fields into JSON that are not represented in schema
 - changes a section view without updating defaults or types
+- adds a section without the `addSectionConfig.ts` entry
 - hardcodes themed values as literals (`bg-blue-500`, `text-zinc-100`, `rounded-[7px]`) as primary styled contract
 - reads `theme.json` directly inside a View component
 - inlines menu arrays in `site.json` instead of using `$ref`
 - uses index as array item identity instead of stable `id`
 - treats `header`/`footer` as a separate component system rather than ordinary shell-scoped capsules
 - optimizes legacy context awareness at the expense of simpler, reliable editability
+
+## Bootstrap & Run
+
+From a fresh scaffold to a running, verified tenant:
+
+1. **Scaffold:** `npx @olonjs/cli new tenant <slug> --template next` (non-TTY requires `--template`)
+2. **Env:** `.env.local` with the persistence mode you want (see Persistence Modes; locally: cloud URL + key + `SAVE2REPO=true`)
+3. **Run:** `npm run dev` → `http://localhost:3000`
+4. **Build:** `npm run build` must stay green (green-build standard, JAP §6)
+5. **Test:** `npx vitest run` — use the `@vitest-environment jsdom` pragma for tests touching `document` (executors, DOM bindings)
+6. **Verify editability:** open `/admin`, add the section from the Add-Section panel, click through every editable element in the Inspector, save, reload — the section must render the saved data
 
 ## Workflow 1: Base Tenant → Branded Tenant
 
@@ -276,7 +325,7 @@ When adding a new section type:
 1. Create `View.tsx`, `schema.ts`, `types.ts`, `index.ts`.
 2. Register the section in `src/lib/ComponentRegistry.tsx`.
 3. Register the schema in `src/lib/schemas.ts`.
-4. Add defaults and label in `src/lib/addSectionConfig.ts`.
+4. **Add defaults and label in `src/lib/addSectionConfig.ts` — MOST-FORGOTTEN STEP. Symptom when skipped: the section never appears in the Studio Add-Section panel even though View, schema and registry are all correct.** Check this file FIRST when "the section cannot be added in Studio".
 5. Extend `SectionComponentPropsMap` and module augmentation in `src/types.ts`.
 6. Add `data-jp-field` on every editable scalar and `data-jp-item-id` / `data-jp-item-field` on every array item in the View.
 7. Add or update page JSON (or `site.json` for shell-scoped sections) using the new section type.
@@ -290,23 +339,31 @@ When changing an existing section:
 5. Verify the inspector still has a path to edit the content.
 6. If the section is themed, verify the 4-layer theme chain is intact.
 
-## Workflow 3: Images, Rich Content, Nested Routes
+When removing a section type:
 
-Images:
+1. Remove the entry from `src/lib/addSectionConfig.ts` FIRST — otherwise Studio keeps offering a dead section.
+2. Remove from `src/lib/ComponentRegistry.tsx` and `src/lib/schemas.ts`.
+3. Remove the module augmentation entry in `src/types.ts`.
+4. Remove the capsule directory and any page/site JSON instances (and orphaned data).
+5. Verify `/admin` no longer lists the type and every page still builds.
 
-- Prefer structured image objects compatible with tenant base schemas (`ImageSelectionSchema`).
-- Assume the core supports image picking and upload flows.
-- The tenant is responsible for declaring image fields in schema and rendering them coherently.
+Content types within sections:
 
-Rich editorial content:
+- **Images:** prefer structured image objects compatible with tenant base schemas (`ImageSelectionSchema`); the tenant declares image fields in schema and renders them coherently; core supports picking/upload flows.
+- **Rich editorial content:** Tiptap-style sections are tenant-level integrations; page JSON with `type: "tiptap"` is a runtime usage example — section code is the source of truth.
+- **Nested routes:** files under `src/data/pages/**/*.json` may represent nested slugs; preserve slug/path consistency — never replace file-based routing with manual lists.
 
-- Tiptap-style sections are tenant-level integrations.
-- Treat page JSON using `type: "tiptap"` as runtime usage examples, and section code as the real source of truth.
+## Workflow 3: Publish A Tool (WTP 1.0)
 
-Nested routes:
+Publish a WebMCP tool bound to a section capsule:
 
-- Files under `src/data/pages/**/*.json` may represent nested slugs.
-- Preserve slug/path consistency and do not replace file-based routing with manual lists.
+1. **Declare the def** in the capsule: `webmcpTools.ts` exports `webmcpTools: WebMcpToolDef[]` — `{ name: kebab-case, description, surface: 'admin'|'public', inputSchema: Schema.toJSONSchema(), annotations? }`. Serializable data only.
+2. **Re-export** it from the capsule `index.ts`.
+3. **Aggregate** in the tenant registry `src/lib/webmcp/toolRegistry.ts`: add the capsule's tools to `sectionPublicTools` (names per section type) and `declaredPublicTools` (defs).
+4. **Write the executor client-side** (`src/lib/webmcp/` or the capsule): validate with the schema first, then perform the side effect; register it into `visitorToolDefs` via a side-effect import from the visitor island. **Functions never cross the RSC boundary — only names and defs do.**
+5. **Verify:** the page contract (`/schemas/<page>.schema.json`) lists the tool with its `surface`; on the page containing the section, `listTools()` shows it (public surface only) and `executeTool(name, args)` runs it; invalid payloads return readable Zod issues before any side effect.
+
+Reference implementation: `submit-form` on the `form-demo` capsule (declared path `form/send`, Bearer + Idempotency-Key, consequentialHint).
 
 ## Default Operating Procedure
 
